@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* app/globals.css */
+
+/* ফোন ইনপুটের কাস্টম মিনিমাল স্টাইলিং */
+.custom-phone-wrapper .PhoneInput {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* কান্ট্রি সিলেক্টর ও পতাকার এরিয়া */
+.custom-phone-wrapper .PhoneInputCountry {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding-right: 0.6rem;
+  border-right: 1px solid #e5e5e5;
+  cursor: pointer;
+}
+
+/* ফ্ল্যাগ আইকন সাইজ ও বর্ডার */
+.custom-phone-wrapper .PhoneInputCountryIcon {
+  width: 1.35rem;
+  height: 1rem;
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+/* কান্ট্রি ড্রপডাউন অ্যারো */
+.custom-phone-wrapper .PhoneInputCountrySelectArrow {
+  opacity: 0.45;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-bottom-width: 1.5px;
+  border-right-width: 1.5px;
+  border-color: #171717;
+  transform: rotate(45deg);
+}
+
+/* মূল টেক্সট ইনপুট */
+.custom-phone-wrapper .PhoneInputInput {
+  width: 100%;
+  background: transparent;
+  padding: 0.65rem 0.25rem;
+  font-family: monospace;
+  font-size: 0.875rem;
+  color: #141414;
+  outline: none;
+  border: none;
+}
+
+.custom-phone-wrapper .PhoneInputInput::placeholder {
+  color: #a3a3a3;
+  font-family: inherit;
+}
+
+@media print {
+  body {
+    background-color: white !important;
+  }
+  header,
+  nav,
+  .print\:hidden {
+    display: none !important;
+  }
+}
