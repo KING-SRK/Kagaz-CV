@@ -1,7 +1,7 @@
 // app/dashboard/builder/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import BuilderNavbar from "./_components/BuilderNavbar";
 import IndividualForm, { ResumeData } from "./_components/IndividualForm";
 import PaperPreview from "./_components/PaperPreview";
@@ -9,7 +9,8 @@ import OrganizationForm, { OrgData } from "./_components/OrganizationForm";
 import OrgPaperPreview from "./_components/OrgPaperPreview";
 import { useSearchParams } from "next/navigation";
 
-export default function BuilderPage() {
+// ১. মূল বিল্ডার লজিক একটি সাব-কম্পোনেন্টে রাখা হলো
+function BuilderContent() {
   const searchParams = useSearchParams();
   const [kagazId, setKagazId] = useState<string>("");
   const [role, setRole] = useState<string>("individual");
@@ -83,5 +84,21 @@ export default function BuilderPage() {
         </section>
       </main>
     </div>
+  );
+}
+
+// ২. মূল পেজে Suspense দিয়ে BuilderContent র‍্যাপ করা হলো
+export default function BuilderPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#FDFCFB] flex flex-col items-center justify-center font-mono text-xs text-neutral-500 gap-2">
+          <div className="w-5 h-5 border-2 border-neutral-400 border-t-neutral-800 rounded-full animate-spin" />
+          <span>Loading...</span>
+        </div>
+      }
+    >
+      <BuilderContent />
+    </Suspense>
   );
 }
