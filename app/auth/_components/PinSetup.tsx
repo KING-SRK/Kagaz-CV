@@ -61,7 +61,7 @@ export default function PinSetup({
       const newId = generateKagazId(fullName);
 
       // ৩. Supabase-এ প্রোফাইল ইনসার্ট
-      const { data, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from("profiles")
         .insert([
           {
@@ -228,7 +228,7 @@ export default function PinSetup({
 
           <button
             type="button"
-            onClick={() => router.push(`/dashboard/builder?type=${role}`)}
+            onClick={() => router.push("/dashboard")}
             className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3.5 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors"
           >
             <span>Go to Builder</span>

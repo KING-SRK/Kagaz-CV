@@ -59,22 +59,7 @@ export default function HeroSection() {
                 ease: [0.16, 1, 0.3, 1],
               }}
               className="flex flex-wrap items-center gap-6 pt-2"
-            >
-              <Link
-                href="/dashboard/builder"
-                className="group inline-flex items-center gap-3 bg-neutral-950 text-white px-8 py-4 text-xs uppercase tracking-wider font-medium transition-all duration-300 hover:bg-neutral-800 shadow-sm"
-              >
-                <span>Build Free Profile</span>
-                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </Link>
-
-              <Link
-                href="/explore"
-                className="text-xs uppercase tracking-wider font-medium text-neutral-600 hover:text-neutral-950 transition-colors border-b border-neutral-300 pb-0.5"
-              >
-                Explore Directory
-              </Link>
-            </motion.div>
+            ></motion.div>
 
             {/* ৩টি পরিষ্কার কি-ফিচার */}
             <motion.div

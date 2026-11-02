@@ -77,7 +77,7 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
       localStorage.setItem("kagaz_role", profile.role);
 
       // বিল্ডারে রিডাইরেক্ট
-      router.push(`/dashboard/builder?type=${profile.role}`);
+      router.push("/dashboard");
     } catch (err) {
       console.error("DEBUG ERROR DETAILS:", err);
       if (err instanceof Error) {
