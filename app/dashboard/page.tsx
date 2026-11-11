@@ -1,52 +1,39 @@
 // app/dashboard/page.tsx
-import { Fingerprint } from "lucide-react";
-import PrimaryIdentity from "./_components/PrimaryIdentity";
-import CardSection from "./_components/CardSection";
-import ProfileDetailsSection from "./_components/ProfileDetailsSection";
-import IdentityBadge from "./_components/IdentityBadge"; // নতুন কম্পোনেন্ট
+"use client";
 
-export default function DashboardPage() {
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import { getIndividualProfile } from "@/lib/individualService";
+
+export default function DashboardRedirect() {
+  const router = useRouter();
+
+  useEffect(() => {
+    async function checkRoleAndRedirect() {
+      const activeId = localStorage.getItem("kagaz_active_id");
+
+      if (!activeId) {
+        router.replace("/auth");
+        return;
+      }
+
+      const { data } = await getIndividualProfile(activeId);
+
+      if (data?.role === "organization") {
+        router.replace("/dashboard/organization");
+      } else {
+        router.replace("/dashboard/individual");
+      }
+    }
+
+    checkRoleAndRedirect();
+  }, [router]);
+
   return (
-    <div className="min-h-screen bg-[#FDFCFB] text-neutral-900">
-      <main className="max-w-7xl mx-auto px-6 py-10 space-y-8">
-        {/* ব্যানার হেডার */}
-        <div className="flex items-center justify-between border-b border-neutral-200 pb-5">
-          <div>
-            <span className="text-sm font-mono uppercase tracking-wider font-semibold text-slate-500 flex items-center gap-2">
-              <Fingerprint className="h-4 w-4 text-slate-500" />
-              Verified Primary Identity
-            </span>
-            <h1 className="text-3xl font-serif font-normal text-neutral-950 mt-1">
-              Welcome
-            </h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-mono text-neutral-500 uppercase">
-              Active Network
-            </span>
-          </div>
-        </div>
-
-        {/* মাঝখানে বড় করে শুধু SutraNet ID */}
-        <IdentityBadge />
-
-        {/* ওপরের গ্রিড: বাঁদিকের আইডেন্টিটি + ডানদিকের কার্ড */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          <div className="lg:col-span-6">
-            <PrimaryIdentity />
-          </div>
-
-          <div className="lg:col-span-6">
-            <CardSection />
-          </div>
-        </div>
-
-        {/* নিচের পরপর সেকশন: About -> Location -> Education -> Skills -> Secure Govt ID */}
-        <div className="pt-2">
-          <ProfileDetailsSection />
-        </div>
-      </main>
+    <div className="min-h-screen bg-[#FDFCFB] flex flex-col items-center justify-center gap-3 text-neutral-500 font-mono text-xs">
+      <Loader2 className="h-6 w-6 animate-spin text-neutral-900" />
+      <span>Redirecting to your dashboard workspace...</span>
     </div>
   );
 }

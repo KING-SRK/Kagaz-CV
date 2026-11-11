@@ -56,7 +56,7 @@ export default function SmartCard({
   return (
     <div className="flex flex-col items-center">
       <div
-        className="w-[380px] sm:w-[460px] h-[270px] perspective-[1200px] cursor-pointer group select-none"
+        className="w-95 sm:w-115 h-67.5 perspective-distant cursor-pointer group select-none"
         onClick={() => setIsFlipped(!isFlipped)}
       >
         <div

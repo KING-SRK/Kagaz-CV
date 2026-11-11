@@ -33,7 +33,7 @@ export default function DuoSplitCard({
           <div className="flex items-center gap-3.5 z-10 my-auto">
             <div className="h-16 w-16 sm:h-18 sm:w-18 rounded-full border-2 border-neutral-950 p-0.5 shrink-0 bg-neutral-100 overflow-hidden shadow-xs">
               <Image
-                src={data.avatarUrl || "/hero-portrait.jpg"}
+                src={data.avatarUrl || "/biprajit.jpg"}
                 alt="Card Avatar"
                 width={80}
                 height={80}
@@ -73,7 +73,7 @@ export default function DuoSplitCard({
             ) : (
               <div className="flex justify-between">
                 <span className="text-neutral-400">LOC</span>
-                <span className="font-medium text-neutral-900 truncate max-w-[120px]">
+                <span className="font-medium text-neutral-900 truncate max-w-30">
                   {data.address || "Kolkata"}
                 </span>
               </div>

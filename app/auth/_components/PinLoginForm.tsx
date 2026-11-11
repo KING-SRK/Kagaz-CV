@@ -40,7 +40,7 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
       // ফোন নম্বরের স্পেস বা হাইফেন পরিষ্কার করা
       const cleanDigits = query.replace(/\D/g, "");
 
-      // ইউজার ১০ ডিজিটের সাধারণ ভারতীয় নম্বর দিলে '+91' যুক্ত করা
+      // ইউজার ১০ ডিজিটের সাধারণ ভারতীয় নম্বর দিলে '+91' যুক্ত করা
       let phoneQuery = query;
       if (cleanDigits.length === 10) {
         phoneQuery = `+91${cleanDigits}`;
@@ -48,7 +48,7 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
         phoneQuery = `+${cleanDigits}`;
       }
 
-      // Kagaz ID, Email অথবা Phone (+91 সহ বা ছাড়া) দিয়ে প্রোফাইল খোঁজা
+      // Kagaz ID, Email অথবা Phone দিয়ে প্রোফাইল খোঁজা
       const { data: profile, error: fetchError } = await supabase
         .from("profiles")
         .select("id, kagaz_id, role, pin_hash")
@@ -72,12 +72,22 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
         return;
       }
 
-      // সেশনে আইডি ও রোল সেভ রাখা
-      localStorage.setItem("kagaz_active_id", profile.kagaz_id);
+      // 🛑 ১. অর্গানাইজেশন ফিল্টার (শুধুমাত্র Individual লগইন করতে পারবে)
+      if (profile.role !== "individual") {
+        setError(
+          "Organization dashboard is currently under development. Please log in with an Individual account.",
+        );
+        setLoading(false);
+        return;
+      }
+
+      // 💡 ২. আসল UUID-কে `kagaz_active_id` হিসেবে সেভ রাখা (যাতে ডেটাবেজ খুঁজে পায়)
+      localStorage.setItem("kagaz_active_id", profile.id);
+      localStorage.setItem("kagaz_card_id", profile.kagaz_id);
       localStorage.setItem("kagaz_role", profile.role);
 
-      // বিল্ডারে রিডাইরেক্ট
-      router.push("/dashboard");
+      // ড্যাশবোর্ডে রিডাইরেক্ট
+      router.push("/dashboard/individual");
     } catch (err) {
       console.error("DEBUG ERROR DETAILS:", err);
       if (err instanceof Error) {
@@ -130,7 +140,7 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors disabled:opacity-60 cursor-pointer"
         >
           {loading ? (
             <>
@@ -150,7 +160,7 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
         <button
           type="button"
           onClick={onGoToRegister}
-          className="text-xs text-neutral-500 hover:text-neutral-950 transition-colors"
+          className="text-xs text-neutral-500 hover:text-neutral-950 transition-colors cursor-pointer"
         >
           New user?{" "}
           <span className="underline font-medium">Create Kagaz ID</span>

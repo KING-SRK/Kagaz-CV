@@ -1,14 +1,54 @@
 // components/Navbar.tsx
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { ArrowUpRight, User } from "lucide-react";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function Navbar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const currentType = searchParams.get("type");
+
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [loadingAuth, setLoadingAuth] = useState<boolean>(true);
+
+  // ১. ইউজার অথেন্টিকেশন চেক
+  useEffect(() => {
+    async function checkUserAuth() {
+      // localStorage চেক (Kagaz Custom PIN সেশন)
+      const activeId = localStorage.getItem("kagaz_active_id");
+
+      // Supabase Auth সেশন চেক
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (activeId || user) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
+      setLoadingAuth(false);
+    }
+
+    checkUserAuth();
+
+    // Supabase auth স্টেট পরিবর্তনের লিসেনার
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const activeId = localStorage.getItem("kagaz_active_id");
+      setIsLoggedIn(Boolean(session?.user || activeId));
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   // একটিভ পাথ ও প্যারামিটার ম্যাচিং লজিক
   const isActive = (path: string, queryType?: string) => {
@@ -25,8 +65,8 @@ export default function Navbar() {
     { name: "Home", href: "/", active: isActive("/") },
     {
       name: "Create CV",
-      href: "/dashboard/builder",
-      active: isActive("/dashboard/builder"),
+      href: isLoggedIn ? "/dashboard/individual" : "/auth",
+      active: isActive("/dashboard"),
     },
     {
       name: "Find Talent",
@@ -53,7 +93,7 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* নেভিগেশন লিংকস সাথে একটিভ ইন্ডিকেটর */}
+        {/* নেভিগেশন লিংকস */}
         <nav className="hidden md:flex items-center gap-8 text-xs font-medium uppercase tracking-[0.2em]">
           {navLinks.map((link) => (
             <Link
@@ -66,7 +106,6 @@ export default function Navbar() {
               }`}
             >
               <span>{link.name}</span>
-              {/* একটিভ থাকলে নিচে মিনিমাল কালো আন্ডারলাইন দাগ */}
               {link.active && (
                 <span className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-neutral-950" />
               )}
@@ -74,15 +113,32 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* অ্যাকশন বাটনস */}
-        <div className="flex items-center gap-6">
-          <Link
-            href="/dashboard"
-            className="group inline-flex items-center gap-2 bg-neutral-950 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.15em] text-white shadow-sm transition-all duration-300 hover:bg-neutral-800"
-          >
-            <span>Account</span>
-            <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-          </Link>
+        {/* অ্যাকশন বাটনস (কন্ডিশনাল রেন্ডারিং) */}
+        <div className="flex items-center gap-4">
+          {loadingAuth ? (
+            <div className="h-9 w-24 bg-neutral-100 animate-pulse rounded-xs" />
+          ) : isLoggedIn ? (
+            /* ১. লগইন থাকলে: শুধু Account বাটন ও Logout */
+            <div className="flex items-center gap-3">
+              <Link
+                href="/dashboard"
+                className="group inline-flex items-center gap-2 bg-neutral-950 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.15em] text-white shadow-sm transition-all duration-300 hover:bg-neutral-800 rounded-xs"
+              >
+                <User className="h-3.5 w-3.5 text-neutral-300" />
+                <span>Account</span>
+                <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Link>
+            </div>
+          ) : (
+            /* ২. লগইন না থাকলে: একটাই পরিষ্কার বাটন */
+            <Link
+              href="/auth"
+              className="group inline-flex items-center gap-2 bg-neutral-950 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.15em] text-white shadow-sm transition-all duration-300 hover:bg-neutral-800 rounded-xs"
+            >
+              <span>Sign In / Join</span>
+              <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </Link>
+          )}
         </div>
       </div>
     </header>

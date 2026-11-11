@@ -84,7 +84,7 @@ export default function ObsidianCard({
           <div className="col-span-3 flex flex-col items-center gap-1.5">
             <div className="h-18 w-18 sm:h-20 sm:w-20 rounded-xl bg-neutral-900 border border-neutral-700/90 flex items-center justify-center overflow-hidden text-neutral-400 shadow-[0_4px_12px_rgba(0,0,0,0.5)] relative">
               <Image
-                src={data.avatarUrl || "/hero-portrait.jpg"}
+                src={data.avatarUrl || "/biprajit.jpg"}
                 alt="Avatar"
                 width={100}
                 height={100}

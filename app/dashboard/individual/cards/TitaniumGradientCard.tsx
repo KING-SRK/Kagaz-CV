@@ -16,7 +16,7 @@ export default function TitaniumGradientCard({
   return (
     <>
       {/* ================= FRONT SIDE (PURE BLACK & WHITE GRADIENT) ================= */}
-      <div className="absolute inset-0 w-full h-full rounded-2xl bg-gradient-to-br from-black via-neutral-950 to-white text-white p-5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-neutral-300/40 flex flex-col justify-between overflow-hidden backface-hidden ring-1 ring-white/30">
+      <div className="absolute inset-0 w-full h-full rounded-2xl bg-linear-to-br from-black via-neutral-950 to-white text-white p-5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-neutral-300/40 flex flex-col justify-between overflow-hidden backface-hidden ring-1 ring-white/30">
         {/* খাঁটি সাদা মেটালিক গ্লো ও রিফ্লেকশন ব্লাশ */}
         <div className="absolute -top-24 -left-20 w-80 h-80 bg-white/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -right-16 w-72 h-72 bg-white/30 rounded-full blur-3xl pointer-events-none" />
@@ -78,7 +78,7 @@ export default function TitaniumGradientCard({
           <div className="col-span-3 flex flex-col items-center gap-1.5">
             <div className="h-18 w-18 sm:h-20 sm:w-20 rounded-xl bg-black border-2 border-white/40 p-0.5 shadow-[0_4px_16px_rgba(0,0,0,0.8)] overflow-hidden relative">
               <Image
-                src={data.avatarUrl || "/hero-portrait.jpg"}
+                src={data.avatarUrl || "/biprajit.jpg"}
                 alt="Avatar"
                 width={100}
                 height={100}
@@ -162,7 +162,7 @@ export default function TitaniumGradientCard({
       </div>
 
       {/* ================= BACK SIDE (INVERTED HIGH-CONTRAST B&W) ================= */}
-      <div className="absolute inset-0 w-full h-full rounded-2xl bg-gradient-to-tl from-black via-neutral-950 to-white text-white p-5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-neutral-300/40 flex flex-col justify-between overflow-hidden transform-[rotateY(180deg)] backface-hidden ring-1 ring-white/30">
+      <div className="absolute inset-0 w-full h-full rounded-2xl bg-linear-to-tl from-black via-neutral-950 to-white text-white p-5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-neutral-300/40 flex flex-col justify-between overflow-hidden transform-[rotateY(180deg)] backface-hidden ring-1 ring-white/30">
         {/* ম্যাগনেটিক স্ট্রিপ */}
         <div className="absolute top-0 left-0 right-0 h-9 bg-black border-b border-white/20 flex items-center px-4">
           <span className="text-[7px] font-mono uppercase tracking-[0.3em] text-neutral-300">

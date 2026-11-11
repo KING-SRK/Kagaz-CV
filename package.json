@@ -11,6 +11,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
     "bcryptjs": "^3.0.3",
+    "html-to-image": "^1.11.13",
     "lucide-react": "^1.63.0",
     "motion": "^14.7.1",
     "next": "16.4.3",

@@ -2,9 +2,8 @@
 "use client";
 
 import { motion } from "motion/react";
-import { ArrowUpRight, QrCode } from "lucide-react";
+import { QrCode } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 
 export default function HeroSection() {
   return (
@@ -105,7 +104,7 @@ export default function HeroSection() {
             {/* মূল ইমেজ ফ্রেম */}
             <div className="group relative aspect-4/5 w-full max-w-md mx-auto overflow-hidden bg-neutral-100 border border-neutral-200 shadow-[0_20px_50px_rgba(0,0,0,0.06)] rounded-tl-full rounded-tr-full">
               <Image
-                src="/hero-portrait.jpg"
+                src="/biprajit.jpg"
                 alt="Editorial Portrait Profile"
                 fill
                 priority

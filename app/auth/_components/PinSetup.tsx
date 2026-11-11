@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { ArrowRight, CheckCircle2, Copy, Check, Loader2 } from "lucide-react";
 import PinInput from "./PinInput";
-import { generateKagazId } from "../generateKagazId";
+import { generateKagazId } from "../_utils/generateKagazId";
 import { supabase } from "@/lib/supabaseClient";
 import bcrypt from "bcryptjs";
 import { useRouter } from "next/navigation";
