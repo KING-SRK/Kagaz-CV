@@ -53,52 +53,83 @@ export default function PinSetup({
     setError("");
 
     try {
-      // ১. পিন হ্যাশ তৈরি
       const salt = await bcrypt.genSalt(10);
       const pinHash = await bcrypt.hash(rawPin, salt);
-
-      // ২. ইউনিক Kagaz ID তৈরি
       const newId = generateKagazId(fullName);
+      const cleanEmail = (email || "").trim().toLowerCase();
 
-      // ৩. Supabase-এ প্রোফাইল ইনসার্ট
-      const { error: insertError } = await supabase
-        .from("profiles")
-        .insert([
-          {
-            kagaz_id: newId,
-            full_name: fullName,
-            email: (email || "").trim().toLowerCase(),
-            phone: phone || "",
-            role: role,
-            pin_hash: pinHash,
-          },
-        ])
-        .select()
-        .single();
+      let createdUuid = "";
 
-      if (insertError) {
-        if (insertError.message.includes("unique")) {
-          setError("This Email or Phone is already registered.");
-        } else {
-          setError(insertError.message);
+      if (role === "organization") {
+        // 🏢 Organization হলে শুধুমাত্র company_profiles টেবিলে সেভ হবে
+        const { data: orgData, error: orgError } = await supabase
+          .from("company_profiles")
+          .insert([
+            {
+              kagaz_id: newId,
+              company_name: fullName,
+              email: cleanEmail,
+              phone: phone || "",
+              role: "organization",
+              pin_hash: pinHash,
+            },
+          ])
+          .select("id")
+          .single();
+
+        if (orgError || !orgData) {
+          setError(
+            orgError?.message.includes("unique")
+              ? "This Email or Phone is already registered."
+              : orgError?.message || "Failed to create company profile.",
+          );
+          setLoading(false);
+          return;
         }
-        setLoading(false);
-        return;
+        createdUuid = orgData.id;
+      } else {
+        // 👤 Individual হলে শুধুমাত্র profiles টেবিলে সেভ হবে
+        const { data: indData, error: indError } = await supabase
+          .from("profiles")
+          .insert([
+            {
+              kagaz_id: newId,
+              full_name: fullName,
+              email: cleanEmail,
+              phone: phone || "",
+              role: "individual",
+              pin_hash: pinHash,
+            },
+          ])
+          .select("id")
+          .single();
+
+        if (indError || !indData) {
+          setError(
+            indError?.message.includes("unique")
+              ? "This Email or Phone is already registered."
+              : indError?.message || "Failed to create individual profile.",
+          );
+          setLoading(false);
+          return;
+        }
+        createdUuid = indData.id;
       }
 
-      // ৪. লোকাল স্টোরেজে সেশন টোকেন হিসেবে Kagaz ID সেভ রাখা
-      localStorage.setItem("kagaz_active_id", newId);
+      // সেশন লোকাল স্টোরেজে সেভ রাখা
+      localStorage.setItem("kagaz_active_id", createdUuid);
+      localStorage.setItem("kagaz_card_id", newId);
       localStorage.setItem("kagaz_role", role);
 
       setGeneratedId(newId);
       setStep("success");
     } catch (err) {
       console.error("DEBUG ERROR DETAILS:", err);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Failed to create profile. Check console for details.");
-      }
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to create profile. Check console for details.",
+      );
     } finally {
       setLoading(false);
     }
@@ -108,6 +139,14 @@ export default function PinSetup({
     navigator.clipboard.writeText(generatedId);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleGoToDashboard = () => {
+    if (role === "organization") {
+      router.push("/dashboard/organization");
+    } else {
+      router.push("/dashboard/individual");
+    }
   };
 
   return (
@@ -136,7 +175,7 @@ export default function PinSetup({
           <button
             type="button"
             onClick={handleSetPin}
-            className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors"
+            className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors cursor-pointer"
           >
             <span>Next Step</span>
             <ArrowRight className="h-3.5 w-3.5" />
@@ -169,7 +208,7 @@ export default function PinSetup({
             type="button"
             disabled={loading}
             onClick={handleConfirmPin}
-            className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors disabled:opacity-60 cursor-pointer"
           >
             {loading ? (
               <>
@@ -178,7 +217,7 @@ export default function PinSetup({
               </>
             ) : (
               <>
-                <span>Generate Kagaz ID</span>
+                <span>Generate SutraNet ID</span>
                 <CheckCircle2 className="h-3.5 w-3.5" />
               </>
             )}
@@ -193,7 +232,7 @@ export default function PinSetup({
               Account Activated
             </span>
             <h2 className="text-2xl font-serif text-neutral-950">
-              Your Official Kagaz ID
+              Your Official SutraNet ID
             </h2>
           </div>
 
@@ -211,7 +250,7 @@ export default function PinSetup({
                 <button
                   type="button"
                   onClick={copyToClipboard}
-                  className="border border-neutral-800 p-2 hover:bg-neutral-800 transition-colors"
+                  className="border border-neutral-800 p-2 hover:bg-neutral-800 transition-colors cursor-pointer"
                 >
                   {copied ? (
                     <Check className="h-3.5 w-3.5 text-emerald-400" />
@@ -222,16 +261,16 @@ export default function PinSetup({
               </div>
             </div>
             <p className="text-[10px] text-neutral-400 font-light">
-              This unique code will appear on your printed resumes & biodatas.
+              This unique code identifies your {role} profile across SutraNet.
             </p>
           </div>
 
           <button
             type="button"
-            onClick={() => router.push("/dashboard")}
-            className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3.5 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors"
+            onClick={handleGoToDashboard}
+            className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3.5 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors cursor-pointer"
           >
-            <span>Go to Builder</span>
+            <span>Go to Workspace</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </div>

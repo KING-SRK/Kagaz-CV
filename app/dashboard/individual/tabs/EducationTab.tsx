@@ -2,7 +2,7 @@
 "use client";
 
 import { Plus, GraduationCap, School, Building2 } from "lucide-react";
-import EducationCard from "./components/EducationCard";
+import EducationCard from "./_components/EducationCard";
 import { EducationItem as ServiceEducationItem } from "@/lib/individualService";
 
 export type EducationType = "school" | "college" | "institute";

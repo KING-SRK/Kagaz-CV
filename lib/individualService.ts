@@ -76,7 +76,7 @@ export interface FullIndividualProfile {
   profile_vault?: VaultItem[];
 }
 
-// lib/individualService.ts
+// lib/individualService.ts-এর ভেতর getIndividualProfile ফাংশনটি আপডেট করো:
 
 export async function getIndividualProfile(profileId: string) {
   try {
@@ -96,7 +96,35 @@ export async function getIndividualProfile(profileId: string) {
       console.error("Supabase Error Details:", error);
       throw error;
     }
-    return { data: data as FullIndividualProfile, error: null };
+
+    // 📍 profiles টেবিলের কলাম থেকে LocationTab-এর জন্য অ্যারে তৈরি করা
+    const mappedLocations: LocationItem[] =
+      data.address_line || data.city || data.state || data.pincode
+        ? [
+            {
+              id: "primary-loc",
+              address_line: data.address_line || "",
+              city: data.city || "",
+              state: data.state || "",
+              pincode: data.pincode || "",
+              country: data.country || "India",
+              is_primary: true,
+            },
+          ]
+        : [];
+
+    // 👨‍👩‍👧‍👦 profiles টেবিলের family কলাম থেকে FamilyTab-এর জন্য অ্যারে নেওয়া
+    const mappedFamily: FamilyItem[] = Array.isArray(data.family)
+      ? data.family
+      : [];
+
+    const fullData: FullIndividualProfile = {
+      ...data,
+      profile_locations: mappedLocations,
+      profile_family: mappedFamily,
+    };
+
+    return { data: fullData, error: null };
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Failed to fetch profile";

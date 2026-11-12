@@ -15,6 +15,9 @@ import {
   Check,
   Users,
   Loader2,
+  Building2,
+  FolderGit2,
+  Award,
 } from "lucide-react";
 
 import FamilyTab from "./tabs/FamilyTab";
@@ -23,7 +26,16 @@ import LocationTab from "./tabs/LocationTab";
 import EducationTab from "./tabs/EducationTab";
 import SkillsTab from "./tabs/SkillsTab";
 import GovtVaultTab from "./tabs/GovtVaultTab";
-import { SocialLink } from "./tabs/components/DynamicSocialLinks";
+// নতুন ৩টি ট্যাব ইমপোর্ট (এগুলো আমরা পরের ধাপে বানাবো)
+import ExperienceTab, { ExperienceItem } from "./tabs/ExperienceTab";
+import ProjectsTab, { ProjectItem } from "./tabs/ProjectsTab";
+import CredentialsTab, {
+  CertificationItem,
+  AchievementItem,
+  ReferenceItem,
+} from "./tabs/CredentialsTab";
+
+import { SocialLink } from "./tabs/_components/DynamicSocialLinks";
 
 import {
   getIndividualProfile,
@@ -36,6 +48,16 @@ import {
   LocationItem,
 } from "@/lib/individualService";
 
+// এক্সটেন্ডেড টাইপ যাতে নতুন ফিল্ডগুলো টাইপসেফ থাকে
+export interface ExtendedIndividualProfile extends FullIndividualProfile {
+  interests?: string[];
+  experience?: ExperienceItem[];
+  projects?: ProjectItem[];
+  certifications?: CertificationItem[];
+  achievements?: AchievementItem[];
+  references_list?: ReferenceItem[];
+}
+
 export default function ProfileDetailsSection() {
   const [activeTab, setActiveTab] = useState<string>("about");
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -44,7 +66,7 @@ export default function ProfileDetailsSection() {
   const [userId, setUserId] = useState<string>("");
 
   // সেন্ট্রাল প্রোফাইল স্টেট
-  const [profile, setProfile] = useState<FullIndividualProfile>({
+  const [profile, setProfile] = useState<ExtendedIndividualProfile>({
     id: "",
     kagaz_id: "",
     role: "individual",
@@ -52,6 +74,7 @@ export default function ProfileDetailsSection() {
     title: "",
     sector: "",
     skills: [],
+    interests: [],
     email: "",
     phone: "",
     avatar_url: "",
@@ -68,10 +91,14 @@ export default function ProfileDetailsSection() {
     profile_locations: [],
     profile_vault: [],
     social_links: [],
+    experience: [],
+    projects: [],
+    certifications: [],
+    achievements: [],
+    references_list: [],
   });
 
-  // ড্রাফট স্টেট
-  const [draft, setDraft] = useState<FullIndividualProfile>(profile);
+  const [draft, setDraft] = useState<ExtendedIndividualProfile>(profile);
 
   useEffect(() => {
     async function loadData() {
@@ -84,8 +111,8 @@ export default function ProfileDetailsSection() {
 
       const { data, error } = await getIndividualProfile(activeId);
       if (data && !error) {
-        setProfile(data);
-        setDraft(data);
+        setProfile(data as ExtendedIndividualProfile);
+        setDraft(data as ExtendedIndividualProfile);
       }
       setLoading(false);
     }
@@ -93,25 +120,43 @@ export default function ProfileDetailsSection() {
     loadData();
   }, []);
 
-  // বাঁদিকের মেনু সেকশনসমূহ (টাইটেল ও নির্দিষ্ট বিবরণসহ)
+  // বাঁদিকের মেনু সেকশনসমূহ (নতুন ৩টি সহ মোট ৯টি ক্লিন সেকশন)
   const sections = [
     {
       id: "about",
       title: "Personal Details",
-      desc: "Bio, birth details, blood group & contact info.",
+      desc: "Summary, birth details, languages & social links.",
       icon: User,
     },
     {
       id: "skills",
-      title: "Skills & Work",
-      desc: "Work sector, role headline & core expertise.",
+      title: "Skills & Interests",
+      desc: "Work sector, core skills & personal hobbies.",
       icon: Briefcase,
+    },
+    {
+      id: "experience",
+      title: "Work History",
+      desc: "Employment history, companies & responsibilities.",
+      icon: Building2,
+    },
+    {
+      id: "projects",
+      title: "Projects & Portfolio",
+      desc: "Showcase live projects, tech stack & images.",
+      icon: FolderGit2,
     },
     {
       id: "education",
       title: "Education",
       desc: "Degrees, institutions, session years & status.",
       icon: GraduationCap,
+    },
+    {
+      id: "credentials",
+      title: "Honors & References",
+      desc: "Certifications, achievements & professional refs.",
+      icon: Award,
     },
     {
       id: "location",
@@ -127,13 +172,12 @@ export default function ProfileDetailsSection() {
     },
     {
       id: "vault",
-      title: "Government IDs",
-      desc: "Official IDs & documents for identity verification.",
+      title: "Personal Vault",
+      desc: "Official IDs & important personal documents.",
       icon: ShieldCheck,
     },
   ];
 
-  // ট্যাব পরিবর্তনের সময় ড্রাফট রিসেট এবং এডিট মোড বন্ধ করা (অপশন ১)
   const handleTabChange = (newTabId: string) => {
     setActiveTab(newTabId);
     setDraft(profile);
@@ -151,16 +195,13 @@ export default function ProfileDetailsSection() {
   };
 
   const handleSave = async () => {
-    if (!userId) {
-      console.error("No userId found in localStorage!");
-      return;
-    }
+    if (!userId) return;
     setSaving(true);
 
     try {
       const primaryLoc = draft.profile_locations?.[0] || {};
 
-      const coreUpdates: Partial<FullIndividualProfile> = {
+      const coreUpdates: Partial<ExtendedIndividualProfile> = {
         avatar_url: draft.avatar_url || "",
         full_name: draft.full_name || "",
         title: draft.title || "",
@@ -172,30 +213,31 @@ export default function ProfileDetailsSection() {
         nationality: draft.nationality || "",
         languages: draft.languages || "",
         skills: Array.isArray(draft.skills) ? draft.skills : [],
+        interests: Array.isArray(draft.interests) ? draft.interests : [],
         social_links: draft.social_links || [],
+        // নতুন ক্যারিয়ার ডেটা
+        experience: draft.experience || [],
+        projects: draft.projects || [],
+        certifications: draft.certifications || [],
+        achievements: draft.achievements || [],
+        references_list: draft.references_list || [],
 
         address_line: primaryLoc.address_line || "",
         city: primaryLoc.city || "",
         state: primaryLoc.state || "",
         pincode: primaryLoc.pincode || "",
         country: primaryLoc.country || "India",
-
         family: draft.profile_family || [],
       };
 
-      const coreRes = await updateCoreProfile(userId, coreUpdates);
-      if (coreRes?.error) {
-        console.error("Core Profile Save Error:", coreRes.error);
-      }
+      await updateCoreProfile(userId, coreUpdates);
 
       if (draft.profile_education) {
-        const eduRes = await saveEducation(userId, draft.profile_education);
-        if (eduRes?.error) console.error("Education Save Error:", eduRes.error);
+        await saveEducation(userId, draft.profile_education);
       }
 
       if (draft.profile_vault && draft.profile_vault.length > 0) {
-        const vaultRes = await saveGovtVault(userId, draft.profile_vault);
-        if (vaultRes?.error) console.error("Vault Save Error:", vaultRes.error);
+        await saveGovtVault(userId, draft.profile_vault);
       }
 
       setProfile({ ...draft });
@@ -231,11 +273,10 @@ export default function ProfileDetailsSection() {
             <Sparkles className="h-3 w-3" /> Profile Details
           </span>
           <h2 className="text-xl font-serif text-neutral-950 mt-1">
-            Personal & Work Information
+            Personal, Career & Portfolio Information
           </h2>
         </div>
 
-        {/* এডিট / সেভ কন্ট্রোল */}
         <div className="flex items-center gap-3">
           {!isEditing ? (
             <button
@@ -286,7 +327,7 @@ export default function ProfileDetailsSection() {
                 key={item.id}
                 type="button"
                 onClick={() => handleTabChange(item.id)}
-                className={`w-full flex items-start justify-between p-3.5 text-left transition-colors duration-150 rounded-xs cursor-pointer outline-none border ${
+                className={`w-full flex items-start justify-between p-3 text-left transition-colors duration-150 rounded-xs cursor-pointer outline-none border ${
                   isActive
                     ? "bg-white text-neutral-950 shadow-xs border-neutral-200/80"
                     : "bg-transparent border-transparent text-neutral-500 hover:bg-neutral-100/60 hover:text-neutral-900"
@@ -310,7 +351,7 @@ export default function ProfileDetailsSection() {
                     >
                       {item.title}
                     </span>
-                    <p className="text-[11px] font-sans text-neutral-500 mt-0.5 line-clamp-2 leading-relaxed">
+                    <p className="text-[11px] font-sans text-neutral-500 mt-0.5 line-clamp-1 leading-relaxed">
                       {item.desc}
                     </p>
                   </div>
@@ -390,10 +431,13 @@ export default function ProfileDetailsSection() {
                 isEditing={isEditing}
                 skills={isEditing ? draft.skills || [] : profile.skills || []}
                 onChange={(newSkills: string[]) =>
-                  setDraft((prev) => ({
-                    ...prev,
-                    skills: newSkills,
-                  }))
+                  setDraft((prev) => ({ ...prev, skills: newSkills }))
+                }
+                interests={
+                  isEditing ? draft.interests || [] : profile.interests || []
+                }
+                onInterestsChange={(newInterests: string[]) =>
+                  setDraft((prev) => ({ ...prev, interests: newInterests }))
                 }
                 sector={isEditing ? draft.sector : profile.sector}
                 onSectorChange={(sector: string) =>
@@ -402,6 +446,32 @@ export default function ProfileDetailsSection() {
                 roleTitle={isEditing ? draft.title : profile.title}
                 onRoleTitleChange={(title: string) =>
                   setDraft((prev) => ({ ...prev, title }))
+                }
+              />
+            )}
+
+            {/* 🆕 নতুন ১: Work History / Employment */}
+            {activeTab === "experience" && (
+              <ExperienceTab
+                isEditing={isEditing}
+                experienceList={
+                  isEditing ? draft.experience || [] : profile.experience || []
+                }
+                onChange={(newList: ExperienceItem[]) =>
+                  setDraft((prev) => ({ ...prev, experience: newList }))
+                }
+              />
+            )}
+
+            {/* 🆕 নতুন ২: Projects & Portfolio */}
+            {activeTab === "projects" && (
+              <ProjectsTab
+                isEditing={isEditing}
+                projectsList={
+                  isEditing ? draft.projects || [] : profile.projects || []
+                }
+                onChange={(newList: ProjectItem[]) =>
+                  setDraft((prev) => ({ ...prev, projects: newList }))
                 }
               />
             )}
@@ -416,6 +486,46 @@ export default function ProfileDetailsSection() {
                 }
                 onChange={(newList: EducationItem[]) =>
                   setDraft((prev) => ({ ...prev, profile_education: newList }))
+                }
+              />
+            )}
+
+            {/* 🆕 নতুন ৩: Certifications, Achievements & References */}
+            {activeTab === "credentials" && (
+              <CredentialsTab
+                isEditing={isEditing}
+                certifications={
+                  isEditing
+                    ? draft.certifications || []
+                    : profile.certifications || []
+                }
+                achievements={
+                  isEditing
+                    ? draft.achievements || []
+                    : profile.achievements || []
+                }
+                references={
+                  isEditing
+                    ? draft.references_list || []
+                    : profile.references_list || []
+                }
+                onChange={(updated: {
+                  certifications?: CertificationItem[];
+                  achievements?: AchievementItem[];
+                  references?: ReferenceItem[];
+                }) =>
+                  setDraft((prev) => ({
+                    ...prev,
+                    ...(updated.certifications && {
+                      certifications: updated.certifications,
+                    }),
+                    ...(updated.achievements && {
+                      achievements: updated.achievements,
+                    }),
+                    ...(updated.references && {
+                      references_list: updated.references,
+                    }),
+                  }))
                 }
               />
             )}

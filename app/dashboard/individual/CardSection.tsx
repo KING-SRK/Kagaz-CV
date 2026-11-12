@@ -8,7 +8,6 @@ import { toPng } from "html-to-image";
 import { supabase } from "@/lib/supabaseClient";
 import { getIndividualProfile } from "@/lib/individualService";
 import SmartCard, { CardDesignType } from "./SmartCard";
-import CardDesignSwitcher from "./CardDesignSwitcher";
 
 export default function CardSection() {
   const [kagazId, setKagazId] = useState("");
@@ -19,8 +18,8 @@ export default function CardSection() {
   // কার্ড এলিমেন্ট রেফারেন্স (ডাউনলোডের জন্য)
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // ডিজাইন স্টেট (ডিফল্ট Duo-Split)
-  const [design, setDesign] = useState<CardDesignType>("duo-split");
+  // আপাতত শুধুমাত্র একটি সিঙ্গেল ডিফল্ট ডিজাইন রাখা হলো (পরে চাইলে সুইচার যোগ করা যাবে)
+  const defaultDesign: CardDesignType = "duo-split";
 
   const [cardData, setCardData] = useState({
     name: "Member Name",
@@ -38,24 +37,16 @@ export default function CardSection() {
     async function fetchData() {
       const activeId = localStorage.getItem("kagaz_active_id");
       const activeRole = localStorage.getItem("kagaz_role") || "individual";
-      const savedDesign =
-        (localStorage.getItem("kagaz_card_design") as CardDesignType) ||
-        "duo-split";
 
       if (!activeId) return;
 
       setRole(activeRole);
-      setDesign(savedDesign);
 
       // ১. সার্ভিস থেকে সেন্ট্রাল ডেটা ফেচ
       const { data } = await getIndividualProfile(activeId);
 
       if (data) {
         setKagazId(data.kagaz_id || activeId);
-
-        if (data.card_theme) {
-          setDesign(data.card_theme as CardDesignType);
-        }
 
         const primaryLoc = data.profile_locations?.[0];
         const formattedAddress =
@@ -83,15 +74,18 @@ export default function CardSection() {
         const { data: directData } = await supabase
           .from("profiles")
           .select(
-            "id, kagaz_id, full_name, phone, role, avatar_url, title, dob, gender, card_theme, qr_data",
+            "id, kagaz_id, full_name, phone, role, avatar_url, title, dob, gender, address_line, city, state",
           )
           .or(`id.eq.${activeId},kagaz_id.eq.${activeId}`)
           .maybeSingle();
 
         if (directData) {
           setKagazId(directData.kagaz_id || activeId);
-          if (directData.card_theme)
-            setDesign(directData.card_theme as CardDesignType);
+
+          const fallbackAddress =
+            directData.city && directData.state
+              ? `${directData.city}, ${directData.state}`
+              : directData.address_line || "Kolkata, WB";
 
           setCardData({
             name: directData.full_name || "Official Member",
@@ -105,7 +99,7 @@ export default function CardSection() {
               ? directData.gender.charAt(0).toUpperCase()
               : "M",
             tagline: directData.role === "organization" ? "Commercial Hub" : "",
-            address: "Kolkata, WB",
+            address: fallbackAddress,
             estYear: "2025",
           });
         }
@@ -114,11 +108,18 @@ export default function CardSection() {
 
     fetchData();
 
-    // ⚡ রিয়েলটাইম আপডেট লিসেনার
+    // ⚡ রিয়েলটাইম আপডেট লিসেনার (নাম, ছবি, ঠিকানা সবকিছুর জন্য)
     const handleCardUpdate = (e: Event) => {
       const customEvent = e as CustomEvent;
       if (customEvent.detail) {
         const updated = customEvent.detail;
+
+        const primaryLoc = updated.profile_locations?.[0];
+        const locStr =
+          primaryLoc?.city && primaryLoc?.state
+            ? `${primaryLoc.city}, ${primaryLoc.state}`
+            : primaryLoc?.address_line || undefined;
+
         setCardData((prev) => ({
           ...prev,
           name: updated.full_name || prev.name,
@@ -128,6 +129,7 @@ export default function CardSection() {
           gender: updated.gender
             ? updated.gender.charAt(0).toUpperCase()
             : prev.gender,
+          ...(locStr && { address: locStr }),
         }));
       }
     };
@@ -138,20 +140,6 @@ export default function CardSection() {
       window.removeEventListener("profile-updated", handleCardUpdate);
     };
   }, []);
-
-  // ডিজাইন পরিবর্তন ও ডাটাবেজে সেভ হ্যান্ডলার
-  const handleDesignChange = async (newDesign: CardDesignType) => {
-    setDesign(newDesign);
-    localStorage.setItem("kagaz_card_design", newDesign);
-
-    const activeId = localStorage.getItem("kagaz_active_id");
-    if (activeId) {
-      await supabase
-        .from("profiles")
-        .update({ card_theme: newDesign })
-        .or(`id.eq.${activeId},kagaz_id.eq.${activeId}`);
-    }
-  };
 
   // ডিজিটাল লিংক কপি
   const handleCopyLink = () => {
@@ -185,24 +173,18 @@ export default function CardSection() {
 
   return (
     <div className="flex flex-col items-center">
-      {/* ১. মূল স্মার্ট কার্ড */}
+      {/* ১. মূল স্মার্ট কার্ড (সিঙ্গেল প্রিমিয়াম ডিজাইন) */}
       <div ref={cardRef} className="p-1">
         <SmartCard
           role={role}
           kagazId={kagazId}
-          design={design}
+          design={defaultDesign}
           data={cardData}
         />
       </div>
 
-      {/* ২. ডিজাইন সুইচার টগল বার */}
-      <CardDesignSwitcher
-        currentDesign={design}
-        onDesignChange={handleDesignChange}
-      />
-
-      {/* ৩. কুইক অ্যাকশন বাটন বার */}
-      <div className="w-95 sm:w-115 flex items-center gap-2 mt-4">
+      {/* ২. কুইক অ্যাকশন বাটন বার */}
+      <div className="w-95 sm:w-115 flex items-center gap-2 mt-5">
         {/* ডিজিটাল লিংক কপি বাটন */}
         <button
           type="button"

@@ -2,7 +2,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Fingerprint } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Fingerprint, Loader2 } from "lucide-react";
 import PrimaryIdentity from "./PrimaryIdentity";
 import CardSection from "./CardSection";
 import ProfileDetailsSection from "./ProfileDetailsSection";
@@ -10,21 +11,59 @@ import IdentityBadge from "./IdentityBadge";
 import { getIndividualProfile } from "@/lib/individualService";
 
 export default function IndividualDashboardPage() {
+  const router = useRouter();
   const [userName, setUserName] = useState<string>("");
+  const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
 
   useEffect(() => {
-    async function fetchUserName() {
+    async function verifyAndFetchUser() {
       const activeId = localStorage.getItem("kagaz_active_id");
-      if (!activeId) return;
+      const savedRole = localStorage.getItem("kagaz_role");
+
+      // ১. লগইন না থাকলে /auth পেজে পাঠিয়ে দেবে
+      if (!activeId) {
+        router.replace("/auth");
+        return;
+      }
+
+      // ২. লোকাল স্টোরেজে রোল 'organization' থাকলে সরাসরি Organization ড্যাশবোর্ডে পাঠাবে!
+      if (savedRole === "organization") {
+        router.replace("/dashboard/organization");
+        return;
+      }
 
       const { data } = await getIndividualProfile(activeId);
-      if (data?.full_name) {
+
+      // ৩. যদি profiles টেবিলে না পাওয়া যায় বা রোল organization হয়
+      if (!data) {
+        router.replace("/auth");
+        return;
+      }
+
+      if (data.role === "organization") {
+        router.replace("/dashboard/organization");
+        return;
+      }
+
+      if (data.full_name) {
         setUserName(data.full_name);
       }
+
+      // ৪. সব ঠিক থাকলে ড্যাশবোর্ড দেখাবে
+      setCheckingAuth(false);
     }
 
-    fetchUserName();
-  }, []);
+    verifyAndFetchUser();
+  }, [router]);
+
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen bg-[#FDFCFB] flex flex-col items-center justify-center gap-2 text-neutral-500 font-mono text-xs">
+        <Loader2 className="h-5 w-5 animate-spin text-neutral-900" />
+        <span>Verifying identity workspace...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FDFCFB] text-neutral-950">

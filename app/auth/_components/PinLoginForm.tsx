@@ -25,7 +25,7 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
     const rawPin = pin.join("");
 
     if (!query) {
-      setError("Please provide Kagaz ID, email, or phone.");
+      setError("Please provide SutraNet ID, email, or phone.");
       return;
     }
     if (pin.some((d) => d === "")) {
@@ -37,10 +37,8 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
     setError("");
 
     try {
-      // ফোন নম্বরের স্পেস বা হাইফেন পরিষ্কার করা
       const cleanDigits = query.replace(/\D/g, "");
 
-      // ইউজার ১০ ডিজিটের সাধারণ ভারতীয় নম্বর দিলে '+91' যুক্ত করা
       let phoneQuery = query;
       if (cleanDigits.length === 10) {
         phoneQuery = `+91${cleanDigits}`;
@@ -48,53 +46,61 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
         phoneQuery = `+${cleanDigits}`;
       }
 
-      // Kagaz ID, Email অথবা Phone দিয়ে প্রোফাইল খোঁজা
-      const { data: profile, error: fetchError } = await supabase
+      const orFilter = `kagaz_id.eq.${query},email.eq.${query.toLowerCase()},phone.eq.${phoneQuery},phone.eq.${query}`;
+
+      // ১. প্রথমে Individual (profiles টেবিল) খোঁজা
+      const { data: indProfile } = await supabase
         .from("profiles")
-        .select("id, kagaz_id, role, pin_hash")
-        .or(
-          `kagaz_id.eq.${query},email.eq.${query.toLowerCase()},phone.eq.${phoneQuery},phone.eq.${query}`,
-        )
+        .select("id, kagaz_id, pin_hash")
+        .or(orFilter)
         .maybeSingle();
 
-      if (fetchError || !profile) {
-        setError("Account not found with this identifier.");
-        setLoading(false);
+      if (indProfile) {
+        const isMatch = await bcrypt.compare(rawPin, indProfile.pin_hash);
+        if (!isMatch) {
+          setError("Incorrect PIN. Please try again.");
+          setLoading(false);
+          return;
+        }
+
+        localStorage.setItem("kagaz_active_id", indProfile.id);
+        localStorage.setItem("kagaz_card_id", indProfile.kagaz_id);
+        localStorage.setItem("kagaz_role", "individual");
+        router.push("/dashboard/individual");
         return;
       }
 
-      // পিন হ্যাশ মিলানো
-      const isMatch = await bcrypt.compare(rawPin, profile.pin_hash);
+      // ২. না পেলে Organization (company_profiles টেবিল) খোঁজা
+      const { data: orgProfile } = await supabase
+        .from("company_profiles")
+        .select("id, kagaz_id, pin_hash")
+        .or(orFilter)
+        .maybeSingle();
 
-      if (!isMatch) {
-        setError("Incorrect PIN. Please try again.");
-        setLoading(false);
+      if (orgProfile) {
+        const isMatch = await bcrypt.compare(rawPin, orgProfile.pin_hash);
+        if (!isMatch) {
+          setError("Incorrect PIN. Please try again.");
+          setLoading(false);
+          return;
+        }
+
+        localStorage.setItem("kagaz_active_id", orgProfile.id);
+        localStorage.setItem("kagaz_card_id", orgProfile.kagaz_id);
+        localStorage.setItem("kagaz_role", "organization");
+        router.push("/dashboard/organization");
         return;
       }
 
-      // 🛑 ১. অর্গানাইজেশন ফিল্টার (শুধুমাত্র Individual লগইন করতে পারবে)
-      if (profile.role !== "individual") {
-        setError(
-          "Organization dashboard is currently under development. Please log in with an Individual account.",
-        );
-        setLoading(false);
-        return;
-      }
-
-      // 💡 ২. আসল UUID-কে `kagaz_active_id` হিসেবে সেভ রাখা (যাতে ডেটাবেজ খুঁজে পায়)
-      localStorage.setItem("kagaz_active_id", profile.id);
-      localStorage.setItem("kagaz_card_id", profile.kagaz_id);
-      localStorage.setItem("kagaz_role", profile.role);
-
-      // ড্যাশবোর্ডে রিডাইরেক্ট
-      router.push("/dashboard/individual");
+      // ৩. কোনো টেবিলেই না পাওয়া গেলে
+      setError("Account not found with this identifier.");
     } catch (err) {
       console.error("DEBUG ERROR DETAILS:", err);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Failed to verify credentials. Check console for details.");
-      }
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to verify credentials. Check console for details.",
+      );
     } finally {
       setLoading(false);
     }
@@ -114,7 +120,7 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
       <form className="space-y-5" onSubmit={handleLogin}>
         <div>
           <label className="block text-xs font-mono uppercase tracking-wider text-neutral-600 mb-1.5">
-            Kagaz ID / Email / Phone
+            SutraNet ID / Email / Phone
           </label>
           <input
             type="text"
@@ -163,7 +169,7 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
           className="text-xs text-neutral-500 hover:text-neutral-950 transition-colors cursor-pointer"
         >
           New user?{" "}
-          <span className="underline font-medium">Create Kagaz ID</span>
+          <span className="underline font-medium">Create SutraNet ID</span>
         </button>
       </div>
     </div>

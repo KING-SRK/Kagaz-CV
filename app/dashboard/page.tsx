@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { getIndividualProfile } from "@/lib/individualService";
+import { getCompanyProfile } from "@/lib/organizationService";
 
 export default function DashboardRedirect() {
   const router = useRouter();
@@ -12,19 +13,51 @@ export default function DashboardRedirect() {
   useEffect(() => {
     async function checkRoleAndRedirect() {
       const activeId = localStorage.getItem("kagaz_active_id");
+      const savedRole = localStorage.getItem("kagaz_role");
 
       if (!activeId) {
         router.replace("/auth");
         return;
       }
 
-      const { data } = await getIndividualProfile(activeId);
-
-      if (data?.role === "organization") {
-        router.replace("/dashboard/organization");
-      } else {
-        router.replace("/dashboard/individual");
+      // ১. যদি লোকাল স্টোরেজে স্পষ্টভাবে 'individual' লেখা থাকে
+      if (savedRole === "individual") {
+        const { data: indData } = await getIndividualProfile(activeId);
+        if (indData) {
+          router.replace("/dashboard/individual");
+          return;
+        }
       }
+
+      // ২. যদি লোকাল স্টোরেজে স্পষ্টভাবে 'organization' লেখা থাকে
+      if (savedRole === "organization") {
+        const { data: orgData } = await getCompanyProfile(activeId);
+        if (orgData) {
+          router.replace("/dashboard/organization");
+          return;
+        }
+      }
+
+      // ৩. ফলব্যাক: যদি savedRole না থাকে, তবে ডেটাবেজ থেকে খুঁজে বের করা
+      const { data: indData } = await getIndividualProfile(activeId);
+      if (indData) {
+        localStorage.setItem("kagaz_role", "individual");
+        router.replace("/dashboard/individual");
+        return;
+      }
+
+      const { data: orgData } = await getCompanyProfile(activeId);
+      if (orgData) {
+        localStorage.setItem("kagaz_role", "organization");
+        router.replace("/dashboard/organization");
+        return;
+      }
+
+      // কোথাও না পাওয়া গেলে লগআউট করে /auth-এ পাঠানো
+      localStorage.removeItem("kagaz_active_id");
+      localStorage.removeItem("kagaz_card_id");
+      localStorage.removeItem("kagaz_role");
+      router.replace("/auth");
     }
 
     checkRoleAndRedirect();

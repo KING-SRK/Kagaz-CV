@@ -11,6 +11,8 @@ import {
   Camera,
   Trash2,
   Loader2,
+  Plus,
+  X,
 } from "lucide-react";
 import { uploadAvatar, deleteAvatarFromStorage } from "@/lib/individualService";
 
@@ -22,14 +24,38 @@ export interface PersonalInfoData {
   gender: string;
   bloodGroup: string;
   nationality: string;
-  languages: string;
+  languages: string; // JSON string অথবা কমা-সেপারেটেড হিসেবে ব্যাকওয়ার্ড কম্প্যাটিবল থাকবে
   bio: string;
+}
+
+interface LanguageItem {
+  name: string;
+  read: boolean;
+  write: boolean;
+  speak: boolean;
 }
 
 interface Props {
   data: PersonalInfoData;
   isEditing: boolean;
   onChange: (field: keyof PersonalInfoData, value: string) => void;
+}
+
+// পুরনো কমা-সেপারেটেড বা নতুন JSON স্ট্রিং পার্স করার হেল্পার
+function parseLanguages(raw: string): LanguageItem[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed;
+  } catch {
+    // যদি পুরনো "Bengali, English" ফরম্যাটে থাকে
+    return raw
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .map((name) => ({ name, read: true, write: true, speak: true }));
+  }
+  return [];
 }
 
 export default function PersonalInfoFields({
@@ -39,6 +65,36 @@ export default function PersonalInfoFields({
 }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState<boolean>(false);
+  const [newLangName, setNewLangName] = useState<string>("");
+
+  const langList = parseLanguages(data.languages);
+
+  const updateLanguagesList = (updated: LanguageItem[]) => {
+    onChange("languages", JSON.stringify(updated));
+  };
+
+  const handleAddLanguage = () => {
+    const trimmed = newLangName.trim();
+    if (!trimmed) return;
+    if (!langList.some((l) => l.name.toLowerCase() === trimmed.toLowerCase())) {
+      updateLanguagesList([
+        ...langList,
+        { name: trimmed, read: true, write: true, speak: true },
+      ]);
+    }
+    setNewLangName("");
+  };
+
+  const toggleLangSkill = (idx: number, skill: "read" | "write" | "speak") => {
+    const updated = langList.map((item, i) =>
+      i === idx ? { ...item, [skill]: !item[skill] } : item,
+    );
+    updateLanguagesList(updated);
+  };
+
+  const removeLanguage = (idx: number) => {
+    updateLanguagesList(langList.filter((_, i) => i !== idx));
+  };
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -47,42 +103,28 @@ export default function PersonalInfoFields({
     try {
       setUploading(true);
       const activeId = localStorage.getItem("kagaz_active_id") || "user";
-
-      // 🧹 data.avatarUrl পাঠিয়ে দিলে আগের ছবিটি অটো ডিলিট হয়ে নতুনটি বসবে
       const { url, error } = await uploadAvatar(activeId, file, data.avatarUrl);
-      if (error) {
-        console.error("Avatar upload failed:", error);
-        return;
-      }
-
-      if (url) {
+      if (!error && url) {
         onChange("avatarUrl", url);
       }
-    } catch (err) {
-      console.error("Error handling avatar upload:", err);
     } finally {
       setUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
-  // 🗑️ Remove বাটনে ক্লিক করলে স্টোরেজ থেকে পার্মানেন্টলি ডিলিট হবে
   const handleRemoveAvatar = async () => {
     if (data.avatarUrl) {
       await deleteAvatarFromStorage(data.avatarUrl);
     }
     onChange("avatarUrl", "");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   if (!isEditing) {
     return (
       <div className="space-y-4">
-        {/* 📸 নাম, হেডলাইন এবং বাঁদিকের কম্প্যাক্ট অবতার */}
+        {/* প্রোফাইল কার্ড */}
         <div className="p-3.5 bg-neutral-50/70 border border-neutral-200/80 rounded-xs flex items-center gap-3.5">
           <div className="w-12 h-12 rounded-full overflow-hidden border border-neutral-300 bg-white flex items-center justify-center shrink-0 shadow-2xs">
             {data.avatarUrl ? (
@@ -95,7 +137,6 @@ export default function PersonalInfoFields({
               <User className="h-6 w-6 text-neutral-400" />
             )}
           </div>
-
           <div className="min-w-0 flex-1">
             <h2 className="text-sm font-serif font-bold text-neutral-950 truncate">
               {data.fullName || "Name Not Set"}
@@ -106,7 +147,7 @@ export default function PersonalInfoFields({
           </div>
         </div>
 
-        {/* বেসিক ইনফো গ্রিড (DOB, Gender, Blood, Nationality) */}
+        {/* বেসিক ইনফো গ্রিড */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
           <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs">
             <div className="flex items-center gap-1 text-neutral-400 mb-0.5">
@@ -149,33 +190,55 @@ export default function PersonalInfoFields({
           </div>
         </div>
 
-        {/* জানা ভাষা */}
-        <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs">
-          <div className="flex items-center gap-1 text-neutral-400 mb-1.5">
-            <Languages className="h-3 w-3" />
-            <span className="text-[9px] font-mono uppercase">Languages</span>
+        {/* জানা ভাষা ও দক্ষতা (Proficiency) */}
+        <div className="p-3 bg-neutral-50/50 border border-neutral-200/70 rounded-xs">
+          <div className="flex items-center gap-1 text-neutral-400 mb-2">
+            <Languages className="h-3.5 w-3.5" />
+            <span className="text-[9px] font-mono uppercase">
+              Languages & Proficiency
+            </span>
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {data.languages ? (
-              data.languages.split(",").map((lang) => (
-                <span
-                  key={lang}
-                  className="px-2 py-0.5 bg-white border border-neutral-200 text-neutral-800 text-[10.5px] font-mono rounded-xs"
+          {langList.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {langList.map((lang, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between px-2.5 py-1.5 bg-white border border-neutral-200 rounded-xs text-xs font-mono"
                 >
-                  {lang.trim()}
-                </span>
-              ))
-            ) : (
-              <span className="text-xs font-mono text-neutral-400">
-                Not Set
-              </span>
-            )}
-          </div>
+                  <span className="font-semibold text-neutral-900">
+                    {lang.name}
+                  </span>
+                  <div className="flex items-center gap-1 text-[9.5px]">
+                    {lang.read && (
+                      <span className="px-1.5 py-0.2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xs">
+                        Read
+                      </span>
+                    )}
+                    {lang.write && (
+                      <span className="px-1.5 py-0.2 bg-blue-50 text-blue-700 border border-blue-200 rounded-xs">
+                        Write
+                      </span>
+                    )}
+                    {lang.speak && (
+                      <span className="px-1.5 py-0.2 bg-amber-50 text-amber-700 border border-amber-200 rounded-xs">
+                        Speak
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <span className="text-xs font-mono text-neutral-400">Not Set</span>
+          )}
         </div>
 
-        {/* বায়ো */}
+        {/* প্রফেশনাল সামারি / বায়ো */}
         <div className="p-3 bg-neutral-50/70 border border-neutral-200/80 rounded-xs text-xs text-neutral-700 leading-relaxed font-sans">
-          {data.bio || "No bio added yet."}
+          <span className="text-[9px] font-mono uppercase text-neutral-400 block mb-1">
+            Professional Summary / About
+          </span>
+          {data.bio || "No summary added yet."}
         </div>
       </div>
     );
@@ -184,7 +247,7 @@ export default function PersonalInfoFields({
   // ==================== EDIT MODE ====================
   return (
     <div className="space-y-4">
-      {/* 📸 এডিট মোডে ছবির প্রিভিউ ও আপলোড কন্ট্রোল */}
+      {/* প্রোফাইল ফটো আপলোড */}
       <div className="p-3 bg-neutral-50/60 border border-neutral-200/80 rounded-xs flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <div className="relative w-14 h-14 rounded-full overflow-hidden border border-neutral-300 bg-white flex items-center justify-center shrink-0 shadow-2xs group">
           {uploading ? (
@@ -205,7 +268,6 @@ export default function PersonalInfoFields({
             <label
               onClick={() => fileInputRef.current?.click()}
               className="absolute inset-0 bg-neutral-950/45 hover:bg-neutral-950/65 transition-colors flex items-center justify-center cursor-pointer text-white"
-              title="Upload Photo"
             >
               <Camera className="w-4 h-4" />
             </label>
@@ -213,26 +275,23 @@ export default function PersonalInfoFields({
         </div>
 
         <div className="flex-1 space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono uppercase text-neutral-400 font-bold">
-              Profile Photo
-            </span>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/png, image/jpeg, image/webp"
-              className="hidden"
-              onChange={handleFileChange}
-              disabled={uploading}
-            />
-          </div>
-
+          <span className="text-[10px] font-mono uppercase text-neutral-400 font-bold block">
+            Profile Photo
+          </span>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png, image/jpeg, image/webp"
+            className="hidden"
+            onChange={handleFileChange}
+            disabled={uploading}
+          />
           <div className="flex items-center gap-2 pt-0.5">
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="inline-flex items-center gap-1.5 text-[10.5px] font-mono uppercase px-2.5 py-1 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xs transition-colors cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 text-[10.5px] font-mono uppercase px-2.5 py-1 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xs cursor-pointer"
             >
               {uploading && <Loader2 className="w-3 h-3 animate-spin" />}
               <span>{uploading ? "Uploading..." : "Upload Photo"}</span>
@@ -241,7 +300,7 @@ export default function PersonalInfoFields({
               <button
                 type="button"
                 onClick={handleRemoveAvatar}
-                className="text-[10.5px] font-mono uppercase px-2 py-1 text-red-600 hover:bg-red-50 border border-transparent hover:border-red-200 rounded-xs transition-colors flex items-center gap-1 cursor-pointer"
+                className="text-[10.5px] font-mono uppercase px-2 py-1 text-red-600 hover:bg-red-50 rounded-xs flex items-center gap-1 cursor-pointer"
               >
                 <Trash2 className="w-3 h-3" />
                 <span>Remove</span>
@@ -251,7 +310,7 @@ export default function PersonalInfoFields({
         </div>
       </div>
 
-      {/* নাম ও হেডলাইন ইনপুট */}
+      {/* নাম ও হেডলাইন */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
@@ -261,8 +320,7 @@ export default function PersonalInfoFields({
             type="text"
             value={data.fullName}
             onChange={(e) => onChange("fullName", e.target.value)}
-            placeholder="e.g. Joy Thayal"
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white"
+            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
           />
         </div>
         <div>
@@ -273,14 +331,13 @@ export default function PersonalInfoFields({
             type="text"
             value={data.headline}
             onChange={(e) => onChange("headline", e.target.value)}
-            placeholder="e.g. Web Developer"
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white"
+            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
           />
         </div>
       </div>
 
-      {/* জন্মতারিখ, লিঙ্গ ও রক্তের গ্রুপ */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      {/* জন্মতারিখ, লিঙ্গ, রক্তের গ্রুপ ও ন্যাশনালিটি */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div>
           <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
             Date of Birth
@@ -289,7 +346,7 @@ export default function PersonalInfoFields({
             type="date"
             value={data.dob}
             onChange={(e) => onChange("dob", e.target.value)}
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white"
+            className="w-full border border-neutral-200 bg-neutral-50/30 px-2.5 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
           />
         </div>
         <div>
@@ -299,9 +356,9 @@ export default function PersonalInfoFields({
           <select
             value={data.gender}
             onChange={(e) => onChange("gender", e.target.value)}
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white cursor-pointer"
+            className="w-full border border-neutral-200 bg-neutral-50/30 px-2.5 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
           >
-            <option value="">Select Gender</option>
+            <option value="">Select</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
             <option value="Other">Other</option>
@@ -314,9 +371,9 @@ export default function PersonalInfoFields({
           <select
             value={data.bloodGroup}
             onChange={(e) => onChange("bloodGroup", e.target.value)}
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white cursor-pointer"
+            className="w-full border border-neutral-200 bg-neutral-50/30 px-2.5 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
           >
-            <option value="">Select Blood Group</option>
+            <option value="">Select</option>
             <option value="A+">A+</option>
             <option value="A-">A-</option>
             <option value="B+">B+</option>
@@ -327,10 +384,6 @@ export default function PersonalInfoFields({
             <option value="O-">O-</option>
           </select>
         </div>
-      </div>
-
-      {/* ন্যাশনালিটি ও ভাষা */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
             Nationality
@@ -340,33 +393,96 @@ export default function PersonalInfoFields({
             value={data.nationality}
             onChange={(e) => onChange("nationality", e.target.value)}
             placeholder="e.g. Indian"
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white"
-          />
-        </div>
-        <div>
-          <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
-            Languages Known (Comma Separated)
-          </label>
-          <input
-            type="text"
-            value={data.languages}
-            onChange={(e) => onChange("languages", e.target.value)}
-            placeholder="e.g. Bengali, English, Hindi"
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white"
+            className="w-full border border-neutral-200 bg-neutral-50/30 px-2.5 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
           />
         </div>
       </div>
 
-      {/* বায়ো */}
+      {/* ভাষা ও প্রোফিসিয়েন্সি (Read / Write / Speak) */}
+      <div className="p-3 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-2.5">
+        <label className="block text-[11px] font-mono uppercase text-neutral-600 font-bold">
+          Languages & Proficiency
+        </label>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={newLangName}
+            onChange={(e) => setNewLangName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddLanguage();
+              }
+            }}
+            placeholder="e.g. Bengali, English, Hindi..."
+            className="flex-1 border border-neutral-200 bg-white px-3 py-1.5 text-xs font-mono outline-none focus:border-neutral-950"
+          />
+          <button
+            type="button"
+            onClick={handleAddLanguage}
+            className="px-3 py-1.5 bg-neutral-900 text-white text-xs font-mono uppercase rounded-xs cursor-pointer flex items-center gap-1"
+          >
+            <Plus className="h-3.5 w-3.5" /> Add
+          </button>
+        </div>
+
+        <div className="space-y-1.5">
+          {langList.map((lang, idx) => (
+            <div
+              key={idx}
+              className="flex flex-wrap items-center justify-between gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-xs text-xs font-mono"
+            >
+              <span className="font-semibold text-neutral-900">
+                {lang.name}
+              </span>
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-1 cursor-pointer text-[11px]">
+                  <input
+                    type="checkbox"
+                    checked={lang.read}
+                    onChange={() => toggleLangSkill(idx, "read")}
+                  />
+                  <span>Read</span>
+                </label>
+                <label className="flex items-center gap-1 cursor-pointer text-[11px]">
+                  <input
+                    type="checkbox"
+                    checked={lang.write}
+                    onChange={() => toggleLangSkill(idx, "write")}
+                  />
+                  <span>Write</span>
+                </label>
+                <label className="flex items-center gap-1 cursor-pointer text-[11px]">
+                  <input
+                    type="checkbox"
+                    checked={lang.speak}
+                    onChange={() => toggleLangSkill(idx, "speak")}
+                  />
+                  <span>Speak</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => removeLanguage(idx)}
+                  className="text-neutral-400 hover:text-red-600 ml-1 cursor-pointer"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* প্রফেশনাল সামারি / বায়ো */}
       <div>
         <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
-          About You (Bio)
+          Professional Summary / Career Objective
         </label>
         <textarea
           rows={3}
           value={data.bio}
           onChange={(e) => onChange("bio", e.target.value)}
-          placeholder="Write a short summary about yourself..."
+          placeholder="Write your professional introduction, career objective & summary..."
           className="w-full border border-neutral-200 bg-neutral-50/30 p-3 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white resize-none"
         />
       </div>

@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, User } from "lucide-react";
+import { ArrowUpRight, User, LogOut } from "lucide-react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -16,13 +16,11 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [loadingAuth, setLoadingAuth] = useState<boolean>(true);
 
-  // ১. ইউজার অথেন্টিকেশন চেক
+  // ১. ইউজার অথেন্টিকেশন চেক (প্রতিবার রুট/পেজ চেঞ্জ হলেও আপডেট হবে)
   useEffect(() => {
     async function checkUserAuth() {
-      // localStorage চেক (Kagaz Custom PIN সেশন)
       const activeId = localStorage.getItem("kagaz_active_id");
 
-      // Supabase Auth সেশন চেক
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -37,7 +35,6 @@ export default function Navbar() {
 
     checkUserAuth();
 
-    // Supabase auth স্টেট পরিবর্তনের লিসেনার
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -48,7 +45,17 @@ export default function Navbar() {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [pathname]);
+
+  // ২. লগআউট হ্যান্ডলার
+  const handleLogout = async () => {
+    localStorage.removeItem("kagaz_active_id");
+    localStorage.removeItem("kagaz_card_id");
+    localStorage.removeItem("kagaz_role");
+    await supabase.auth.signOut();
+    setIsLoggedIn(false);
+    router.replace("/auth");
+  };
 
   // একটিভ পাথ ও প্যারামিটার ম্যাচিং লজিক
   const isActive = (path: string, queryType?: string) => {
@@ -65,8 +72,8 @@ export default function Navbar() {
     { name: "Home", href: "/", active: isActive("/") },
     {
       name: "Create CV",
-      href: isLoggedIn ? "/dashboard/individual" : "/auth",
-      active: isActive("/dashboard"),
+      href: "/cv-builder",
+      active: isActive("/cv-builder"),
     },
     {
       name: "Find Talent",
@@ -118,8 +125,8 @@ export default function Navbar() {
           {loadingAuth ? (
             <div className="h-9 w-24 bg-neutral-100 animate-pulse rounded-xs" />
           ) : isLoggedIn ? (
-            /* ১. লগইন থাকলে: শুধু Account বাটন ও Logout */
-            <div className="flex items-center gap-3">
+            /* ১. লগইন থাকলে: Account বাটন ও Logout বাটন */
+            <div className="flex items-center gap-2.5">
               <Link
                 href="/dashboard"
                 className="group inline-flex items-center gap-2 bg-neutral-950 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.15em] text-white shadow-sm transition-all duration-300 hover:bg-neutral-800 rounded-xs"
@@ -128,6 +135,16 @@ export default function Navbar() {
                 <span>Account</span>
                 <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Link>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                title="Logout"
+                className="inline-flex items-center gap-1.5 border border-neutral-300 bg-white px-3.5 py-2.5 text-xs font-mono uppercase tracking-wider text-neutral-700 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors cursor-pointer rounded-xs"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
             </div>
           ) : (
             /* ২. লগইন না থাকলে: একটাই পরিষ্কার বাটন */

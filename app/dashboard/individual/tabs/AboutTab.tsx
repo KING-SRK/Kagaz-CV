@@ -3,10 +3,10 @@
 
 import PersonalInfoFields, {
   PersonalInfoData,
-} from "./components/PersonalInfoFields";
+} from "./_components/PersonalInfoFields";
 import DynamicSocialLinks, {
   SocialLink,
-} from "./components/DynamicSocialLinks";
+} from "./_components/DynamicSocialLinks";
 
 export interface AboutTabData {
   avatarUrl?: string;
