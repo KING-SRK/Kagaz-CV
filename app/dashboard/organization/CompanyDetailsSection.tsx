@@ -8,17 +8,18 @@ import {
   MapPin,
   Package,
   ShieldCheck,
-  Users,
-  Award,
   Clock,
-  Share2,
-  FolderKanban,
   ChevronRight,
   Sparkles,
   Pencil,
   X,
   Check,
   Loader2,
+  Users,
+  Briefcase,
+  Award,
+  FolderKanban,
+  FileText,
 } from "lucide-react";
 
 import {
@@ -29,10 +30,16 @@ import {
 
 // আমরা পরের ধাপে একে একে এই ট্যাব কম্পোনেন্টগুলো বানাবো
 import OrgBasicTab from "./tabs/OrgBasicTab";
-import OrgContactLocationTab from "./tabs/OrgContactLocationTab";
+import OrgContactTab from "./tabs/OrgContactTab";
+import OrgLocationTab from "./tabs/OrgLocationTab";
 import OrgOfferingsTab from "./tabs/OrgOfferingsTab";
-import OrgTeamLegalTab from "./tabs/OrgTeamLegalTab";
-import OrgOperationsPortfolioTab from "./tabs/OrgOperationsPortfolioTab";
+import OrgLegalTab from "./tabs/OrgLegalTab";
+import OrgTeamTab from "./tabs/OrgTeamTab";
+import OrgCareersTab from "./tabs/OrgCareersTab";
+import OrgAchievementsTab from "./tabs/OrgAchievementsTab";
+import OrgOperationsTab from "./tabs/OrgOperationsTab";
+import OrgPortfolioTab from "./tabs/OrgPortfolioTab";
+import OrgDocumentsTab from "./tabs/OrgDocumentsTab";
 
 export default function CompanyDetailsSection() {
   const [activeTab, setActiveTab] = useState<string>("basic");
@@ -102,14 +109,20 @@ export default function CompanyDetailsSection() {
   const sections = [
     {
       id: "basic",
-      title: "Basic & Digital Presence",
+      title: "Basic Company Information",
       desc: "Company name, logo, business type, industry & social links.",
       icon: Building2,
     },
     {
-      id: "contact_location",
-      title: "Contacts & Branches",
-      desc: "Department contacts, office addresses & map locations.",
+      id: "contact",
+      title: "Contact Information",
+      desc: "Official emails, phone numbers, WhatsApp & department contacts.",
+      icon: PhoneCall,
+    },
+    {
+      id: "location",
+      title: "Business Locations",
+      desc: "Head office, branches, retail stores & Google Maps links.",
       icon: MapPin,
     },
     {
@@ -119,16 +132,46 @@ export default function CompanyDetailsSection() {
       icon: Package,
     },
     {
-      id: "team_legal",
-      title: "Team & Legal Vault",
-      desc: "Leadership team connections & GST/PAN/Registration IDs.",
+      id: "legal",
+      title: "Legal & Government Registration",
+      desc: "GSTIN, PAN, CIN, Udyam, Trade/FSSAI licences & compliance.",
       icon: ShieldCheck,
     },
     {
-      id: "ops_portfolio",
-      title: "Operations & Portfolio",
-      desc: "Working hours, payment methods, projects & awards.",
+      id: "team",
+      title: "Company Team & Management",
+      desc: "Founders, leadership team & verified SutraNet members.",
+      icon: Users,
+    },
+    {
+      id: "careers",
+      title: "Careers & Job Vacancies",
+      desc: "Job openings, job applications & interviews.",
+      icon: Briefcase,
+    },
+    {
+      id: "achievements",
+      title: "Achievements & Certifications",
+      desc: "Awards, certifications & recognitions.",
+      icon: Award,
+    },
+    {
+      id: "operations",
+      title: "Business Operations",
+      desc: "Opening hours, home delivery, online orders & payment methods.",
       icon: Clock,
+    },
+    {
+      id: "portfolio",
+      title: "Company Portfolio & Gallery",
+      desc: "Showcase of company products & services.",
+      icon: FolderKanban,
+    },
+    {
+      id: "documents",
+      title: "Company Profile Documents",
+      desc: "Company profile, visiting card, business introduction & catalogue.",
+      icon: FileText,
     },
   ];
 
@@ -174,7 +217,7 @@ export default function CompanyDetailsSection() {
   return (
     <div className="border border-neutral-200/80 bg-white shadow-xs select-none rounded-xs">
       {/* ১. সেকশন হেডার */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 p-6">
+      <div className="sticky top-16 z-20 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 p-6">
         <div>
           <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-600 font-semibold flex items-center gap-1.5">
             <Sparkles className="h-3 w-3" /> Organization Profile
@@ -186,45 +229,50 @@ export default function CompanyDetailsSection() {
 
         {/* এডিট / সেভ বাটন */}
         <div className="flex items-center gap-3">
-          {!isEditing ? (
-            <button
-              type="button"
-              onClick={() => {
-                setDraft(company);
-                setIsEditing(true);
-              }}
-              className="inline-flex items-center gap-2 bg-neutral-950 hover:bg-neutral-800 text-white px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-xs transition-colors cursor-pointer"
-            >
-              <Pencil className="h-3.5 w-3.5 text-neutral-300" />
-              <span>Edit Business Profile</span>
-            </button>
-          ) : (
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setDraft(company);
-                  setIsEditing(false);
-                }}
-                disabled={saving}
-                className="inline-flex items-center gap-1.5 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 px-3.5 py-2 text-xs font-mono uppercase tracking-wider rounded-xs cursor-pointer"
-              >
-                <X className="h-3.5 w-3.5" />
-                <span>Cancel</span>
-              </button>
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={saving}
-                className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-xs cursor-pointer shadow-xs"
-              >
-                {saving ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <Check className="h-3.5 w-3.5" />
-                )}
-                <span>{saving ? "Saving..." : "Save"}</span>
-              </button>
+          {/* এডিট / সেভ বাটন (Careers ট্যাবে এটি হাইড থাকবে কারণ Careers-এর নিজস্ব ফর্ম আছে) */}
+          {activeTab !== "careers" && activeTab !== "documents" && (
+            <div className="flex items-center gap-3">
+              {!isEditing ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDraft(company);
+                    setIsEditing(true);
+                  }}
+                  className="inline-flex items-center gap-2 bg-neutral-950 hover:bg-neutral-800 text-white px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-xs transition-colors cursor-pointer"
+                >
+                  <Pencil className="h-3.5 w-3.5 text-neutral-300" />
+                  <span>Edit Business Profile</span>
+                </button>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDraft(company);
+                      setIsEditing(false);
+                    }}
+                    disabled={saving}
+                    className="inline-flex items-center gap-1.5 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 px-3.5 py-2 text-xs font-mono uppercase tracking-wider rounded-xs cursor-pointer"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                    <span>Cancel</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-xs cursor-pointer shadow-xs"
+                  >
+                    {saving ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Check className="h-3.5 w-3.5" />
+                    )}
+                    <span>{saving ? "Saving..." : "Save"}</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -283,7 +331,7 @@ export default function CompanyDetailsSection() {
         </div>
 
         {/* ৩. ডানদিকের মূল ট্যাব এরিয়া */}
-        <div className="md:col-span-8 p-6 sm:p-8">
+        <div className="md:col-span-8 p-6 sm:p-8 md:sticky md:top-40 self-start">
           {activeTab === "basic" && (
             <OrgBasicTab
               isEditing={isEditing}
@@ -294,13 +342,23 @@ export default function CompanyDetailsSection() {
             />
           )}
 
-          {activeTab === "contact_location" && (
-            <OrgContactLocationTab
+          {activeTab === "contact" && (
+            <OrgContactTab
               isEditing={isEditing}
               contacts={isEditing ? draft.contacts : company.contacts}
-              branches={isEditing ? draft.branches : company.branches}
+              website={isEditing ? draft.website : company.website}
               onChange={(updated) =>
                 setDraft((prev) => ({ ...prev, ...updated }))
+              }
+            />
+          )}
+
+          {activeTab === "location" && (
+            <OrgLocationTab
+              isEditing={isEditing}
+              branches={isEditing ? draft.branches : company.branches}
+              onChange={(newBranches) =>
+                setDraft((prev) => ({ ...prev, branches: newBranches }))
               }
             />
           )}
@@ -315,31 +373,69 @@ export default function CompanyDetailsSection() {
             />
           )}
 
-          {activeTab === "team_legal" && (
-            <OrgTeamLegalTab
+          {activeTab === "legal" && (
+            <OrgLegalTab
               isEditing={isEditing}
-              teamMembers={
-                isEditing ? draft.team_members : company.team_members
-              }
               legalInfo={isEditing ? draft.legal_info : company.legal_info}
-              onChange={(updated) =>
-                setDraft((prev) => ({ ...prev, ...updated }))
+              onChange={(newLegal) =>
+                setDraft((prev) => ({ ...prev, legal_info: newLegal }))
               }
             />
           )}
 
-          {activeTab === "ops_portfolio" && (
-            <OrgOperationsPortfolioTab
+          {activeTab === "team" && (
+            <OrgTeamTab
               isEditing={isEditing}
-              operations={isEditing ? draft.operations : company.operations}
-              portfolio={isEditing ? draft.portfolio : company.portfolio}
+              teamMembers={
+                isEditing ? draft.team_members : company.team_members
+              }
+              onChange={(newTeam) =>
+                setDraft((prev) => ({ ...prev, team_members: newTeam }))
+              }
+            />
+          )}
+
+          {activeTab === "careers" && (
+            <OrgCareersTab companyId={profileId} kagazId={company.kagaz_id} />
+          )}
+
+          {activeTab === "achievements" && (
+            <OrgAchievementsTab
+              isEditing={isEditing}
               achievements={
                 isEditing ? draft.achievements : company.achievements
               }
-              onChange={(updated) =>
-                setDraft((prev) => ({ ...prev, ...updated }))
+              onChange={(newAchievements) =>
+                setDraft((prev) => ({
+                  ...prev,
+                  achievements: newAchievements,
+                }))
               }
             />
+          )}
+
+          {activeTab === "operations" && (
+            <OrgOperationsTab
+              isEditing={isEditing}
+              operations={isEditing ? draft.operations : company.operations}
+              onChange={(newOps) =>
+                setDraft((prev) => ({ ...prev, operations: newOps }))
+              }
+            />
+          )}
+
+          {activeTab === "portfolio" && (
+            <OrgPortfolioTab
+              isEditing={isEditing}
+              portfolio={isEditing ? draft.portfolio : company.portfolio}
+              onChange={(newPortfolio) =>
+                setDraft((prev) => ({ ...prev, portfolio: newPortfolio }))
+              }
+            />
+          )}
+
+          {activeTab === "documents" && (
+            <OrgDocumentsTab company={isEditing ? draft : company} />
           )}
         </div>
       </div>

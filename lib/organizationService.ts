@@ -3,12 +3,15 @@ import { supabase } from "@/lib/supabaseClient";
 
 export interface OrgContactItem {
   id: string;
-  department: string; // e.g. General, Sales, HR, Support
+  department: string; // General Enquiries, Sales Department, HR Department, Customer Support, etc.
   personName: string;
   designation: string;
-  phone: string;
-  whatsapp: string;
-  email: string;
+  phone: string; // Primary Mobile Number
+  secondaryPhone?: string; // Secondary Mobile Number
+  whatsapp: string; // WhatsApp Number
+  supportPhone?: string; // Customer Support Number
+  email: string; // Official Email
+  enquiryEmail?: string; // Business Enquiry Email
   isPublic: boolean;
 }
 
@@ -40,24 +43,46 @@ export interface OrgOfferingItem {
 
 export interface OrgTeamMember {
   id: string;
-  kagazId?: string; // যদি SutraNet প্রোফাইল থাকে
+  kagazId?: string; // SutraNet Individual ID
   name: string;
   designation: string;
   department: string;
   intro: string;
+  avatarUrl?: string; // কানেক্ট করা SutraNet প্রোফাইল থেকে আসা ছবি (নতুন আপলোড নয়)
   consentVerified: boolean;
+  status?: "Pending Consent" | "Accepted";
 }
 
 export interface OrgLegalInfo {
   gstin?: string;
   showGstin?: boolean;
-  pan?: string; // ডিফল্ট প্রাইভেট থাকবে
+  pan?: string; // সর্বদা প্রাইভেট থাকবে
   cin?: string;
   llpin?: string;
   udyam?: string;
+  shopEstablishment?: string;
   tradeLicense?: string;
   fssai?: string;
-  otherLicense?: string;
+  iec?: string;
+  professionalTax?: string;
+  otherLicenseName?: string;
+  otherLicenseNumber?: string;
+  // Verification & Consent fields
+  verificationDocUrl?: string; // Google Drive / DigiLocker / Official PDF URL (no direct image upload)
+  verificationStatus?: "Unverified" | "Pending Review" | "Verified";
+  verificationConsent?: boolean;
+}
+
+export interface OrgAchievementItem {
+  id: string;
+  title: string;
+  category?: string;
+  issuer: string;
+  date: string;
+  description: string; // 🆕 '?' সরিয়ে শুধু 'string' রাখো
+  certificationId?: string;
+  verificationUrl?: string;
+  isVerified?: boolean;
 }
 
 export interface OrgOperations {
@@ -65,10 +90,24 @@ export interface OrgOperations {
   openingTime: string;
   closingTime: string;
   status: "Open" | "Closed" | "Temporarily Closed";
+  customerService?: string;
   homeDelivery: boolean;
   onlineOrders: boolean;
   paymentMethods: string[];
   serviceArea: string;
+  holidaySchedule?: string;
+  temporaryClosureNote?: string;
+}
+
+export interface OrgPortfolioItem {
+  id: string;
+  title: string; // Project Name
+  category: string; // Project Category
+  description: string; // Project Description
+  completionDate?: string; // Project Completion Date
+  url: string;
+  clientName?: string; // Client / Partner Name
+  clientPermission?: boolean; // Client permission checkbox
 }
 
 export interface FullCompanyProfile {
@@ -91,22 +130,10 @@ export interface FullCompanyProfile {
   offerings: OrgOfferingItem[];
   legal_info: OrgLegalInfo;
   team_members: OrgTeamMember[];
-  achievements: {
-    id: string;
-    title: string;
-    issuer: string;
-    date: string;
-    description: string;
-  }[];
+  achievements: OrgAchievementItem[];
   operations: OrgOperations;
   social_links: { id: string; platform: string; url: string }[];
-  portfolio: {
-    id: string;
-    title: string;
-    category: string;
-    description: string;
-    url: string;
-  }[];
+  portfolio: OrgPortfolioItem[];
 }
 
 // ১. শুধুমাত্র company_profiles টেবিল থেকে কোম্পানির সম্পূর্ণ প্রোফাইল লোড করা

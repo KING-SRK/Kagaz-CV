@@ -47,16 +47,16 @@ export default function CompanySmartCard({
     <div
       onClick={() => setIsFlipped((prev) => !prev)}
       title="Click card to flip"
-      className="w-[370px] sm:w-[440px] h-[230px] sm:h-[250px] cursor-pointer select-none [perspective:1200px] group"
+      className="w-92.5 sm:w-110 h-57.5 sm:h-62.5 cursor-pointer select-none perspective-distant group"
     >
       {/* ৩ডি ফ্লিপ কন্টেইনার */}
       <div
-        className={`relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] ${
-          isFlipped ? "[transform:rotateY(180deg)]" : ""
+        className={`relative w-full h-full transition-transform duration-700 transform-3d ${
+          isFlipped ? "transform-[rotateY(180deg)]" : ""
         }`}
       >
         {/* ================= FRONT SIDE (সামনের দিক) ================= */}
-        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-sm overflow-hidden border border-neutral-300 shadow-md bg-white flex">
+        <div className="absolute inset-0 w-full h-full backface-hidden rounded-sm overflow-hidden border border-neutral-300 shadow-md bg-white flex">
           {/* বাম দিকের অংশ */}
           <div className="flex-1 p-5 sm:p-6 flex flex-col justify-between bg-[#FDFCFB] text-neutral-950 relative">
             {/* ওপরের ব্র্যান্ডিং হেডার */}
@@ -130,7 +130,7 @@ export default function CompanySmartCard({
           </div>
 
           {/* ডান দিকের ডার্ক অংশ (QR কোড ও ID) */}
-          <div className="w-[115px] sm:w-[130px] bg-neutral-950 text-white p-3.5 flex flex-col items-center justify-between border-l border-neutral-800 shrink-0">
+          <div className="w-28.75 sm:w-32.5 bg-neutral-950 text-white p-3.5 flex flex-col items-center justify-between border-l border-neutral-800 shrink-0">
             <span className="text-[8.5px] font-mono uppercase tracking-[0.2em] text-neutral-400 text-center">
               OFFICIAL ID
             </span>
@@ -151,7 +151,7 @@ export default function CompanySmartCard({
         </div>
 
         {/* ================= BACK SIDE (পেছনের দিক) ================= */}
-        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-sm overflow-hidden border border-neutral-800 shadow-md bg-neutral-950 text-white p-5 sm:p-6 flex flex-col justify-between">
+        <div className="absolute inset-0 w-full h-full backface-hidden transform-[rotateY(180deg)] rounded-sm overflow-hidden border border-neutral-800 shadow-md bg-neutral-950 text-white p-5 sm:p-6 flex flex-col justify-between">
           {/* ওপরের ম্যাগনেটিক স্ট্রিপ স্টাইল ও হেডার */}
           <div className="flex items-center justify-between border-b border-neutral-800 pb-2.5">
             <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-neutral-400">

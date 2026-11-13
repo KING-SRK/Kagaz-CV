@@ -148,7 +148,7 @@ export default function OrganizationDashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#FDFCFB] text-neutral-950">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
         {/* ১. উপরের আইডেন্টিটি ও কোম্পানির স্মার্ট কার্ড সেকশন */}
         <div className="border border-neutral-200/80 bg-white p-6 sm:p-8 shadow-xs rounded-xs">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">

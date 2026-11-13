@@ -12,54 +12,24 @@ import {
   Plus,
   Trash2,
   Link as LinkIcon,
+  Hash,
 } from "lucide-react";
 import { FullCompanyProfile } from "@/lib/organizationService";
 import { uploadAvatar } from "@/lib/individualService";
+import {
+  BUSINESS_TYPES,
+  INDUSTRY_CATEGORIES,
+  INDUSTRIES,
+  BUSINESS_SIZES,
+  formatOtherDisplay,
+} from "@/constants/orgOptions";
+import { FormInput, FormSelectWithOther } from "@/components/ui/FormFields";
 
 interface Props {
   isEditing: boolean;
   data: FullCompanyProfile;
   onChange: (updated: Partial<FullCompanyProfile>) => void;
 }
-
-const BUSINESS_TYPES = [
-  "Sole Proprietorship",
-  "Partnership Firm",
-  "Limited Liability Partnership (LLP)",
-  "Private Limited Company",
-  "Public Limited Company",
-  "One Person Company (OPC)",
-  "Startup",
-  "Freelancer / Independent Business",
-  "Local Shop / Retail Business",
-  "Non-Profit Organisation",
-  "Other",
-];
-
-const INDUSTRIES = [
-  "Information Technology & Software",
-  "Computer Sales, Repair & Electronics",
-  "Education & Training",
-  "Healthcare & Clinic",
-  "Retail & E-commerce",
-  "Food & Restaurant",
-  "Manufacturing",
-  "Construction & Real Estate",
-  "Finance & Consulting",
-  "Transportation & Logistics",
-  "Media & Entertainment",
-  "Professional Services",
-  "Beauty & Fashion",
-  "Other",
-];
-
-const BUSINESS_SIZES = [
-  "1-5 Employees (Micro / Solo)",
-  "6-20 Employees (Small Team)",
-  "21-50 Employees (Growing)",
-  "51-200 Employees (Medium)",
-  "200+ Employees (Enterprise)",
-];
 
 export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -68,27 +38,40 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
   const handleLogoUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     try {
       setUploadingLogo(true);
       const activeId = localStorage.getItem("kagaz_active_id") || "org";
       const { url, error } = await uploadAvatar(activeId, file, data.logo_url);
-      if (!error && url) {
-        onChange({ logo_url: url });
-      }
+      if (!error && url) onChange({ logo_url: url });
     } finally {
       setUploadingLogo(false);
       if (logoInputRef.current) logoInputRef.current.value = "";
     }
   };
 
+  const isOtherIndustry =
+    data.industry === "Other" ||
+    (data.industry !== "" && !INDUSTRIES.includes(data.industry));
+
+  const availableCategories = isOtherIndustry
+    ? ["Other"]
+    : data.industry
+      ? INDUSTRY_CATEGORIES[data.industry] || ["Other"]
+      : [];
+
+  const handleIndustryChange = (val: string) => {
+    onChange({
+      industry: val,
+      business_category: val === "Other" ? "Other" : "",
+    });
+  };
+
   // সোশ্যাল লিংক হ্যান্ডলার
   const addSocialLink = () => {
-    const current = data.social_links || [];
     onChange({
       social_links: [
-        ...current,
-        { id: Date.now().toString(), platform: "Website", url: "" },
+        ...(data.social_links || []),
+        { id: Date.now().toString(), platform: "LinkedIn", url: "" },
       ],
     });
   };
@@ -113,9 +96,12 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
 
   // ==================== VIEW MODE ====================
   if (!isEditing) {
+    const displayType = formatOtherDisplay(data.business_type);
+    const displayIndustry = formatOtherDisplay(data.industry);
+    const displayCategory = formatOtherDisplay(data.business_category);
+
     return (
       <div className="space-y-5">
-        {/* কোম্পানির হেডার কার্ড */}
         <div className="p-4 bg-neutral-50/70 border border-neutral-200/80 rounded-xs flex items-center gap-4">
           <div className="w-14 h-14 rounded-xs border border-neutral-300 bg-white flex items-center justify-center overflow-hidden shrink-0">
             {data.logo_url ? (
@@ -129,38 +115,48 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="text-base font-serif font-bold text-neutral-950 truncate">
-              {data.company_name || "Organization Name Not Set"}
-            </h3>
-            <p className="text-xs font-mono text-neutral-600 truncate">
-              {data.short_description || "No tagline added yet"}
-            </p>
-            <div className="flex flex-wrap gap-1.5 mt-1.5">
-              {data.business_type && (
-                <span className="px-2 py-0.5 bg-white border border-neutral-200 text-[10px] font-mono text-neutral-700 rounded-xs">
-                  {data.business_type}
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-base font-serif font-bold text-neutral-950 truncate">
+                {data.company_name || "Organization Name Not Set"}
+              </h3>
+              {data.kagaz_id && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-neutral-900 text-white text-[10px] font-mono rounded-xs shrink-0">
+                  <Hash className="h-2.5 w-2.5" /> {data.kagaz_id}
                 </span>
               )}
-              {data.industry && (
+            </div>
+            <p className="text-xs font-mono text-neutral-600 truncate mt-0.5">
+              {data.short_description || "No short description added yet"}
+            </p>
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {displayType && (
+                <span className="px-2 py-0.5 bg-white border border-neutral-200 text-[10px] font-mono text-neutral-700 rounded-xs">
+                  {displayType}
+                </span>
+              )}
+              {displayIndustry && (
                 <span className="px-2 py-0.5 bg-emerald-50 border border-emerald-200 text-[10px] font-mono text-emerald-700 rounded-xs">
-                  {data.industry}
+                  {displayIndustry}
+                </span>
+              )}
+              {displayCategory && (
+                <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 text-[10px] font-mono text-blue-700 rounded-xs">
+                  {displayCategory}
                 </span>
               )}
             </div>
           </div>
         </div>
 
-        {/* ৪টি বেসিক তথ্য কার্ড */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
           <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs">
             <span className="text-[9px] uppercase text-neutral-400 block mb-0.5">
-              Category
+              Business Category
             </span>
             <p className="font-medium text-neutral-900 truncate">
-              {data.business_category || "Not Set"}
+              {displayCategory || "Not Set"}
             </p>
           </div>
-
           <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs">
             <span className="text-[9px] uppercase text-neutral-400 flex items-center gap-1 mb-0.5">
               <Calendar className="h-3 w-3" /> Est. Year
@@ -169,16 +165,14 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
               {data.est_year || "Not Set"}
             </p>
           </div>
-
           <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs">
             <span className="text-[9px] uppercase text-neutral-400 flex items-center gap-1 mb-0.5">
-              <Users className="h-3 w-3" /> Team Size
+              <Users className="h-3 w-3" /> Business Size
             </span>
             <p className="font-medium text-neutral-900 truncate">
               {data.business_size || "Not Set"}
             </p>
           </div>
-
           <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs">
             <span className="text-[9px] uppercase text-neutral-400 flex items-center gap-1 mb-0.5">
               <Globe className="h-3 w-3" /> Website
@@ -198,17 +192,15 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
           </div>
         </div>
 
-        {/* বিস্তারিত বিবরণ */}
         <div className="p-3.5 bg-neutral-50/70 border border-neutral-200/80 rounded-xs space-y-1">
           <span className="text-[9.5px] font-mono uppercase text-neutral-400 block">
-            About Organization
+            Detailed Description
           </span>
-          <p className="text-xs text-neutral-700 leading-relaxed">
+          <p className="text-xs text-neutral-700 leading-relaxed whitespace-pre-line">
             {data.detailed_description || "No detailed description added yet."}
           </p>
         </div>
 
-        {/* ডিজিটাল ও সোশ্যাল লিংক */}
         {(data.social_links || []).length > 0 && (
           <div className="space-y-2">
             <span className="text-[10px] font-mono uppercase text-neutral-400 block">
@@ -237,178 +229,114 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
   // ==================== EDIT MODE ====================
   return (
     <div className="space-y-4">
-      {/* লোগো আপলোড */}
-      <div className="p-3 bg-neutral-50/60 border border-neutral-200/80 rounded-xs flex items-center gap-4">
-        <div className="relative w-14 h-14 rounded-xs overflow-hidden border border-neutral-300 bg-white flex items-center justify-center shrink-0">
-          {uploadingLogo ? (
-            <Loader2 className="w-5 h-5 animate-spin text-neutral-800" />
-          ) : data.logo_url ? (
-            <img
-              src={data.logo_url}
-              alt="Logo"
-              className="w-full h-full object-cover"
+      <div className="p-3 bg-neutral-50/60 border border-neutral-200/80 rounded-xs flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="relative w-14 h-14 rounded-xs overflow-hidden border border-neutral-300 bg-white flex items-center justify-center shrink-0">
+            {uploadingLogo ? (
+              <Loader2 className="w-5 h-5 animate-spin text-neutral-800" />
+            ) : data.logo_url ? (
+              <img
+                src={data.logo_url}
+                alt="Logo"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Building2 className="w-7 h-7 text-neutral-400" />
+            )}
+            <button
+              type="button"
+              onClick={() => logoInputRef.current?.click()}
+              className="absolute inset-0 bg-neutral-950/45 hover:bg-neutral-950/65 flex items-center justify-center text-white cursor-pointer"
+            >
+              <Camera className="w-4 h-4" />
+            </button>
+          </div>
+          <div>
+            <span className="text-[10px] font-mono uppercase text-neutral-500 font-bold block">
+              Business Logo (Recommended)
+            </span>
+            <input
+              ref={logoInputRef}
+              type="file"
+              accept="image/png, image/jpeg, image/webp"
+              className="hidden"
+              onChange={handleLogoUpload}
             />
-          ) : (
-            <Building2 className="w-7 h-7 text-neutral-400" />
-          )}
-          <button
-            type="button"
-            onClick={() => logoInputRef.current?.click()}
-            className="absolute inset-0 bg-neutral-950/45 hover:bg-neutral-950/65 flex items-center justify-center text-white cursor-pointer"
-          >
-            <Camera className="w-4 h-4" />
-          </button>
+            <button
+              type="button"
+              onClick={() => logoInputRef.current?.click()}
+              className="mt-1.5 px-3 py-1 bg-neutral-900 text-white text-[10.5px] font-mono uppercase rounded-xs cursor-pointer"
+            >
+              {uploadingLogo ? "Uploading..." : "Upload Logo"}
+            </button>
+          </div>
         </div>
-        <div>
-          <span className="text-[10px] font-mono uppercase text-neutral-500 font-bold block">
-            Business Logo
+
+        <div className="px-3 py-2 bg-white border border-neutral-200 rounded-xs">
+          <span className="text-[9px] font-mono uppercase text-neutral-400 block">
+            Company Profile ID *
           </span>
-          <input
-            ref={logoInputRef}
-            type="file"
-            accept="image/png, image/jpeg, image/webp"
-            className="hidden"
-            onChange={handleLogoUpload}
-          />
-          <button
-            type="button"
-            onClick={() => logoInputRef.current?.click()}
-            className="mt-1.5 px-3 py-1 bg-neutral-900 text-white text-[10.5px] font-mono uppercase rounded-xs cursor-pointer"
-          >
-            {uploadingLogo ? "Uploading..." : "Upload Logo"}
-          </button>
+          <span className="text-xs font-mono font-bold text-neutral-900">
+            {data.kagaz_id || "AUTO-GENERATED"}
+          </span>
         </div>
       </div>
 
-      {/* নাম ও ট্যাগলাইন */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
-            Company / Business Name *
-          </label>
-          <input
-            type="text"
-            value={data.company_name}
-            onChange={(e) => onChange({ company_name: e.target.value })}
-            placeholder="e.g. Grow Tech"
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
-          />
-        </div>
-        <div>
-          <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
-            Short Tagline / One-liner *
-          </label>
-          <input
-            type="text"
-            value={data.short_description}
-            onChange={(e) => onChange({ short_description: e.target.value })}
-            placeholder="e.g. Software Development & Computer Services"
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
-          />
-        </div>
+        <FormInput
+          label="Company / Business Name"
+          required
+          value={data.company_name}
+          onChange={(val) => onChange({ company_name: val })}
+          placeholder="e.g. Grow Tech"
+        />
+        <FormInput
+          label="Short Description"
+          required
+          value={data.short_description}
+          onChange={(val) => onChange({ short_description: val })}
+          placeholder="e.g. Software Development & Computer Services"
+        />
       </div>
 
-      {/* বিজনেস টাইপ ও ইন্ডাস্ট্রি */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
-            Business Type
-          </label>
-          <select
-            value={data.business_type}
-            onChange={(e) => onChange({ business_type: e.target.value })}
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
-          >
-            <option value="">-- Select Business Type --</option>
-            {BUSINESS_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-start">
+        <FormSelectWithOther
+          label="Business Type"
+          required
+          value={data.business_type}
+          options={BUSINESS_TYPES}
+          placeholder="-- Select Business Type --"
+          otherPlaceholder="Specify Business Type..."
+          onChange={(val) => onChange({ business_type: val })}
+        />
 
-        <div>
-          <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
-            Industry
-          </label>
-          <select
-            value={data.industry}
-            onChange={(e) => onChange({ industry: e.target.value })}
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
-          >
-            <option value="">-- Select Industry --</option>
-            {INDUSTRIES.map((ind) => (
-              <option key={ind} value={ind}>
-                {ind}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+        <FormSelectWithOther
+          label="Industry"
+          required
+          value={data.industry}
+          options={INDUSTRIES}
+          placeholder="-- Select Industry --"
+          otherPlaceholder="Specify Industry..."
+          onChange={handleIndustryChange}
+        />
 
-      {/* সাব-ক্যাটাগরি, প্রতিষ্ঠার সাল ও টিম সাইজ */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div>
-          <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
-            Sub-Category
-          </label>
-          <input
-            type="text"
-            value={data.business_category}
-            onChange={(e) => onChange({ business_category: e.target.value })}
-            placeholder="e.g. Web & App Agency"
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
-          />
-        </div>
-        <div>
-          <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
-            Establishment Year
-          </label>
-          <input
-            type="text"
-            value={data.est_year}
-            onChange={(e) => onChange({ est_year: e.target.value })}
-            placeholder="e.g. 2025"
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
-          />
-        </div>
-        <div>
-          <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
-            Business Size
-          </label>
-          <select
-            value={data.business_size}
-            onChange={(e) => onChange({ business_size: e.target.value })}
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
-          >
-            <option value="">Select Size</option>
-            {BUSINESS_SIZES.map((sz) => (
-              <option key={sz} value={sz}>
-                {sz}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* ওয়েবসাইট ও বিস্তারিত বিবরণ */}
-      <div>
-        <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
-          Official Website URL
-        </label>
-        <input
-          type="url"
-          value={data.website}
-          onChange={(e) => onChange({ website: e.target.value })}
-          placeholder="https://yourcompany.com"
-          className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
+        <FormSelectWithOther
+          label="Business Category"
+          required
+          disabled={!data.industry}
+          value={data.business_category}
+          options={availableCategories}
+          placeholder={
+            data.industry ? "-- Select Category --" : "Select Industry First"
+          }
+          otherPlaceholder="Specify Category..."
+          onChange={(val) => onChange({ business_category: val })}
         />
       </div>
 
       <div>
         <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
-          Detailed Description / About Company
+          Detailed Description (Optional)
         </label>
         <textarea
           rows={3}
@@ -419,11 +347,48 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
         />
       </div>
 
-      {/* সোশ্যাল ও ডিজিটাল লিংক */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <FormInput
+          label="Establishment Year (Optional)"
+          type="number"
+          min="1800"
+          max={new Date().getFullYear()}
+          value={data.est_year}
+          onChange={(val) => onChange({ est_year: val })}
+          placeholder="e.g. 2025"
+        />
+
+        <div>
+          <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
+            Business Size (Optional)
+          </label>
+          <select
+            value={data.business_size}
+            onChange={(e) => onChange({ business_size: e.target.value })}
+            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
+          >
+            <option value="">-- Select Size --</option>
+            {BUSINESS_SIZES.map((sz) => (
+              <option key={sz} value={sz}>
+                {sz}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <FormInput
+          label="Company Website (Optional)"
+          type="url"
+          value={data.website}
+          onChange={(val) => onChange({ website: val })}
+          placeholder="https://yourcompany.com"
+        />
+      </div>
+
       <div className="p-3 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-2.5">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-mono uppercase text-neutral-600 font-bold">
-            Social & Digital Links (Instagram, LinkedIn, Google Business, etc.)
+            Social & Digital Links
           </span>
           <button
             type="button"
