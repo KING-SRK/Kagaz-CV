@@ -1,5 +1,7 @@
+// app/dashboard/individual/tabs/ExperienceTab.tsx
 "use client";
 
+import { useEffect } from "react";
 import { Building2, Calendar, Plus, Trash2, Briefcase } from "lucide-react";
 
 export interface ExperienceItem {
@@ -19,23 +21,31 @@ interface Props {
   onChange: (list: ExperienceItem[]) => void;
 }
 
+const createDefaultExperience = (): ExperienceItem => ({
+  id: Date.now().toString(),
+  company: "",
+  designation: "",
+  employmentType: "Full-time",
+  startDate: "",
+  endDate: "",
+  isCurrent: false,
+  responsibilities: "",
+});
+
 export default function ExperienceTab({
   isEditing,
   experienceList = [],
   onChange,
 }: Props) {
+  // ⚡ নিয়ম অনুযায়ী: এডিট মোডে গেলে এবং লিস্ট খালি থাকলে অটোমেটিক ১টি ডিফল্ট ফর্ম ওপেন থাকবে
+  useEffect(() => {
+    if (isEditing && experienceList.length === 0) {
+      onChange([createDefaultExperience()]);
+    }
+  }, [isEditing, experienceList.length, onChange]);
+
   const handleAdd = () => {
-    const newItem: ExperienceItem = {
-      id: Date.now().toString(),
-      company: "",
-      designation: "",
-      employmentType: "Full-time",
-      startDate: "",
-      endDate: "",
-      isCurrent: false,
-      responsibilities: "",
-    };
-    onChange([...experienceList, newItem]);
+    onChange([...experienceList, createDefaultExperience()]);
   };
 
   const handleUpdate = (
@@ -53,55 +63,99 @@ export default function ExperienceTab({
     onChange(experienceList.filter((item) => item.id !== id));
   };
 
+  const displayList =
+    experienceList.length > 0 ? experienceList : [createDefaultExperience()];
+
   // ==================== VIEW MODE ====================
   if (!isEditing) {
-    if (experienceList.length === 0) {
-      return (
-        <div className="p-8 border border-dashed border-neutral-200 rounded-xs text-center space-y-1">
-          <Briefcase className="h-6 w-6 text-neutral-300 mx-auto" />
-          <p className="text-xs font-mono text-neutral-500">
-            No employment history added yet.
-          </p>
-        </div>
-      );
-    }
-
     return (
-      <div className="space-y-3">
-        {experienceList.map((exp) => (
-          <div
-            key={exp.id}
-            className="p-4 bg-neutral-50/70 border border-neutral-200/80 rounded-xs space-y-2"
-          >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-              <div>
-                <h3 className="text-sm font-serif font-bold text-neutral-950">
-                  {exp.designation || "Role Not Specified"}
-                </h3>
-                <p className="text-xs font-mono text-neutral-600 flex items-center gap-1.5 mt-0.5">
-                  <Building2 className="h-3.5 w-3.5 text-neutral-400" />
-                  <span>{exp.company || "Company Name"}</span>
-                  <span className="px-1.5 py-0.2 bg-white border border-neutral-200 text-[10px] rounded-xs">
-                    {exp.employmentType}
-                  </span>
-                </p>
-              </div>
-              <div className="text-[11px] font-mono text-neutral-500 flex items-center gap-1 bg-white px-2.5 py-1 border border-neutral-200/70 rounded-xs self-start">
-                <Calendar className="h-3 w-3 text-neutral-400" />
-                <span>
-                  {exp.startDate || "Start"} —{" "}
-                  {exp.isCurrent ? "Present" : exp.endDate || "End"}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
+            <Briefcase className="h-3.5 w-3.5 text-emerald-600" />
+            Work History & Experience ({displayList.length})
+          </span>
+        </div>
+
+        <div className="space-y-4">
+          {displayList.map((exp, idx) => (
+            <div
+              key={exp.id}
+              className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
+            >
+              {/* কার্ড হেডার */}
+              <div className="flex items-center justify-between border-b border-neutral-200/80 pb-2.5">
+                <span className="text-[11px] font-mono uppercase font-bold text-neutral-700">
+                  Experience #{idx + 1}
+                </span>
+                <span className="px-2 py-0.5 bg-white border border-neutral-200 text-[10px] font-mono text-neutral-700 rounded-xs">
+                  {exp.employmentType || "Full-time"}
                 </span>
               </div>
-            </div>
 
-            {exp.responsibilities && (
-              <p className="text-xs text-neutral-700 leading-relaxed pt-1 border-t border-neutral-200/50">
-                {exp.responsibilities}
-              </p>
-            )}
-          </div>
-        ))}
+              {/* রো ১: Designation, Company & Duration */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
+                    Designation / Role
+                  </span>
+                  <p
+                    className={`font-medium truncate ${
+                      exp.designation ? "text-neutral-900" : "text-neutral-400"
+                    }`}
+                  >
+                    {exp.designation || "Not Set"}
+                  </p>
+                </div>
+
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <span className="text-[9.5px] uppercase text-neutral-400 flex items-center gap-1 mb-0.5">
+                    <Building2 className="h-3 w-3" /> Company / Organization
+                  </span>
+                  <p
+                    className={`font-medium truncate ${
+                      exp.company ? "text-neutral-900" : "text-neutral-400"
+                    }`}
+                  >
+                    {exp.company || "Not Set"}
+                  </p>
+                </div>
+
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <span className="text-[9.5px] uppercase text-neutral-400 flex items-center gap-1 mb-0.5">
+                    <Calendar className="h-3 w-3" /> Employment Duration
+                  </span>
+                  <p
+                    className={`font-medium truncate ${
+                      exp.startDate || exp.isCurrent
+                        ? "text-neutral-900"
+                        : "text-neutral-400"
+                    }`}
+                  >
+                    {exp.startDate || "Start"} —{" "}
+                    {exp.isCurrent ? "Present" : exp.endDate || "End"}
+                  </p>
+                </div>
+              </div>
+
+              {/* রো ২: Key Responsibilities */}
+              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs text-xs">
+                <span className="text-[9.5px] font-mono uppercase text-neutral-400 block mb-0.5">
+                  Key Responsibilities & Achievements
+                </span>
+                <p
+                  className={`leading-relaxed ${
+                    exp.responsibilities
+                      ? "text-neutral-700"
+                      : "text-neutral-400 font-mono"
+                  }`}
+                >
+                  {exp.responsibilities || "Not Set"}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -111,7 +165,7 @@ export default function ExperienceTab({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <span className="text-xs font-mono uppercase text-neutral-500 font-bold">
-          Work Experience ({experienceList.length})
+          Work Experience ({displayList.length})
         </span>
         <button
           type="button"
@@ -123,7 +177,7 @@ export default function ExperienceTab({
         </button>
       </div>
 
-      {experienceList.map((exp, idx) => (
+      {displayList.map((exp, idx) => (
         <div
           key={exp.id}
           className="p-4 bg-neutral-50/50 border border-neutral-200 rounded-xs space-y-3 relative"
@@ -132,14 +186,16 @@ export default function ExperienceTab({
             <span className="text-[10px] font-mono uppercase text-neutral-400 font-bold">
               Experience #{idx + 1}
             </span>
-            <button
-              type="button"
-              onClick={() => handleRemove(exp.id)}
-              className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
-              title="Remove"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
+            {displayList.length > 1 && (
+              <button
+                type="button"
+                onClick={() => handleRemove(exp.id)}
+                className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
+                title="Remove"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -153,7 +209,7 @@ export default function ExperienceTab({
                 onChange={(e) =>
                   handleUpdate(exp.id, "company", e.target.value)
                 }
-                placeholder="e.g. Grow Tech"
+                placeholder="Enter company or organization name"
                 className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950"
               />
             </div>
@@ -167,7 +223,7 @@ export default function ExperienceTab({
                 onChange={(e) =>
                   handleUpdate(exp.id, "designation", e.target.value)
                 }
-                placeholder="e.g. Full-Stack Web Developer"
+                placeholder="Enter your designation or professional role"
                 className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950"
               />
             </div>
@@ -241,7 +297,7 @@ export default function ExperienceTab({
               onChange={(e) =>
                 handleUpdate(exp.id, "responsibilities", e.target.value)
               }
-              placeholder="Describe your role, achievements & daily responsibilities..."
+              placeholder="Enter your key responsibilities, achievements and role scope"
               className="w-full border border-neutral-200 bg-white p-2.5 text-xs font-mono outline-none focus:border-neutral-950 resize-none"
             />
           </div>

@@ -281,7 +281,7 @@ export default function OrgContactTab({
           type="url"
           value={website}
           onChange={(val) => onChange({ website: val })}
-          placeholder="https://www.organization.in"
+          placeholder="Enter your official website URL"
         />
       </div>
 
@@ -367,14 +367,14 @@ export default function OrgContactTab({
                 label="Contact Person"
                 value={c.personName}
                 onChange={(val) => updateContact(c.id, "personName", val)}
-                placeholder="e.g. Rajesh Sharma"
+                placeholder="Enter contact person full name"
               />
 
               <FormInput
                 label="Contact Person Designation"
                 value={c.designation}
                 onChange={(val) => updateContact(c.id, "designation", val)}
-                placeholder="e.g. Head of Operations"
+                placeholder="Enter contact person designation"
               />
             </div>
 
@@ -385,7 +385,7 @@ export default function OrgContactTab({
                 type="email"
                 value={c.email}
                 onChange={(val) => updateContact(c.id, "email", val)}
-                placeholder="contact@organization.in"
+                placeholder="Enter your official email"
               />
 
               <FormInput
@@ -393,7 +393,7 @@ export default function OrgContactTab({
                 type="email"
                 value={c.enquiryEmail || ""}
                 onChange={(val) => updateContact(c.id, "enquiryEmail", val)}
-                placeholder="enquiries@organization.in"
+                placeholder="Enter your business enquiry email"
               />
             </div>
 
@@ -404,7 +404,7 @@ export default function OrgContactTab({
                 type="tel"
                 value={c.phone}
                 onChange={(val) => updateContact(c.id, "phone", val)}
-                placeholder="+91 98300 12345"
+                placeholder="Enter your primary mobile number"
               />
 
               <FormInput
@@ -412,7 +412,7 @@ export default function OrgContactTab({
                 type="tel"
                 value={c.secondaryPhone || ""}
                 onChange={(val) => updateContact(c.id, "secondaryPhone", val)}
-                placeholder="+91 98300 67890"
+                placeholder="Enter your secondary mobile number"
               />
 
               <FormInput
@@ -420,7 +420,7 @@ export default function OrgContactTab({
                 type="tel"
                 value={c.whatsapp}
                 onChange={(val) => updateContact(c.id, "whatsapp", val)}
-                placeholder="+91 98300 12345"
+                placeholder="Enter your WhatsApp number"
               />
 
               <FormInput
@@ -428,7 +428,7 @@ export default function OrgContactTab({
                 type="tel"
                 value={c.supportPhone || ""}
                 onChange={(val) => updateContact(c.id, "supportPhone", val)}
-                placeholder="1800-120-4567"
+                placeholder="Enter your customer support number"
               />
             </div>
           </div>

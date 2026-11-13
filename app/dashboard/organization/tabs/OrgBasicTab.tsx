@@ -288,14 +288,14 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
           required
           value={data.company_name}
           onChange={(val) => onChange({ company_name: val })}
-          placeholder="e.g. Grow Tech"
+          placeholder="Enter your company or business name"
         />
         <FormInput
           label="Short Description"
           required
           value={data.short_description}
           onChange={(val) => onChange({ short_description: val })}
-          placeholder="e.g. Software Development & Computer Services"
+          placeholder="Enter your short business tagline or summary"
         />
       </div>
 
@@ -305,8 +305,8 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
           required
           value={data.business_type}
           options={BUSINESS_TYPES}
-          placeholder="-- Select Business Type --"
-          otherPlaceholder="Specify Business Type..."
+          placeholder="Select business type"
+          otherPlaceholder="Enter your business type"
           onChange={(val) => onChange({ business_type: val })}
         />
 
@@ -315,8 +315,8 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
           required
           value={data.industry}
           options={INDUSTRIES}
-          placeholder="-- Select Industry --"
-          otherPlaceholder="Specify Industry..."
+          placeholder="Select industry"
+          otherPlaceholder="Enter your industry"
           onChange={handleIndustryChange}
         />
 
@@ -327,9 +327,9 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
           value={data.business_category}
           options={availableCategories}
           placeholder={
-            data.industry ? "-- Select Category --" : "Select Industry First"
+            data.industry ? "Select category" : "Select industry first"
           }
-          otherPlaceholder="Specify Category..."
+          otherPlaceholder="Enter your business category"
           onChange={(val) => onChange({ business_category: val })}
         />
       </div>
@@ -342,7 +342,7 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
           rows={3}
           value={data.detailed_description}
           onChange={(e) => onChange({ detailed_description: e.target.value })}
-          placeholder="Write about your company's mission, story & core expertise..."
+          placeholder="Enter your detailed company overview, mission & expertise"
           className="w-full border border-neutral-200 bg-neutral-50/30 p-3 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white resize-none"
         />
       </div>
@@ -355,7 +355,7 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
           max={new Date().getFullYear()}
           value={data.est_year}
           onChange={(val) => onChange({ est_year: val })}
-          placeholder="e.g. 2025"
+          placeholder="Enter your establishment year"
         />
 
         <div>
@@ -367,7 +367,7 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
             onChange={(e) => onChange({ business_size: e.target.value })}
             className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
           >
-            <option value="">-- Select Size --</option>
+            <option value="">Select business size</option>
             {BUSINESS_SIZES.map((sz) => (
               <option key={sz} value={sz}>
                 {sz}
@@ -381,7 +381,7 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
           type="url"
           value={data.website}
           onChange={(val) => onChange({ website: val })}
-          placeholder="https://yourcompany.com"
+          placeholder="Enter your official website URL"
         />
       </div>
 
@@ -412,6 +412,7 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
               <option value="Instagram">Instagram</option>
               <option value="Facebook">Facebook</option>
               <option value="YouTube">YouTube</option>
+              <option value="X">X</option>
               <option value="WhatsApp Business">WhatsApp Business</option>
               <option value="Google Business">Google Business</option>
               <option value="Online Store">Online Store</option>
@@ -421,7 +422,7 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
               type="url"
               value={link.url}
               onChange={(e) => updateSocialLink(link.id, "url", e.target.value)}
-              placeholder="https://..."
+              placeholder="Enter your social or profile URL"
               className="flex-1 border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-mono"
             />
             <button

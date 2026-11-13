@@ -18,6 +18,7 @@ import {
   Building2,
   FolderGit2,
   Award,
+  Target,
 } from "lucide-react";
 
 import FamilyTab from "./tabs/FamilyTab";
@@ -26,6 +27,7 @@ import LocationTab from "./tabs/LocationTab";
 import EducationTab from "./tabs/EducationTab";
 import SkillsTab from "./tabs/SkillsTab";
 import GovtVaultTab from "./tabs/GovtVaultTab";
+import CareerPreferencesTab from "./tabs/CareerPreferencesTab";
 // নতুন ৩টি ট্যাব ইমপোর্ট (এগুলো আমরা পরের ধাপে বানাবো)
 import ExperienceTab, { ExperienceItem } from "./tabs/ExperienceTab";
 import ProjectsTab, { ProjectItem } from "./tabs/ProjectsTab";
@@ -176,6 +178,12 @@ export default function ProfileDetailsSection() {
       desc: "Official IDs & important personal documents.",
       icon: ShieldCheck,
     },
+    {
+      id: "preferences",
+      title: "Career Preferences",
+      desc: "Open to work, freelance availability, preferred role & location.",
+      icon: Target,
+    },
   ];
 
   const handleTabChange = (newTabId: string) => {
@@ -221,6 +229,7 @@ export default function ProfileDetailsSection() {
         certifications: draft.certifications || [],
         achievements: draft.achievements || [],
         references_list: draft.references_list || [],
+        career_preferences: draft.career_preferences,
 
         address_line: primaryLoc.address_line || "",
         city: primaryLoc.city || "",
@@ -267,7 +276,7 @@ export default function ProfileDetailsSection() {
   return (
     <div className="border border-neutral-200/80 bg-white shadow-xs select-none rounded-xs">
       {/* ১. সেকশন হেডার */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 p-6 sticky top-20 z-20 bg-white">
         <div>
           <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-600 font-semibold flex items-center gap-1.5">
             <Sparkles className="h-3 w-3" /> Profile Details
@@ -369,7 +378,7 @@ export default function ProfileDetailsSection() {
         </div>
 
         {/* ৩. ডানদিকের মূল কনটেন্ট এরিয়া */}
-        <div className="md:col-span-8 p-6 sm:p-8 flex flex-col justify-between">
+        <div className="md:col-span-8 p-6 sm:p-8 flex flex-col justify-between md:sticky md:top-44 self-start">
           <div className="min-h-80">
             {activeTab === "about" && (
               <AboutTab
@@ -446,6 +455,23 @@ export default function ProfileDetailsSection() {
                 roleTitle={isEditing ? draft.title : profile.title}
                 onRoleTitleChange={(title: string) =>
                   setDraft((prev) => ({ ...prev, title }))
+                }
+              />
+            )}
+
+            {activeTab === "preferences" && (
+              <CareerPreferencesTab
+                isEditing={isEditing}
+                preferences={
+                  isEditing
+                    ? draft.career_preferences
+                    : profile.career_preferences
+                }
+                onChange={(updatedPrefs) =>
+                  setDraft((prev) => ({
+                    ...prev,
+                    career_preferences: updatedPrefs,
+                  }))
                 }
               />
             )}

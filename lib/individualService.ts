@@ -1,5 +1,6 @@
 // lib/individualService.ts
 import { supabase } from "@/lib/supabaseClient";
+import { CareerPreferences } from "@/app/dashboard/individual/tabs/CareerPreferencesTab";
 
 export interface EducationItem {
   id?: string;
@@ -74,6 +75,7 @@ export interface FullIndividualProfile {
   profile_family: FamilyItem[];
   profile_locations: LocationItem[];
   profile_vault?: VaultItem[];
+  career_preferences?: CareerPreferences;
 }
 
 // lib/individualService.ts-এর ভেতর getIndividualProfile ফাংশনটি আপডেট করো:

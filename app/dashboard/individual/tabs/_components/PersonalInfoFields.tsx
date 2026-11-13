@@ -319,6 +319,7 @@ export default function PersonalInfoFields({
           <input
             type="text"
             value={data.fullName}
+            placeholder="Enter your full name"
             onChange={(e) => onChange("fullName", e.target.value)}
             className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
           />
@@ -330,6 +331,7 @@ export default function PersonalInfoFields({
           <input
             type="text"
             value={data.headline}
+            placeholder="Enter your work title or headline"
             onChange={(e) => onChange("headline", e.target.value)}
             className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
           />

@@ -1,6 +1,15 @@
+// app/dashboard/individual/tabs/ProjectsTab.tsx
 "use client";
 
-import { FolderGit2, ExternalLink, Plus, Trash2, Code2 } from "lucide-react";
+import { useEffect } from "react";
+import {
+  FolderGit2,
+  ExternalLink,
+  Plus,
+  Trash2,
+  Code2,
+  Calendar,
+} from "lucide-react";
 
 export interface ProjectItem {
   id: string;
@@ -8,6 +17,8 @@ export interface ProjectItem {
   description: string;
   technologies: string;
   projectUrl: string;
+  githubUrl?: string;
+  demoUrl?: string;
   imageUrl?: string;
 }
 
@@ -17,21 +28,31 @@ interface Props {
   onChange: (list: ProjectItem[]) => void;
 }
 
+const createDefaultProject = (): ProjectItem => ({
+  id: Date.now().toString(),
+  title: "",
+  description: "",
+  technologies: "",
+  projectUrl: "",
+  githubUrl: "",
+  demoUrl: "",
+  imageUrl: "",
+});
+
 export default function ProjectsTab({
   isEditing,
   projectsList = [],
   onChange,
 }: Props) {
+  // ⚡ এডিট মোডে গেলে এবং লিস্ট খালি থাকলে অটোমেটিক ১টি ফর্ম ওপেন থাকবে
+  useEffect(() => {
+    if (isEditing && projectsList.length === 0) {
+      onChange([createDefaultProject()]);
+    }
+  }, [isEditing, projectsList.length, onChange]);
+
   const handleAdd = () => {
-    const newProj: ProjectItem = {
-      id: Date.now().toString(),
-      title: "",
-      description: "",
-      technologies: "",
-      projectUrl: "",
-      imageUrl: "",
-    };
-    onChange([...projectsList, newProj]);
+    onChange([...projectsList, createDefaultProject()]);
   };
 
   const handleUpdate = (
@@ -48,63 +69,110 @@ export default function ProjectsTab({
     onChange(projectsList.filter((p) => p.id !== id));
   };
 
+  const displayList =
+    projectsList.length > 0 ? projectsList : [createDefaultProject()];
+
   // ==================== VIEW MODE ====================
   if (!isEditing) {
-    if (projectsList.length === 0) {
-      return (
-        <div className="p-8 border border-dashed border-neutral-200 rounded-xs text-center space-y-1">
-          <FolderGit2 className="h-6 w-6 text-neutral-300 mx-auto" />
-          <p className="text-xs font-mono text-neutral-500">
-            No projects showcased yet.
-          </p>
-        </div>
-      );
-    }
-
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-        {projectsList.map((proj) => (
-          <div
-            key={proj.id}
-            className="p-4 bg-neutral-50/70 border border-neutral-200/80 rounded-xs flex flex-col justify-between space-y-3"
-          >
-            <div className="space-y-1.5">
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="text-sm font-serif font-bold text-neutral-950">
-                  {proj.title || "Untitled Project"}
-                </h3>
-                {proj.projectUrl && (
-                  <a
-                    href={proj.projectUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-neutral-500 hover:text-neutral-950 p-1 bg-white border border-neutral-200 rounded-xs"
-                    title="Visit Live Project"
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
+            <FolderGit2 className="h-3.5 w-3.5 text-blue-600" />
+            Projects & Portfolio Showcase ({displayList.length})
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {displayList.map((proj, idx) => (
+            <div
+              key={proj.id}
+              className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs flex flex-col justify-between space-y-3.5"
+            >
+              <div className="space-y-2.5">
+                {/* কার্ড হেডার ও লিংক */}
+                <div className="flex items-start justify-between gap-2 border-b border-neutral-200/80 pb-2.5">
+                  <div>
+                    <span className="text-[10px] font-mono uppercase text-neutral-400 font-bold block">
+                      Project #{idx + 1}
+                    </span>
+                    <h3
+                      className={`text-sm font-serif font-bold truncate mt-0.5 ${
+                        proj.title ? "text-neutral-950" : "text-neutral-400"
+                      }`}
+                    >
+                      {proj.title || "Untitled Project"}
+                    </h3>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {proj.projectUrl && (
+                      <a
+                        href={proj.projectUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-2 py-1 bg-white border border-neutral-300 hover:bg-neutral-100 text-[10px] font-mono uppercase text-neutral-900 rounded-xs inline-flex items-center gap-1"
+                        title="Live Preview"
+                      >
+                        <span>Live</span>
+                        <ExternalLink className="h-2.5 w-2.5" />
+                      </a>
+                    )}
+                    {proj.githubUrl && (
+                      <a
+                        href={proj.githubUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-2 py-1 bg-white border border-neutral-300 hover:bg-neutral-100 text-[10px] font-mono uppercase text-neutral-900 rounded-xs inline-flex items-center gap-1"
+                        title="GitHub Repository"
+                      >
+                        <span>Code</span>
+                        <ExternalLink className="h-2.5 w-2.5" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                {/* বিবরণ */}
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs text-xs">
+                  <span className="text-[9.5px] font-mono uppercase text-neutral-400 block mb-0.5">
+                    Description
+                  </span>
+                  <p
+                    className={`leading-relaxed ${
+                      proj.description
+                        ? "text-neutral-700"
+                        : "text-neutral-400 font-mono"
+                    }`}
                   >
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
+                    {proj.description || "Not Set"}
+                  </p>
+                </div>
+              </div>
+
+              {/* টেক স্ট্যাক বা ট্যাগসমূহ */}
+              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs space-y-1.5">
+                <span className="text-[9.5px] font-mono uppercase text-neutral-400 block">
+                  Technologies Used
+                </span>
+                {proj.technologies ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {proj.technologies.split(",").map((tech, i) => (
+                      <span
+                        key={i}
+                        className="px-2 py-0.5 bg-neutral-100 border border-neutral-200 text-[10px] font-mono text-neutral-800 rounded-xs"
+                      >
+                        {tech.trim()}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs font-mono text-neutral-400">Not Set</p>
                 )}
               </div>
-
-              <p className="text-xs text-neutral-600 line-clamp-3 leading-relaxed">
-                {proj.description || "No description provided."}
-              </p>
             </div>
-
-            {proj.technologies && (
-              <div className="flex flex-wrap gap-1 pt-2 border-t border-neutral-200/60">
-                {proj.technologies.split(",").map((tech, i) => (
-                  <span
-                    key={i}
-                    className="px-2 py-0.5 bg-white border border-neutral-200 text-[10px] font-mono text-neutral-700 rounded-xs"
-                  >
-                    {tech.trim()}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     );
   }
@@ -114,19 +182,19 @@ export default function ProjectsTab({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <span className="text-xs font-mono uppercase text-neutral-500 font-bold">
-          Projects & Portfolio ({projectsList.length})
+          Projects & Portfolio Showcase ({displayList.length})
         </span>
         <button
           type="button"
           onClick={handleAdd}
-          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white px-3 py-1.5 text-[11px] font-mono uppercase rounded-xs cursor-pointer"
+          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white px-3.5 py-1.5 text-[11px] font-mono uppercase rounded-xs cursor-pointer"
         >
           <Plus className="h-3.5 w-3.5" />
           <span>Add Project</span>
         </button>
       </div>
 
-      {projectsList.map((proj, idx) => (
+      {displayList.map((proj, idx) => (
         <div
           key={proj.id}
           className="p-4 bg-neutral-50/50 border border-neutral-200 rounded-xs space-y-3"
@@ -135,13 +203,15 @@ export default function ProjectsTab({
             <span className="text-[10px] font-mono uppercase text-neutral-400 font-bold flex items-center gap-1">
               <Code2 className="h-3 w-3" /> Project #{idx + 1}
             </span>
-            <button
-              type="button"
-              onClick={() => handleRemove(proj.id)}
-              className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
+            {displayList.length > 1 && (
+              <button
+                type="button"
+                onClick={() => handleRemove(proj.id)}
+                className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -153,13 +223,13 @@ export default function ProjectsTab({
                 type="text"
                 value={proj.title}
                 onChange={(e) => handleUpdate(proj.id, "title", e.target.value)}
-                placeholder="e.g. KagazCV Digital Identity"
+                placeholder="Enter your project title"
                 className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950"
               />
             </div>
             <div>
               <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">
-                Live URL / GitHub Link
+                Live URL (Optional)
               </label>
               <input
                 type="url"
@@ -167,7 +237,38 @@ export default function ProjectsTab({
                 onChange={(e) =>
                   handleUpdate(proj.id, "projectUrl", e.target.value)
                 }
-                placeholder="https://..."
+                placeholder="Enter live website URL"
+                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">
+                GitHub Repository URL (Optional)
+              </label>
+              <input
+                type="url"
+                value={proj.githubUrl || ""}
+                onChange={(e) =>
+                  handleUpdate(proj.id, "githubUrl", e.target.value)
+                }
+                placeholder="Enter GitHub repository URL"
+                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-mono uppercase text-neutral-500 mb-1">
+                Video Demo / Showcase URL (Optional)
+              </label>
+              <input
+                type="url"
+                value={proj.demoUrl || ""}
+                onChange={(e) =>
+                  handleUpdate(proj.id, "demoUrl", e.target.value)
+                }
+                placeholder="Enter video demo URL (YouTube / Drive)"
                 className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950"
               />
             </div>
@@ -183,7 +284,7 @@ export default function ProjectsTab({
               onChange={(e) =>
                 handleUpdate(proj.id, "technologies", e.target.value)
               }
-              placeholder="e.g. Next.js, Tailwind CSS, Supabase"
+              placeholder="Enter technologies (e.g. Next.js, Tailwind CSS, Supabase)"
               className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950"
             />
           </div>
@@ -198,7 +299,7 @@ export default function ProjectsTab({
               onChange={(e) =>
                 handleUpdate(proj.id, "description", e.target.value)
               }
-              placeholder="Briefly explain what this project does and your role..."
+              placeholder="Enter your project description, key features and your role"
               className="w-full border border-neutral-200 bg-white p-2.5 text-xs font-mono outline-none focus:border-neutral-950 resize-none"
             />
           </div>

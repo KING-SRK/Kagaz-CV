@@ -159,7 +159,7 @@ export default function SkillsTab({
                 type="text"
                 value={roleTitle}
                 onChange={(e) => onRoleTitleChange?.(e.target.value)}
-                placeholder="e.g. Lead Developer / UI Designer"
+                placeholder="Enter your job title or professional role"
                 className="w-full border border-neutral-200 bg-neutral-50/30 px-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white"
               />
             </div>
@@ -183,7 +183,7 @@ export default function SkillsTab({
                       handleAddSkill();
                     }
                   }}
-                  placeholder="e.g. Next.js, TypeScript, Supabase..."
+                  placeholder="Enter a skill and press Enter (e.g. React, Python)"
                   className="w-full border border-neutral-200 bg-neutral-50/30 pl-9 pr-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white"
                 />
               </div>
@@ -240,7 +240,7 @@ export default function SkillsTab({
                       handleAddInterest();
                     }
                   }}
-                  placeholder="e.g. Video Editing, Hardware Repair, Literature..."
+                  placeholder="Enter an interest or hobby and press Enter"
                   className="w-full border border-neutral-200 bg-neutral-50/30 pl-9 pr-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white"
                 />
               </div>
