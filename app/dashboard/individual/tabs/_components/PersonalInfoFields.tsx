@@ -384,6 +384,7 @@ export default function PersonalInfoFields({
             <option value="AB-">AB-</option>
             <option value="O+">O+</option>
             <option value="O-">O-</option>
+            <option value="Unknown">Unknown</option>
           </select>
         </div>
         <div>

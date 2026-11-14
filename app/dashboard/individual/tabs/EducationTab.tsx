@@ -1,6 +1,7 @@
 // app/dashboard/individual/tabs/EducationTab.tsx
 "use client";
 
+import { useEffect } from "react";
 import { Plus, GraduationCap, School, Building2 } from "lucide-react";
 import EducationCard from "./_components/EducationCard";
 import { EducationItem as ServiceEducationItem } from "@/lib/individualService";
@@ -29,6 +30,19 @@ export const SCHOOL_STANDARDS = [
   "10th (Secondary)",
   "12th (Higher Secondary)",
 ];
+
+const createDefaultEducation = (
+  type: EducationType = "college",
+): EducationItem => ({
+  id: `new-${Date.now()}`,
+  type,
+  institutionName: "",
+  universityName: "",
+  degreeOrStandard: type === "school" ? SCHOOL_STANDARDS[1] : "",
+  session: "",
+  gradeOrScore: "",
+  status: type === "college" ? "pursuing" : undefined,
+});
 
 export default function EducationTab({
   isEditing = false,
@@ -66,14 +80,16 @@ export default function EducationTab({
 
       if (ui.session.includes("-")) {
         const parts = ui.session.split("-");
-        start_year = parts[0] || "";
-        end_year = parts[1] || "";
+        start_year = parts[0]?.trim() || "";
+        end_year = parts[1]?.trim() || "";
       } else {
-        end_year = ui.session;
+        end_year = ui.session.trim();
       }
 
       const isValidUUID =
         ui.id &&
+        !ui.id.startsWith("new-") &&
+        !ui.id.startsWith("edu-") &&
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
           ui.id,
         );
@@ -95,18 +111,19 @@ export default function EducationTab({
   };
 
   const handleAddEducation = (selectedType: EducationType = "college") => {
-    const newItem: EducationItem = {
-      id: `new-${Date.now()}`,
-      type: selectedType,
-      institutionName: "",
-      universityName: "",
-      degreeOrStandard: selectedType === "school" ? SCHOOL_STANDARDS[1] : "",
-      session: "",
-      gradeOrScore: "",
-      status: selectedType === "college" ? "pursuing" : undefined,
-    };
+    const newItem = createDefaultEducation(selectedType);
     syncToParent([...uiItems, newItem]);
   };
+
+  // ⚡ `handleAddEducation` ওপরে ডিক্লেয়ার করার পর এখন `useEffect` তাকে নিরাপদে কল করতে পারবে
+  useEffect(() => {
+    if (isEditing && educationList.length === 0) {
+      handleAddEducation("college");
+    }
+  }, [isEditing, educationList.length]);
+
+  const displayUiItems =
+    uiItems.length > 0 ? uiItems : [createDefaultEducation("college")];
 
   const handleRemoveEducation = (id: string) => {
     const filtered = uiItems.filter((item) => item.id !== id);
@@ -146,96 +163,72 @@ export default function EducationTab({
     <div className="space-y-4 animate-in fade-in-50 duration-200">
       {/* এডিট মোডে দ্রুত আইটেম অ্যাড করার কন্ট্রোল বার */}
       {isEditing && (
-        <div className="flex items-center justify-end gap-1.5 flex-wrap pb-1">
-          <button
-            type="button"
-            onClick={() => handleAddEducation("school")}
-            className="inline-flex items-center gap-1 text-[11px] font-mono uppercase text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200/80 px-2.5 py-1.5 rounded-xs transition-colors cursor-pointer"
-          >
-            <Plus className="h-3 w-3" /> School
-          </button>
-          <button
-            type="button"
-            onClick={() => handleAddEducation("college")}
-            className="inline-flex items-center gap-1 text-[11px] font-mono uppercase text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200/80 px-2.5 py-1.5 rounded-xs transition-colors cursor-pointer"
-          >
-            <Plus className="h-3 w-3" /> College
-          </button>
-          <button
-            type="button"
-            onClick={() => handleAddEducation("institute")}
-            className="inline-flex items-center gap-1 text-[11px] font-mono uppercase text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200/80 px-2.5 py-1.5 rounded-xs transition-colors cursor-pointer"
-          >
-            <Plus className="h-3 w-3" /> Institute
-          </button>
+        <div className="flex items-center justify-between flex-wrap pb-1 gap-2">
+          <span className="text-xs font-mono uppercase text-neutral-500 font-bold">
+            Education Records ({displayUiItems.length})
+          </span>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <button
+              type="button"
+              onClick={() => handleAddEducation("school")}
+              className="inline-flex items-center gap-1 text-[11px] font-mono uppercase text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200/80 px-2.5 py-1.5 rounded-xs transition-colors cursor-pointer"
+            >
+              <Plus className="h-3 w-3" /> School
+            </button>
+            <button
+              type="button"
+              onClick={() => handleAddEducation("college")}
+              className="inline-flex items-center gap-1 text-[11px] font-mono uppercase text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200/80 px-2.5 py-1.5 rounded-xs transition-colors cursor-pointer"
+            >
+              <Plus className="h-3 w-3" /> College
+            </button>
+            <button
+              type="button"
+              onClick={() => handleAddEducation("institute")}
+              className="inline-flex items-center gap-1 text-[11px] font-mono uppercase text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200/80 px-2.5 py-1.5 rounded-xs transition-colors cursor-pointer"
+            >
+              <Plus className="h-3 w-3" /> Institute
+            </button>
+          </div>
         </div>
       )}
 
       {!isEditing ? (
-        /* READ ONLY VIEW */
-        <div className="space-y-3">
-          {uiItems.length === 0 ? (
-            <div className="p-8 border border-dashed border-neutral-300 bg-neutral-50/40 rounded-xs text-center space-y-1.5">
-              <GraduationCap className="h-6 w-6 text-neutral-400 mx-auto" />
-              <p className="text-xs font-mono text-neutral-600">
-                No education details added yet.
-              </p>
-              <span className="text-[11px] text-neutral-400 block font-sans">
-                Click Edit Details above to add your school, college, or
-                institute records.
-              </span>
-            </div>
-          ) : (
-            uiItems.map((item) => {
+        /* ==================== VIEW MODE ==================== */
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
+              <GraduationCap className="h-3.5 w-3.5 text-blue-600" />
+              Education & Academic Records ({displayUiItems.length})
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            {displayUiItems.map((item, idx) => {
               const Icon = getIcon(item.type);
               const isCollege = item.type === "college";
 
               return (
                 <div
                   key={item.id}
-                  className="p-4 border border-neutral-200/80 bg-neutral-50/60 rounded-xs flex items-start justify-between gap-4"
+                  className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
                 >
-                  <div className="flex items-start gap-3.5 min-w-0">
-                    <div className="p-2 bg-white border border-neutral-200 rounded text-neutral-800 shrink-0 shadow-2xs">
-                      <Icon className="h-4 w-4" />
+                  {/* কার্ড হেডার */}
+                  <div className="flex items-center justify-between border-b border-neutral-200/80 pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-mono uppercase font-bold text-neutral-700">
+                        Education #{idx + 1}
+                      </span>
+                      <span className="px-2 py-0.5 bg-white border border-neutral-200 text-[10px] font-mono text-neutral-700 uppercase rounded-xs">
+                        {item.type}
+                      </span>
                     </div>
-                    <div className="space-y-0.5 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[9.5px] font-mono uppercase tracking-wider text-neutral-400 font-semibold">
-                          {item.type}
-                        </span>
-                        {item.gradeOrScore && (
-                          <span className="text-[9.5px] font-mono bg-neutral-100 text-neutral-600 px-1.5 py-0.2 rounded-xs border border-neutral-200">
-                            {item.gradeOrScore}
-                          </span>
-                        )}
-                      </div>
-                      <h4 className="text-xs font-mono font-bold text-neutral-950 truncate">
-                        {item.degreeOrStandard || "Not Specified"}
-                      </h4>
-                      <p className="text-xs text-neutral-700 truncate font-sans">
-                        {item.institutionName || "Institute Name Not Added"}
-                      </p>
-                      {isCollege && item.universityName && (
-                        <p className="text-[11px] font-mono text-neutral-500 truncate">
-                          University: {item.universityName}
-                        </p>
-                      )}
-                    </div>
-                  </div>
 
-                  <div className="text-right shrink-0">
-                    <span className="text-[10px] font-mono uppercase text-neutral-400 block">
-                      Year / Session
-                    </span>
-                    <span className="text-xs font-mono font-medium text-neutral-800 block">
-                      {item.session || "N/A"}
-                    </span>
                     {isCollege && item.status && (
                       <span
-                        className={`inline-block text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-xs mt-1 border ${
+                        className={`px-2 py-0.5 text-[10px] font-mono uppercase rounded-xs border ${
                           item.status === "completed"
-                            ? "bg-neutral-100 text-neutral-700 border-neutral-300"
+                            ? "bg-neutral-100 text-neutral-700 border-neutral-200"
                             : "bg-emerald-50 text-emerald-700 border-emerald-200"
                         }`}
                       >
@@ -243,74 +236,128 @@ export default function EducationTab({
                       </span>
                     )}
                   </div>
+
+                  {/* রো ১: Degree / Course & Institution */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs font-mono">
+                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                      <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
+                        Degree / Standard / Course
+                      </span>
+                      <p
+                        className={`font-medium truncate ${
+                          item.degreeOrStandard
+                            ? "text-neutral-900"
+                            : "text-neutral-400"
+                        }`}
+                      >
+                        {item.degreeOrStandard || "Not Set"}
+                      </p>
+                    </div>
+
+                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                      <span className="text-[9.5px] uppercase text-neutral-400 flex items-center gap-1 mb-0.5">
+                        <Icon className="h-3 w-3" /> Institution Name
+                      </span>
+                      <p
+                        className={`font-medium truncate ${
+                          item.institutionName
+                            ? "text-neutral-900"
+                            : "text-neutral-400"
+                        }`}
+                      >
+                        {item.institutionName || "Not Set"}
+                      </p>
+                    </div>
+
+                    {isCollege && (
+                      <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                        <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
+                          University Name
+                        </span>
+                        <p
+                          className={`font-medium truncate ${
+                            item.universityName
+                              ? "text-neutral-900"
+                              : "text-neutral-400"
+                          }`}
+                        >
+                          {item.universityName || "Not Set"}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* রো ২: Session & Score */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-mono">
+                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                      <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
+                        Session / Year
+                      </span>
+                      <p
+                        className={`font-medium truncate ${
+                          item.session ? "text-neutral-900" : "text-neutral-400"
+                        }`}
+                      >
+                        {item.session || "Not Set"}
+                      </p>
+                    </div>
+
+                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                      <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
+                        Score / Percentage
+                      </span>
+                      <p
+                        className={`font-medium truncate ${
+                          item.gradeOrScore
+                            ? "text-neutral-900"
+                            : "text-neutral-400"
+                        }`}
+                      >
+                        {item.gradeOrScore || "Not Set"}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               );
-            })
-          )}
+            })}
+          </div>
         </div>
       ) : (
-        /* EDIT FORM */
+        /* ==================== EDIT MODE ==================== */
         <div className="space-y-4">
-          {uiItems.length === 0 ? (
-            <div className="p-8 border border-dashed border-neutral-300 bg-neutral-50/40 rounded-xs text-center space-y-3">
-              <GraduationCap className="h-6 w-6 text-neutral-400 mx-auto" />
-              <p className="text-xs font-mono text-neutral-600">
-                No education added. Choose an option to start:
-              </p>
-              <div className="flex justify-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleAddEducation("school")}
-                  className="px-3 py-1.5 bg-neutral-900 text-white text-xs font-mono uppercase rounded-xs"
-                >
-                  + Add School
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleAddEducation("college")}
-                  className="px-3 py-1.5 bg-neutral-900 text-white text-xs font-mono uppercase rounded-xs"
-                >
-                  + Add College
-                </button>
-              </div>
-            </div>
-          ) : (
-            uiItems.map((item, index) => (
-              <EducationCard
-                key={item.id}
-                item={item}
-                index={index}
-                onUpdate={handleUpdateItem}
-                onRemove={handleRemoveEducation}
-              />
-            ))
-          )}
+          {displayUiItems.map((item, index) => (
+            <EducationCard
+              key={item.id}
+              item={item}
+              index={index}
+              onUpdate={handleUpdateItem}
+              onRemove={handleRemoveEducation}
+            />
+          ))}
 
-          {uiItems.length > 0 && (
-            <div className="grid grid-cols-3 gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => handleAddEducation("school")}
-                className="py-2.5 border border-dashed border-neutral-300 text-xs font-mono uppercase text-neutral-600 hover:border-neutral-950 hover:text-neutral-950 transition-colors flex items-center justify-center gap-1.5 cursor-pointer bg-neutral-50/20"
-              >
-                <Plus className="h-3.5 w-3.5" /> + Add School
-              </button>
-              <button
-                type="button"
-                onClick={() => handleAddEducation("college")}
-                className="py-2.5 border border-dashed border-neutral-300 text-xs font-mono uppercase text-neutral-600 hover:border-neutral-950 hover:text-neutral-950 transition-colors flex items-center justify-center gap-1.5 cursor-pointer bg-neutral-50/20"
-              >
-                <Plus className="h-3.5 w-3.5" /> + Add College
-              </button>
-              <button
-                type="button"
-                onClick={() => handleAddEducation("institute")}
-                className="py-2.5 border border-dashed border-neutral-300 text-xs font-mono uppercase text-neutral-600 hover:border-neutral-950 hover:text-neutral-950 transition-colors flex items-center justify-center gap-1.5 cursor-pointer bg-neutral-50/20"
-              >
-                <Plus className="h-3.5 w-3.5" /> + Add Institute
-              </button>
-            </div>
-          )}
+          <div className="grid grid-cols-3 gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => handleAddEducation("school")}
+              className="py-2.5 border border-dashed border-neutral-300 text-xs font-mono uppercase text-neutral-600 hover:border-neutral-950 hover:text-neutral-950 transition-colors flex items-center justify-center gap-1.5 cursor-pointer bg-neutral-50/20 rounded-xs"
+            >
+              <Plus className="h-3.5 w-3.5" /> + Add School
+            </button>
+            <button
+              type="button"
+              onClick={() => handleAddEducation("college")}
+              className="py-2.5 border border-dashed border-neutral-300 text-xs font-mono uppercase text-neutral-600 hover:border-neutral-950 hover:text-neutral-950 transition-colors flex items-center justify-center gap-1.5 cursor-pointer bg-neutral-50/20 rounded-xs"
+            >
+              <Plus className="h-3.5 w-3.5" /> + Add College
+            </button>
+            <button
+              type="button"
+              onClick={() => handleAddEducation("institute")}
+              className="py-2.5 border border-dashed border-neutral-300 text-xs font-mono uppercase text-neutral-600 hover:border-neutral-950 hover:text-neutral-950 transition-colors flex items-center justify-center gap-1.5 cursor-pointer bg-neutral-50/20 rounded-xs"
+            >
+              <Plus className="h-3.5 w-3.5" /> + Add Institute
+            </button>
+          </div>
         </div>
       )}
     </div>

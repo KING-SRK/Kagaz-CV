@@ -1,7 +1,14 @@
 // app/dashboard/_components/cards/DuoSplitCard.tsx
 import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
-import { RotateCw, ShieldCheck, Globe, Sparkles } from "lucide-react";
+import {
+  RotateCw,
+  ShieldCheck,
+  Globe,
+  Sparkles,
+  User,
+  Building2,
+} from "lucide-react";
 import { CardProps } from "./types";
 
 export default function DuoSplitCard({
@@ -31,14 +38,20 @@ export default function DuoSplitCard({
           </div>
 
           <div className="flex items-center gap-3.5 z-10 my-auto">
-            <div className="h-16 w-16 sm:h-18 sm:w-18 rounded-full border-2 border-neutral-950 p-0.5 shrink-0 bg-neutral-100 overflow-hidden shadow-xs">
-              <Image
-                src={data.avatarUrl || "/biprajit.jpg"}
-                alt="Card Avatar"
-                width={80}
-                height={80}
-                className="w-full h-full object-cover rounded-full"
-              />
+            <div className="h-16 w-16 sm:h-18 sm:w-18 rounded-full border-2 border-neutral-950 p-0.5 shrink-0 bg-neutral-100 overflow-hidden shadow-xs flex items-center justify-center">
+              {data.avatarUrl ? (
+                <Image
+                  src={data.avatarUrl}
+                  alt="Card Avatar"
+                  width={80}
+                  height={80}
+                  className="w-full h-full object-cover rounded-full"
+                />
+              ) : isOrg ? (
+                <Building2 className="h-7 w-7 text-neutral-500" />
+              ) : (
+                <User className="h-7 w-7 text-neutral-500" />
+              )}
             </div>
 
             <div className="min-w-0 flex-1 space-y-0.5">
