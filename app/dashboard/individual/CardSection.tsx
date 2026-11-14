@@ -1,4 +1,3 @@
-// app/dashboard/individual/CardSection.tsx
 "use client";
 
 import { useEffect, useState, useRef } from "react";
@@ -14,12 +13,32 @@ export default function CardSection() {
   const [role, setRole] = useState("individual");
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [scale, setScale] = useState(1);
 
-  // কার্ড এলিমেন্ট রেফারেন্স (ডাউনলোডের জন্য)
   const cardRef = useRef<HTMLDivElement>(null);
-
-  // আপাতত শুধুমাত্র একটি সিঙ্গেল ডিফল্ট ডিজাইন রাখা হলো (পরে চাইলে সুইচার যোগ করা যাবে)
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const defaultDesign: CardDesignType = "duo-split";
+
+  const CARD_WIDTH = 440;
+  const CARD_HEIGHT = 265;
+
+  // 📱 স্ক্রিন ছোট হলে অটোমেটিক স্কেল হিসাব করবে যাতে কার্ডের একবিন্দুও না কাটে
+  useEffect(() => {
+    const updateScale = () => {
+      if (wrapperRef.current) {
+        const availableWidth = wrapperRef.current.offsetWidth;
+        if (availableWidth > 0 && availableWidth < CARD_WIDTH) {
+          setScale(availableWidth / CARD_WIDTH);
+        } else {
+          setScale(1);
+        }
+      }
+    };
+
+    updateScale();
+    window.addEventListener("resize", updateScale);
+    return () => window.removeEventListener("resize", updateScale);
+  }, []);
 
   const [cardData, setCardData] = useState({
     name: "Member Name",
@@ -42,7 +61,6 @@ export default function CardSection() {
 
       setRole(activeRole);
 
-      // ১. সার্ভিস থেকে সেন্ট্রাল ডেটা ফেচ
       const { data } = await getIndividualProfile(activeId);
 
       if (data) {
@@ -70,7 +88,6 @@ export default function CardSection() {
           estYear: "2025",
         });
       } else {
-        // ফলব্যাক ডিরেক্ট কুয়েরি
         const { data: directData } = await supabase
           .from("profiles")
           .select(
@@ -108,7 +125,6 @@ export default function CardSection() {
 
     fetchData();
 
-    // ⚡ রিয়েলটাইম আপডেট লিসেনার (নাম, ছবি, ঠিকানা সবকিছুর জন্য)
     const handleCardUpdate = (e: Event) => {
       const customEvent = e as CustomEvent;
       if (customEvent.detail) {
@@ -141,7 +157,6 @@ export default function CardSection() {
     };
   }, []);
 
-  // ডিজিটাল লিংক কপি
   const handleCopyLink = () => {
     if (!kagazId) return;
     navigator.clipboard.writeText(`${window.location.origin}/p/${kagazId}`);
@@ -149,7 +164,7 @@ export default function CardSection() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // স্মার্ট কার্ড PNG হিসেবে ডাউনলোড করার হ্যান্ডলার
+  // ⚡ ফোন থেকে ডাউনলোড করলেও একদম ডেস্কটপের মতো ফুল-সাইজ HD কার্ড সেভ হবে
   const handleDownloadCard = async () => {
     if (!cardRef.current) return;
 
@@ -157,7 +172,15 @@ export default function CardSection() {
       setDownloading(true);
       const dataUrl = await toPng(cardRef.current, {
         cacheBust: true,
-        pixelRatio: 2,
+        pixelRatio: 3,
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
+        style: {
+          transform: "scale(1)",
+          transformOrigin: "top left",
+          width: `${CARD_WIDTH}px`,
+          height: `${CARD_HEIGHT}px`,
+        },
       });
 
       const link = document.createElement("a");
@@ -172,54 +195,70 @@ export default function CardSection() {
   };
 
   return (
-    <div className="flex flex-col items-center">
-      {/* ১. মূল স্মার্ট কার্ড (সিঙ্গেল প্রিমিয়াম ডিজাইন) */}
-      <div ref={cardRef} className="p-1">
-        <SmartCard
-          role={role}
-          kagazId={kagazId}
-          design={defaultDesign}
-          data={cardData}
-        />
+    <div className="w-full flex flex-col items-center">
+      {/* ১. মূল স্মার্ট কার্ড (অটো-স্কেল রেসপন্সিভ র‍্যাপার) */}
+      <div
+        ref={wrapperRef}
+        style={{ height: `${CARD_HEIGHT * scale}px` }}
+        className="w-full max-w-[440px] flex items-center justify-center relative"
+      >
+        <div
+          ref={cardRef}
+          style={{
+            width: `${CARD_WIDTH}px`,
+            height: `${CARD_HEIGHT}px`,
+            transform: `scale(${scale})`,
+            transformOrigin: "center center",
+          }}
+          className="shrink-0 flex items-center justify-center"
+        >
+          <SmartCard
+            role={role}
+            kagazId={kagazId}
+            design={defaultDesign}
+            data={cardData}
+          />
+        </div>
       </div>
 
-      {/* ২. কুইক অ্যাকশন বাটন বার */}
-      <div className="w-95 sm:w-115 flex items-center gap-2 mt-5">
-        {/* ডিজিটাল লিংক কপি বাটন */}
+      {/* ২. কুইক অ্যাকশন বাটন বার (সম্পূর্ণ রেসপন্সিভ) */}
+      <div className="w-full max-w-[380px] sm:max-w-[440px] flex flex-wrap sm:flex-nowrap items-center gap-2 mt-5 px-2 sm:px-0">
         <button
           type="button"
           onClick={handleCopyLink}
-          className="flex-1 flex items-center justify-center gap-2 border border-neutral-300 bg-white py-2.5 text-xs font-mono uppercase text-neutral-800 hover:bg-neutral-50 transition-colors shadow-xs cursor-pointer rounded-xs"
+          className="flex-1 min-w-[130px] flex items-center justify-center gap-1.5 sm:gap-2 border border-neutral-300 bg-white py-2.5 px-3 text-[11px] sm:text-xs font-mono uppercase text-neutral-800 hover:bg-neutral-50 transition-colors shadow-xs cursor-pointer rounded-xs"
         >
           {copied ? (
-            <Check className="h-3.5 w-3.5 text-emerald-600" />
+            <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
           ) : (
-            <Copy className="h-3.5 w-3.5 text-neutral-600" />
+            <Copy className="h-3.5 w-3.5 text-neutral-600 shrink-0" />
           )}
-          <span>{copied ? "Link Copied" : "Copy Link"}</span>
+          <span className="truncate">
+            {copied ? "Link Copied" : "Copy Link"}
+          </span>
         </button>
 
-        {/* কার্ড ডাউনলোড বাটন */}
         <button
           type="button"
           onClick={handleDownloadCard}
           disabled={downloading}
-          className="flex-1 flex items-center justify-center gap-2 border border-neutral-900 bg-neutral-900 py-2.5 text-xs font-mono uppercase text-white hover:bg-neutral-800 disabled:bg-neutral-600 transition-colors shadow-xs cursor-pointer rounded-xs"
+          className="flex-1 min-w-[140px] flex items-center justify-center gap-1.5 sm:gap-2 border border-neutral-900 bg-neutral-900 py-2.5 px-3 text-[11px] sm:text-xs font-mono uppercase text-white hover:bg-neutral-800 disabled:bg-neutral-600 transition-colors shadow-xs cursor-pointer rounded-xs"
         >
           {downloading ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin text-white" />
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-white shrink-0" />
           ) : (
-            <Download className="h-3.5 w-3.5 text-white" />
+            <Download className="h-3.5 w-3.5 text-white shrink-0" />
           )}
-          <span>{downloading ? "Saving..." : "Download Card"}</span>
+          <span className="truncate">
+            {downloading ? "Saving..." : "Download Card"}
+          </span>
         </button>
 
-        {/* পাবলিক পেজ লিংক */}
         <Link
           href={`/p/${kagazId}`}
           target="_blank"
           title="Open Public Page"
-          className="flex items-center justify-center border border-neutral-300 bg-white p-2.5 text-neutral-700 hover:text-neutral-950 hover:bg-neutral-50 transition-colors shadow-xs rounded-xs"
+          className="flex items-center justify-center border border-neutral-300 bg-white p-2.5 text-neutral-700 hover:text-neutral-950 hover:bg-neutral-50 transition-colors shadow-xs rounded-xs shrink-0"
         >
           <ExternalLink className="h-3.5 w-3.5" />
         </Link>

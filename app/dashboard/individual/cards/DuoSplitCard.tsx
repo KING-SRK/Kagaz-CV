@@ -1,4 +1,3 @@
-// app/dashboard/_components/cards/DuoSplitCard.tsx
 import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
 import {
@@ -24,12 +23,12 @@ export default function DuoSplitCard({
     <>
       {/* FRONT SIDE */}
       <div className="absolute inset-0 w-full h-full rounded-2xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.18)] border border-neutral-300 flex overflow-hidden backface-hidden ring-1 ring-neutral-200">
-        {/* বাঁদিকের ৬০% অংশ: পিওর হোয়াইট */}
-        <div className="w-[62%] h-full p-5 sm:p-6 flex flex-col justify-between bg-white text-neutral-900 relative">
+        {/* বাঁদিকের ৬২% অংশ: পিওর হোয়াইট */}
+        <div className="w-[62%] h-full p-6 flex flex-col justify-between bg-white text-neutral-900 relative">
           <div className="absolute inset-0 bg-[radial-gradient(#000000_0.75px,transparent_0.75px)] bg-size-[14px_14px] opacity-[0.04] pointer-events-none" />
 
           <div className="flex items-center gap-2.5 z-10">
-            <span className="flex h-6 w-6 items-center justify-center bg-neutral-950 text-white font-mono font-bold text-xs rounded-xs">
+            <span className="flex h-6 w-6 items-center justify-center bg-neutral-950 text-white font-mono font-bold text-xs rounded-xs shrink-0">
               S
             </span>
             <span className="text-sm font-semibold tracking-tight text-neutral-950">
@@ -38,7 +37,7 @@ export default function DuoSplitCard({
           </div>
 
           <div className="flex items-center gap-3.5 z-10 my-auto">
-            <div className="h-16 w-16 sm:h-18 sm:w-18 rounded-full border-2 border-neutral-950 p-0.5 shrink-0 bg-neutral-100 overflow-hidden shadow-xs flex items-center justify-center">
+            <div className="h-16 w-16 rounded-full border-2 border-neutral-950 p-0.5 shrink-0 bg-neutral-100 overflow-hidden shadow-xs flex items-center justify-center">
               {data.avatarUrl ? (
                 <Image
                   src={data.avatarUrl}
@@ -55,7 +54,7 @@ export default function DuoSplitCard({
             </div>
 
             <div className="min-w-0 flex-1 space-y-0.5">
-              <h3 className="text-sm sm:text-base font-serif font-bold text-neutral-950 truncate leading-snug">
+              <h3 className="text-base font-serif font-bold text-neutral-950 truncate leading-snug">
                 {data.name || "Member Name"}
               </h3>
               <p className="text-[10px] font-mono text-neutral-500 truncate uppercase">
@@ -70,23 +69,23 @@ export default function DuoSplitCard({
           </div>
 
           <div className="space-y-0.5 text-[9px] font-mono text-neutral-600 border-t border-neutral-200/80 pt-2 z-10">
-            <div className="flex justify-between">
-              <span className="text-neutral-400">TEL</span>
-              <span className="font-medium text-neutral-900">
+            <div className="flex justify-between gap-2">
+              <span className="text-neutral-400 shrink-0">TEL</span>
+              <span className="font-medium text-neutral-900 truncate">
                 {data.phone || "N/A"}
               </span>
             </div>
             {!isOrg ? (
-              <div className="flex justify-between">
-                <span className="text-neutral-400">DOB</span>
-                <span className="font-medium text-neutral-900">
+              <div className="flex justify-between gap-2">
+                <span className="text-neutral-400 shrink-0">DOB</span>
+                <span className="font-medium text-neutral-900 truncate">
                   {data.dob || "DD/MM/YYYY"}
                 </span>
               </div>
             ) : (
-              <div className="flex justify-between">
-                <span className="text-neutral-400">LOC</span>
-                <span className="font-medium text-neutral-900 truncate max-w-30">
+              <div className="flex justify-between gap-2">
+                <span className="text-neutral-400 shrink-0">LOC</span>
+                <span className="font-medium text-neutral-900 truncate">
                   {data.address || "Kolkata"}
                 </span>
               </div>
@@ -95,11 +94,11 @@ export default function DuoSplitCard({
         </div>
 
         {/* ডানদিকের ৩৮% অংশ: জেট ব্ল্যাক */}
-        <div className="w-[38%] h-full bg-[#0A0A0A] p-4 sm:p-5 flex flex-col justify-between items-center text-white relative border-l border-neutral-950">
+        <div className="w-[38%] h-full bg-[#0A0A0A] p-5 flex flex-col justify-between items-center text-white relative border-l border-neutral-950">
           <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none" />
 
           <div className="flex items-center gap-1 bg-white/10 border border-white/15 px-2 py-0.5 rounded-full text-[8px] font-mono tracking-wider text-neutral-200">
-            <Sparkles className="h-2.5 w-2.5 text-emerald-400" />
+            <Sparkles className="h-2.5 w-2.5 text-emerald-400 shrink-0" />
             <span>VERIFIED</span>
           </div>
 
@@ -122,30 +121,30 @@ export default function DuoSplitCard({
 
       {/* BACK SIDE */}
       <div className="absolute inset-0 w-full h-full rounded-2xl bg-[#FCFBFA] shadow-[0_20px_50px_rgba(0,0,0,0.18)] border border-neutral-300 flex flex-col justify-between overflow-hidden transform-[rotateY(180deg)] backface-hidden ring-1 ring-neutral-200">
-        <div className="h-10 bg-[#0A0A0A] w-full flex items-center justify-between px-6 border-b border-neutral-900">
-          <span className="text-[7.5px] font-mono uppercase tracking-[0.3em] text-neutral-400">
-            SUTRANET AUTHENTICATED SMART CARD • ZERO KNOWLEDGE
+        <div className="h-10 bg-[#0A0A0A] w-full flex items-center justify-between px-6 border-b border-neutral-900 gap-2">
+          <span className="text-[7.5px] font-mono uppercase tracking-[0.3em] text-neutral-400 truncate">
+            SUTRANET SMART CARD • ZERO KNOWLEDGE
           </span>
-          <span className="text-[8px] font-mono text-emerald-400 font-semibold">
+          <span className="text-[8px] font-mono text-emerald-400 font-semibold shrink-0">
             PASS-V2
           </span>
         </div>
 
-        <div className="flex items-center justify-between gap-6 px-6 sm:px-8 my-auto">
-          <div className="space-y-1.5 text-left flex-1">
+        <div className="flex items-center justify-between gap-6 px-8 my-auto">
+          <div className="space-y-1.5 text-left flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-neutral-950" />
-              <span className="text-xs font-mono uppercase tracking-wider text-neutral-950 font-bold">
+              <ShieldCheck className="h-4 w-4 text-neutral-950 shrink-0" />
+              <span className="text-xs font-mono uppercase tracking-wider text-neutral-950 font-bold truncate">
                 Official Registry
               </span>
             </div>
-            <p className="text-[10.5px] text-neutral-600 leading-relaxed font-light">
+            <p className="text-[10.5px] text-neutral-600 leading-relaxed font-light line-clamp-3">
               This identity card provides instant offline and digital credential
               verification across the SutraNet registry network.
             </p>
             <div className="flex items-center gap-1.5 text-[9.5px] font-mono text-neutral-800 pt-1">
-              <Globe className="h-3 w-3 text-neutral-500" />
-              <span className="font-medium">sutranet.in</span>
+              <Globe className="h-3 w-3 text-neutral-500 shrink-0" />
+              <span className="font-medium truncate">sutranet.in</span>
             </div>
           </div>
 
@@ -160,8 +159,8 @@ export default function DuoSplitCard({
         </div>
 
         <div className="border-t border-neutral-200 px-6 py-2 bg-neutral-50 flex justify-between items-center text-[8.5px] font-mono text-neutral-500">
-          <span>ISSUED BY SUTRANET PLATFORM</span>
-          <div className="flex items-center gap-1">
+          <span className="truncate">ISSUED BY SUTRANET PLATFORM</span>
+          <div className="flex items-center gap-1 shrink-0">
             <span>Click to flip</span>
             <RotateCw className="h-2.5 w-2.5" />
           </div>

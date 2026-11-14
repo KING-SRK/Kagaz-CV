@@ -61,7 +61,6 @@ export default function PinSetup({
       let createdUuid = "";
 
       if (role === "organization") {
-        // 🏢 Organization হলে শুধুমাত্র company_profiles টেবিলে সেভ হবে
         const { data: orgData, error: orgError } = await supabase
           .from("company_profiles")
           .insert([
@@ -88,7 +87,6 @@ export default function PinSetup({
         }
         createdUuid = orgData.id;
       } else {
-        // 👤 Individual হলে শুধুমাত্র profiles টেবিলে সেভ হবে
         const { data: indData, error: indError } = await supabase
           .from("profiles")
           .insert([
@@ -116,7 +114,6 @@ export default function PinSetup({
         createdUuid = indData.id;
       }
 
-      // সেশন লোকাল স্টোরেজে সেভ রাখা
       localStorage.setItem("kagaz_active_id", createdUuid);
       localStorage.setItem("kagaz_card_id", newId);
       localStorage.setItem("kagaz_role", role);
@@ -157,7 +154,7 @@ export default function PinSetup({
             <span className="text-[10px] font-mono uppercase tracking-widest text-neutral-400">
               Step 02 // Security
             </span>
-            <h2 className="text-2xl font-serif text-neutral-950">
+            <h2 className="text-xl sm:text-2xl font-serif text-neutral-950">
               Set a 4-Digit PIN.
             </h2>
             <p className="text-xs text-neutral-500 font-light">
@@ -175,7 +172,7 @@ export default function PinSetup({
           <button
             type="button"
             onClick={handleSetPin}
-            className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors cursor-pointer"
+            className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors cursor-pointer rounded-xs"
           >
             <span>Next Step</span>
             <ArrowRight className="h-3.5 w-3.5" />
@@ -189,7 +186,7 @@ export default function PinSetup({
             <span className="text-[10px] font-mono uppercase tracking-widest text-neutral-400">
               Step 02 // Verification
             </span>
-            <h2 className="text-2xl font-serif text-neutral-950">
+            <h2 className="text-xl sm:text-2xl font-serif text-neutral-950">
               Repeat your PIN.
             </h2>
             <p className="text-xs text-neutral-500 font-light">
@@ -208,7 +205,7 @@ export default function PinSetup({
             type="button"
             disabled={loading}
             onClick={handleConfirmPin}
-            className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors disabled:opacity-60 cursor-pointer"
+            className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors disabled:opacity-60 cursor-pointer rounded-xs"
           >
             {loading ? (
               <>
@@ -231,26 +228,29 @@ export default function PinSetup({
             <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-600">
               Account Activated
             </span>
-            <h2 className="text-2xl font-serif text-neutral-950">
+            <h2 className="text-xl sm:text-2xl font-serif text-neutral-950">
               Your Official SutraNet ID
             </h2>
           </div>
 
-          <div className="border border-neutral-950 bg-neutral-950 p-6 text-white space-y-4">
-            <div className="flex items-center justify-between text-[10px] font-mono tracking-widest uppercase text-neutral-400 border-b border-neutral-800 pb-2">
-              <span>OFFICIAL IDENTITY</span>
-              <span>{role}</span>
+          <div className="border border-neutral-950 bg-neutral-950 p-4 sm:p-6 text-white space-y-4 rounded-xs">
+            <div className="flex items-center justify-between text-[10px] font-mono tracking-widest uppercase text-neutral-400 border-b border-neutral-800 pb-2 gap-2">
+              <span className="truncate">OFFICIAL IDENTITY</span>
+              <span className="shrink-0">{role}</span>
             </div>
-            <div>
-              <p className="text-xs text-neutral-400 font-light">{fullName}</p>
-              <div className="flex items-center justify-between mt-1">
-                <span className="font-mono text-2xl font-light tracking-widest text-white">
+            <div className="min-w-0">
+              <p className="text-xs text-neutral-400 font-light truncate">
+                {fullName}
+              </p>
+              <div className="flex items-center justify-between gap-2 mt-1">
+                <span className="font-mono text-lg sm:text-2xl font-light tracking-wider sm:tracking-widest text-white truncate">
                   {generatedId}
                 </span>
                 <button
                   type="button"
                   onClick={copyToClipboard}
-                  className="border border-neutral-800 p-2 hover:bg-neutral-800 transition-colors cursor-pointer"
+                  title="Copy SutraNet ID"
+                  className="border border-neutral-800 p-2 hover:bg-neutral-800 transition-colors cursor-pointer shrink-0 rounded-xs"
                 >
                   {copied ? (
                     <Check className="h-3.5 w-3.5 text-emerald-400" />
@@ -260,7 +260,7 @@ export default function PinSetup({
                 </button>
               </div>
             </div>
-            <p className="text-[10px] text-neutral-400 font-light">
+            <p className="text-[10px] text-neutral-400 font-light leading-relaxed">
               This unique code identifies your {role} profile across SutraNet.
             </p>
           </div>
@@ -268,7 +268,7 @@ export default function PinSetup({
           <button
             type="button"
             onClick={handleGoToDashboard}
-            className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3.5 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors cursor-pointer"
+            className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3.5 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors cursor-pointer rounded-xs"
           >
             <span>Go to Workspace</span>
             <ArrowRight className="h-3.5 w-3.5" />

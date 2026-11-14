@@ -14,7 +14,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { toPng } from "html-to-image";
-import CompanySmartCard, { CompanyCardData } from "./CompanySmartCard"; // 🆕 কোম্পানির নিজস্ব কার্ড
+import CompanySmartCard, { CompanyCardData } from "./CompanySmartCard";
 import { getCompanyProfile } from "@/lib/organizationService";
 import CompanyDetailsSection from "./CompanyDetailsSection";
 
@@ -127,13 +127,20 @@ export default function OrganizationDashboardPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // ⚡ ফোনে ডাউনলোড করলেও একদম ডেস্কটপের মতো ফুল-সাইজ HD কার্ড সেভ হবে
   const handleDownloadCard = async () => {
     if (!cardRef.current) return;
     try {
       setDownloading(true);
       const dataUrl = await toPng(cardRef.current, {
         cacheBust: true,
-        pixelRatio: 2,
+        pixelRatio: 3,
+        width: 450,
+        style: {
+          width: "450px",
+          maxWidth: "450px",
+          margin: "0",
+        },
       });
       const link = document.createElement("a");
       link.download = `CompanyCard-${kagazId || "org"}.png`;
@@ -148,18 +155,18 @@ export default function OrganizationDashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#FDFCFB] text-neutral-950">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* ১. উপরের আইডেন্টিটি ও কোম্পানির স্মার্ট কার্ড সেকশন */}
-        <div className="border border-neutral-200/80 bg-white p-6 sm:p-8 shadow-xs rounded-xs">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-6 space-y-4">
+        <div className="border border-neutral-200/80 bg-white p-4 sm:p-8 shadow-xs rounded-xs">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
+            <div className="lg:col-span-6 space-y-3.5 sm:space-y-4">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-200/80 text-emerald-700 text-[10px] font-mono uppercase tracking-wider rounded-xs">
                 <ShieldCheck className="h-3.5 w-3.5" />
                 <span>Enterprise Digital Identity</span>
               </div>
 
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-xs border border-neutral-200 bg-neutral-50 flex items-center justify-center overflow-hidden shrink-0">
+              <div className="flex items-center gap-3.5 sm:gap-4">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xs border border-neutral-200 bg-neutral-50 flex items-center justify-center overflow-hidden shrink-0">
                   {cardData.logoUrl ? (
                     <img
                       src={cardData.logoUrl}
@@ -167,14 +174,14 @@ export default function OrganizationDashboardPage() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <Building2 className="h-8 w-8 text-neutral-400" />
+                    <Building2 className="h-7 w-7 sm:h-8 sm:w-8 text-neutral-400" />
                   )}
                 </div>
-                <div>
-                  <h1 className="text-2xl font-serif font-bold text-neutral-950">
+                <div className="min-w-0">
+                  <h1 className="text-xl sm:text-2xl font-serif font-bold text-neutral-950 truncate">
                     {cardData.name}
                   </h1>
-                  <p className="text-xs font-mono text-neutral-500 mt-0.5">
+                  <p className="text-[11px] sm:text-xs font-mono text-neutral-500 mt-0.5 truncate">
                     ID: {kagazId || "Generating..."} • Est. {cardData.estYear}
                   </p>
                 </div>
@@ -187,43 +194,49 @@ export default function OrganizationDashboardPage() {
               </p>
             </div>
 
-            <div className="lg:col-span-6 flex flex-col items-center">
-              <div ref={cardRef} className="p-1">
+            <div className="lg:col-span-6 flex flex-col items-center w-full">
+              <div ref={cardRef} className="p-1 w-full flex justify-center">
                 <CompanySmartCard kagazId={kagazId} data={cardData} />
               </div>
 
-              <div className="w-[370px] sm:w-[440px] flex items-center gap-2 mt-4">
+              {/* 📱 রেসপন্সিভ অ্যাকশন বাটন বার */}
+              <div className="w-full max-w-[360px] sm:max-w-[440px] flex flex-wrap sm:flex-nowrap items-center gap-2 mt-4">
                 <button
                   type="button"
                   onClick={handleCopyLink}
-                  className="flex-1 flex items-center justify-center gap-2 border border-neutral-300 bg-white py-2 text-xs font-mono uppercase text-neutral-800 hover:bg-neutral-50 cursor-pointer rounded-xs"
+                  className="flex-1 min-w-[120px] flex items-center justify-center gap-1.5 sm:gap-2 border border-neutral-300 bg-white py-2 px-3 text-[11px] sm:text-xs font-mono uppercase text-neutral-800 hover:bg-neutral-50 cursor-pointer rounded-xs"
                 >
                   {copied ? (
-                    <Check className="h-3.5 w-3.5 text-emerald-600" />
+                    <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
                   ) : (
-                    <Copy className="h-3.5 w-3.5 text-neutral-600" />
+                    <Copy className="h-3.5 w-3.5 text-neutral-600 shrink-0" />
                   )}
-                  <span>{copied ? "Copied" : "Copy Link"}</span>
+                  <span className="truncate">
+                    {copied ? "Copied" : "Copy Link"}
+                  </span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleDownloadCard}
                   disabled={downloading}
-                  className="flex-1 flex items-center justify-center gap-2 border border-neutral-900 bg-neutral-900 py-2 text-xs font-mono uppercase text-white hover:bg-neutral-800 cursor-pointer rounded-xs"
+                  className="flex-1 min-w-[135px] flex items-center justify-center gap-1.5 sm:gap-2 border border-neutral-900 bg-neutral-900 py-2 px-3 text-[11px] sm:text-xs font-mono uppercase text-white hover:bg-neutral-800 cursor-pointer rounded-xs"
                 >
                   {downloading ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" />
                   ) : (
-                    <Download className="h-3.5 w-3.5" />
+                    <Download className="h-3.5 w-3.5 shrink-0" />
                   )}
-                  <span>{downloading ? "Saving..." : "Download Card"}</span>
+                  <span className="truncate">
+                    {downloading ? "Saving..." : "Download Card"}
+                  </span>
                 </button>
 
                 <Link
                   href={`/p/${kagazId}`}
                   target="_blank"
-                  className="flex items-center justify-center border border-neutral-300 bg-white p-2 text-neutral-700 hover:bg-neutral-50 rounded-xs"
+                  title="Open Public Profile"
+                  className="flex items-center justify-center border border-neutral-300 bg-white p-2 text-neutral-700 hover:bg-neutral-50 rounded-xs shrink-0"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
                 </Link>

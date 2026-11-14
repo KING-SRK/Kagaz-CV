@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import PinInput from "./PinInput";
+import GoogleAuthButton from "./GoogleAuthButton";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import bcrypt from "bcryptjs";
@@ -56,6 +57,14 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
         .maybeSingle();
 
       if (indProfile) {
+        if (!indProfile.pin_hash) {
+          setError(
+            "This account uses Google Sign-In. Please continue with Google.",
+          );
+          setLoading(false);
+          return;
+        }
+
         const isMatch = await bcrypt.compare(rawPin, indProfile.pin_hash);
         if (!isMatch) {
           setError("Incorrect PIN. Please try again.");
@@ -78,6 +87,14 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
         .maybeSingle();
 
       if (orgProfile) {
+        if (!orgProfile.pin_hash) {
+          setError(
+            "This account uses Google Sign-In. Please continue with Google.",
+          );
+          setLoading(false);
+          return;
+        }
+
         const isMatch = await bcrypt.compare(rawPin, orgProfile.pin_hash);
         if (!isMatch) {
           setError("Incorrect PIN. Please try again.");
@@ -107,17 +124,17 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
   };
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-5">
       <div className="space-y-1">
         <span className="text-[10px] font-mono uppercase tracking-widest text-neutral-400">
           Quick Access
         </span>
-        <h2 className="text-2xl font-serif text-neutral-950">
+        <h2 className="text-xl sm:text-2xl font-serif text-neutral-950">
           Unlock Workspace.
         </h2>
       </div>
 
-      <form className="space-y-5" onSubmit={handleLogin}>
+      <form className="space-y-4" onSubmit={handleLogin}>
         <div>
           <label className="block text-xs font-mono uppercase tracking-wider text-neutral-600 mb-1.5">
             SutraNet ID / Email / Phone
@@ -128,12 +145,12 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
             placeholder="e.g. JT-2610-8942 or 9876543210"
-            className="w-full border border-neutral-200 bg-neutral-50/50 px-4 py-2.5 text-sm font-mono outline-none focus:border-neutral-950 focus:bg-white"
+            className="w-full border border-neutral-200 bg-neutral-50/50 px-3.5 sm:px-4 py-2.5 text-sm font-mono outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-mono uppercase tracking-wider text-neutral-600 mb-2.5 text-center">
+          <label className="block text-xs font-mono uppercase tracking-wider text-neutral-600 mb-2 text-center">
             Security PIN
           </label>
           <PinInput pin={pin} setPin={setPin} />
@@ -146,7 +163,7 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors disabled:opacity-60 cursor-pointer"
+          className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors disabled:opacity-60 cursor-pointer rounded-xs"
         >
           {loading ? (
             <>
@@ -162,7 +179,18 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
         </button>
       </form>
 
-      <div className="text-center pt-2">
+      {/* ডিভাইডার এবং Google Sign-In বাটন */}
+      <div className="relative flex items-center py-0.5">
+        <div className="grow border-t border-neutral-200" />
+        <span className="shrink mx-3 text-[10px] font-mono uppercase tracking-widest text-neutral-400">
+          Or
+        </span>
+        <div className="grow border-t border-neutral-200" />
+      </div>
+
+      <GoogleAuthButton label="Sign in with Google" />
+
+      <div className="text-center pt-1">
         <button
           type="button"
           onClick={onGoToRegister}

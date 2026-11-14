@@ -46,22 +46,26 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB] text-[#141414] flex flex-col justify-center py-12 px-6 overflow-hidden">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-6">
-        <Link href="/" className="inline-block">
-          <span className="flex h-8 w-8 items-center justify-center bg-neutral-950 text-xs font-mono font-medium text-white mx-auto">
-            K
+    <div className="min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-5rem)] bg-[#FDFCFB] text-[#141414] flex flex-col justify-center py-8 sm:py-12 px-4 sm:px-6 overflow-x-hidden">
+      {/* SutraNet লোগো */}
+      <div className="w-full max-w-md mx-auto text-center mb-5 sm:mb-6">
+        <Link href="/" className="inline-flex items-center gap-2 group">
+          <span className="flex h-8 w-8 items-center justify-center bg-neutral-950 text-xs font-mono font-bold text-white transition-transform group-hover:scale-95">
+            S
+          </span>
+          <span className="text-base font-light tracking-tight text-neutral-950">
+            Sutra<span className="font-serif italic font-normal">Net</span>
           </span>
         </Link>
       </div>
 
-      <div className="relative sm:mx-auto sm:w-full sm:max-w-md">
+      <div className="relative w-full max-w-md mx-auto">
         {/* স্লাইডিং ট্যাব কন্ট্রোলার */}
-        <div className="relative flex border border-neutral-200 bg-neutral-100/70 p-1 mb-8">
+        <div className="relative flex border border-neutral-200 bg-neutral-100/70 p-1 mb-6 sm:mb-8 rounded-xs">
           <button
             type="button"
             onClick={() => switchTab("login")}
-            className={`relative z-10 flex-1 py-2 text-xs font-mono uppercase tracking-wider transition-colors duration-200 ${
+            className={`relative z-10 flex-1 py-2 text-xs font-mono uppercase tracking-wider transition-colors duration-200 cursor-pointer ${
               view === "login"
                 ? "text-neutral-950 font-medium"
                 : "text-neutral-500 hover:text-neutral-900"
@@ -71,7 +75,7 @@ export default function AuthPage() {
               <motion.div
                 layoutId="activeTabIndicator"
                 transition={{ type: "spring", stiffness: 450, damping: 32 }}
-                className="absolute inset-0 bg-white border border-neutral-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                className="absolute inset-0 bg-white border border-neutral-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] rounded-xs"
               />
             )}
             <span className="relative z-20">Log In</span>
@@ -80,7 +84,7 @@ export default function AuthPage() {
           <button
             type="button"
             onClick={() => switchTab("select-role")}
-            className={`relative z-10 flex-1 py-2 text-xs font-mono uppercase tracking-wider transition-colors duration-200 ${
+            className={`relative z-10 flex-1 py-2 text-xs font-mono uppercase tracking-wider transition-colors duration-200 cursor-pointer ${
               view !== "login"
                 ? "text-neutral-950 font-medium"
                 : "text-neutral-500 hover:text-neutral-900"
@@ -90,7 +94,7 @@ export default function AuthPage() {
               <motion.div
                 layoutId="activeTabIndicator"
                 transition={{ type: "spring", stiffness: 450, damping: 32 }}
-                className="absolute inset-0 bg-white border border-neutral-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                className="absolute inset-0 bg-white border border-neutral-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] rounded-xs"
               />
             )}
             <span className="relative z-20">Register</span>
@@ -98,7 +102,7 @@ export default function AuthPage() {
         </div>
 
         {/* কার্ড র‍্যাপার */}
-        <div className="relative border border-neutral-200 bg-white p-8 sm:p-10 shadow-[0_4px_25px_rgba(0,0,0,0.02)] min-h-115 flex items-center justify-center overflow-hidden">
+        <div className="relative border border-neutral-200 bg-white p-5 sm:p-8 md:p-10 shadow-[0_4px_25px_rgba(0,0,0,0.02)] min-h-[420px] sm:min-h-[460px] flex items-center justify-center overflow-hidden rounded-xs">
           <AnimatePresence mode="popLayout" custom={direction} initial={false}>
             <motion.div
               key={view}
