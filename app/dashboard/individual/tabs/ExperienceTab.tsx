@@ -37,7 +37,6 @@ export default function ExperienceTab({
   experienceList = [],
   onChange,
 }: Props) {
-  // ⚡ নিয়ম অনুযায়ী: এডিট মোডে গেলে এবং লিস্ট খালি থাকলে অটোমেটিক ১টি ডিফল্ট ফর্ম ওপেন থাকবে
   useEffect(() => {
     if (isEditing && experienceList.length === 0) {
       onChange([createDefaultExperience()]);
@@ -69,33 +68,35 @@ export default function ExperienceTab({
   // ==================== VIEW MODE ====================
   if (!isEditing) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 animate-in fade-in-50 duration-200">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
-            <Briefcase className="h-3.5 w-3.5 text-emerald-600" />
-            Work History & Experience ({displayList.length})
+          <span className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5 min-w-0">
+            <Briefcase className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+            <span className="truncate">
+              Work History & Experience ({displayList.length})
+            </span>
           </span>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3.5 sm:space-y-4">
           {displayList.map((exp, idx) => (
             <div
               key={exp.id}
-              className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
+              className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3 sm:space-y-3.5"
             >
               {/* কার্ড হেডার */}
-              <div className="flex items-center justify-between border-b border-neutral-200/80 pb-2.5">
+              <div className="flex items-center justify-between gap-2 border-b border-neutral-200/80 pb-2 sm:pb-2.5">
                 <span className="text-[11px] font-mono uppercase font-bold text-neutral-700">
                   Experience #{idx + 1}
                 </span>
-                <span className="px-2 py-0.5 bg-white border border-neutral-200 text-[10px] font-mono text-neutral-700 rounded-xs">
+                <span className="px-2 py-0.5 bg-white border border-neutral-200 text-[10px] font-mono text-neutral-700 rounded-xs shrink-0">
                   {exp.employmentType || "Full-time"}
                 </span>
               </div>
 
               {/* রো ১: Designation, Company & Duration */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
-                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-2.5 text-xs font-mono">
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                   <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                     Designation / Role
                   </span>
@@ -108,9 +109,10 @@ export default function ExperienceTab({
                   </p>
                 </div>
 
-                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                   <span className="text-[9.5px] uppercase text-neutral-400 flex items-center gap-1 mb-0.5">
-                    <Building2 className="h-3 w-3" /> Company / Organization
+                    <Building2 className="h-3 w-3 shrink-0" /> Company /
+                    Organization
                   </span>
                   <p
                     className={`font-medium truncate ${
@@ -121,9 +123,10 @@ export default function ExperienceTab({
                   </p>
                 </div>
 
-                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                   <span className="text-[9.5px] uppercase text-neutral-400 flex items-center gap-1 mb-0.5">
-                    <Calendar className="h-3 w-3" /> Employment Duration
+                    <Calendar className="h-3 w-3 shrink-0" /> Employment
+                    Duration
                   </span>
                   <p
                     className={`font-medium truncate ${
@@ -144,7 +147,7 @@ export default function ExperienceTab({
                   Key Responsibilities & Achievements
                 </span>
                 <p
-                  className={`leading-relaxed ${
+                  className={`leading-relaxed wrap-break-word ${
                     exp.responsibilities
                       ? "text-neutral-700"
                       : "text-neutral-400 font-mono"
@@ -162,15 +165,15 @@ export default function ExperienceTab({
 
   // ==================== EDIT MODE ====================
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-mono uppercase text-neutral-500 font-bold">
+    <div className="space-y-4 animate-in fade-in-50 duration-200">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="text-[11px] sm:text-xs font-mono uppercase text-neutral-500 font-bold min-w-0 truncate">
           Work Experience ({displayList.length})
         </span>
         <button
           type="button"
           onClick={handleAdd}
-          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white px-3 py-1.5 text-[11px] font-mono uppercase rounded-xs cursor-pointer"
+          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white px-3 py-1.5 text-[11px] font-mono uppercase rounded-xs cursor-pointer shrink-0 transition-colors"
         >
           <Plus className="h-3.5 w-3.5" />
           <span>Add Experience</span>
@@ -180,7 +183,7 @@ export default function ExperienceTab({
       {displayList.map((exp, idx) => (
         <div
           key={exp.id}
-          className="p-4 bg-neutral-50/50 border border-neutral-200 rounded-xs space-y-3 relative"
+          className="p-3 sm:p-4 bg-neutral-50/50 border border-neutral-200 rounded-xs space-y-3 relative"
         >
           <div className="flex items-center justify-between border-b border-neutral-200/70 pb-2">
             <span className="text-[10px] font-mono uppercase text-neutral-400 font-bold">
@@ -210,7 +213,7 @@ export default function ExperienceTab({
                   handleUpdate(exp.id, "company", e.target.value)
                 }
                 placeholder="Enter company or organization name"
-                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
             </div>
             <div>
@@ -224,7 +227,7 @@ export default function ExperienceTab({
                   handleUpdate(exp.id, "designation", e.target.value)
                 }
                 placeholder="Enter your designation or professional role"
-                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
             </div>
           </div>
@@ -239,7 +242,7 @@ export default function ExperienceTab({
                 onChange={(e) =>
                   handleUpdate(exp.id, "employmentType", e.target.value)
                 }
-                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs cursor-pointer"
               >
                 <option value="Full-time">Full-time</option>
                 <option value="Part-time">Part-time</option>
@@ -258,7 +261,7 @@ export default function ExperienceTab({
                 onChange={(e) =>
                   handleUpdate(exp.id, "startDate", e.target.value)
                 }
-                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
             </div>
             <div>
@@ -272,7 +275,7 @@ export default function ExperienceTab({
                 onChange={(e) =>
                   handleUpdate(exp.id, "endDate", e.target.value)
                 }
-                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 disabled:bg-neutral-100 disabled:text-neutral-400"
+                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 disabled:bg-neutral-100 disabled:text-neutral-400 rounded-xs"
               />
               <label className="flex items-center gap-1.5 mt-1.5 text-[11px] font-mono text-neutral-600 cursor-pointer">
                 <input
@@ -281,6 +284,7 @@ export default function ExperienceTab({
                   onChange={(e) =>
                     handleUpdate(exp.id, "isCurrent", e.target.checked)
                   }
+                  className="shrink-0"
                 />
                 <span>Currently working here</span>
               </label>
@@ -298,7 +302,7 @@ export default function ExperienceTab({
                 handleUpdate(exp.id, "responsibilities", e.target.value)
               }
               placeholder="Enter your key responsibilities, achievements and role scope"
-              className="w-full border border-neutral-200 bg-white p-2.5 text-xs font-mono outline-none focus:border-neutral-950 resize-none"
+              className="w-full border border-neutral-200 bg-white p-2.5 text-xs font-mono outline-none focus:border-neutral-950 resize-none rounded-xs"
             />
           </div>
         </div>

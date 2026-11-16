@@ -19,7 +19,6 @@ import {
   Briefcase,
   Award,
   FolderKanban,
-  FileText,
 } from "lucide-react";
 
 import {
@@ -47,7 +46,6 @@ export default function CompanyDetailsSection() {
   const [saving, setSaving] = useState<boolean>(false);
   const [profileId, setProfileId] = useState<string>("");
 
-  // মোবাইলে ট্যাব ক্লিক করলে কনটেন্ট এরিয়ায় স্মুথ স্ক্রল করার রেফারেন্স
   const contentAreaRef = useRef<HTMLDivElement>(null);
 
   const [company, setCompany] = useState<FullCompanyProfile>({
@@ -151,13 +149,6 @@ export default function CompanyDetailsSection() {
       icon: Users,
     },
     {
-      id: "careers",
-      shortTitle: "Careers",
-      title: "Careers & Job Vacancies",
-      desc: "Job openings, job applications & interviews.",
-      icon: Briefcase,
-    },
-    {
       id: "achievements",
       shortTitle: "Awards",
       title: "Achievements & Certifications",
@@ -179,11 +170,11 @@ export default function CompanyDetailsSection() {
       icon: FolderKanban,
     },
     {
-      id: "documents",
-      shortTitle: "Documents",
-      title: "Company Profile Documents",
-      desc: "Company profile, visiting card, business introduction & catalogue.",
-      icon: FileText,
+      id: "careers",
+      shortTitle: "Careers",
+      title: "Careers & Job Vacancies",
+      desc: "Job openings, job applications & interviews.",
+      icon: Briefcase,
     },
   ];
 
@@ -192,13 +183,12 @@ export default function CompanyDetailsSection() {
     setDraft(company);
     setIsEditing(false);
 
-    // 📱 মোবাইল স্ক্রিনে (< 768px) ট্যাব বদলালে কনটেন্টের শুরুতে স্মুথলি নিয়ে যাবে
     if (
       typeof window !== "undefined" &&
       window.innerWidth < 768 &&
       contentAreaRef.current
     ) {
-      const yOffset = -130;
+      const yOffset = -120;
       const y =
         contentAreaRef.current.getBoundingClientRect().top +
         window.pageYOffset +
@@ -239,69 +229,89 @@ export default function CompanyDetailsSection() {
     );
   }
 
+  const activeSection = sections.find((s) => s.id === activeTab);
+  const canEditTab = activeTab !== "careers" && activeTab !== "documents";
+
+  // এডিট / সেভ বাটন গ্রুপ (মোবাইল ও ডেস্কটপ উভয়ের জন্য)
+  const renderActionButtons = (isMobile = false) => {
+    if (!canEditTab) return null;
+
+    if (!isEditing) {
+      return (
+        <button
+          type="button"
+          onClick={() => {
+            setDraft(company);
+            setIsEditing(true);
+          }}
+          className={`${
+            isMobile ? "w-full justify-center py-2.5" : "px-4 py-2"
+          } inline-flex items-center gap-2 bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-mono uppercase tracking-wider rounded-xs transition-colors cursor-pointer shadow-2xs`}
+        >
+          <Pencil className="h-3.5 w-3.5 text-neutral-300 shrink-0" />
+          <span>
+            Edit {isMobile ? activeSection?.shortTitle : "Business Profile"}
+          </span>
+        </button>
+      );
+    }
+
+    return (
+      <div className={`flex items-center gap-2 ${isMobile ? "w-full" : ""}`}>
+        <button
+          type="button"
+          onClick={() => {
+            setDraft(company);
+            setIsEditing(false);
+          }}
+          disabled={saving}
+          className={`${
+            isMobile ? "flex-1 justify-center py-2.5" : "px-3.5 py-2"
+          } inline-flex items-center gap-1.5 border border-neutral-300 bg-white hover:bg-neutral-100 text-neutral-700 text-xs font-mono uppercase tracking-wider rounded-xs transition-colors cursor-pointer disabled:opacity-50`}
+        >
+          <X className="h-3.5 w-3.5 shrink-0" />
+          <span>Cancel</span>
+        </button>
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving}
+          className={`${
+            isMobile ? "flex-1 justify-center py-2.5" : "px-4 py-2"
+          } inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-mono uppercase tracking-wider rounded-xs transition-colors cursor-pointer shadow-xs disabled:opacity-50`}
+        >
+          {saving ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" />
+          ) : (
+            <Check className="h-3.5 w-3.5 shrink-0" />
+          )}
+          <span>{saving ? "Saving..." : "Save"}</span>
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="border border-neutral-200/80 bg-white shadow-xs select-none rounded-xs">
-      {/* ১. রেসপন্সিভ স্টিকি সেকশন হেডার */}
-      <div className="sticky top-16 z-20 bg-white/95 backdrop-blur-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-b border-neutral-100 p-4 sm:p-6">
+      {/* ১. সেকশন হেডার (মোবাইলে ক্লিন টাইটেল, ডেস্কটপে ডানদিকে এডিট বাটন) */}
+      <div className="flex items-center justify-between gap-4 border-b border-neutral-100 p-4 sm:p-6 md:sticky md:top-20 z-20 bg-white">
         <div className="min-w-0">
           <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-600 font-semibold flex items-center gap-1.5">
             <Sparkles className="h-3 w-3 shrink-0" /> Organization Profile
           </span>
-          <h2 className="text-base sm:text-xl font-serif text-neutral-950 mt-0.5 sm:mt-1 truncate">
+          <h2 className="text-lg sm:text-xl font-serif text-neutral-950 mt-0.5 sm:mt-1 truncate">
             Business Identity, Offerings & Operations
           </h2>
         </div>
 
-        {/* এডিট / সেভ বাটন */}
-        {activeTab !== "careers" && activeTab !== "documents" && (
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0 self-start sm:self-auto">
-            {!isEditing ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setDraft(company);
-                  setIsEditing(true);
-                }}
-                className="inline-flex items-center gap-1.5 sm:gap-2 bg-neutral-950 hover:bg-neutral-800 text-white px-3.5 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-mono uppercase tracking-wider rounded-xs transition-colors cursor-pointer"
-              >
-                <Pencil className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-neutral-300" />
-                <span>Edit Business Profile</span>
-              </button>
-            ) : (
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDraft(company);
-                    setIsEditing(false);
-                  }}
-                  disabled={saving}
-                  className="inline-flex items-center gap-1.5 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 px-3 sm:px-3.5 py-1.5 sm:py-2 text-[11px] sm:text-xs font-mono uppercase tracking-wider rounded-xs cursor-pointer"
-                >
-                  <X className="h-3.5 w-3.5" />
-                  <span>Cancel</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-mono uppercase tracking-wider rounded-xs cursor-pointer shadow-xs"
-                >
-                  {saving ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <Check className="h-3.5 w-3.5" />
-                  )}
-                  <span>{saving ? "Saving..." : "Save"}</span>
-                </button>
-              </div>
-            )}
-          </div>
-        )}
+        {/* 💻 শুধুমাত্র ডেস্কটপে হেডারের ডানদিকে বাটন থাকবে */}
+        <div className="hidden md:flex items-center gap-3 shrink-0">
+          {renderActionButtons(false)}
+        </div>
       </div>
 
-      {/* 📱 ২. মোবাইল ও ট্যাবলেট হরিজন্টাল ট্যাব বার (< md) */}
-      <div className="md:hidden border-b border-neutral-200/80 bg-neutral-50/70 px-3 py-2.5 overflow-x-auto no-scrollbar">
+      {/* 📱 ২. মোবাইল ও ট্যাবলেট স্টিকি হরাইজন্টাল ট্যাব বার (< md) */}
+      <div className="md:hidden sticky top-16 z-10 border-b border-neutral-200/80 bg-neutral-50/90 backdrop-blur-xs px-3 py-2.5 overflow-x-auto no-scrollbar">
         <div className="flex items-center gap-2 w-max">
           {sections.map((item) => {
             const Icon = item.icon;
@@ -330,8 +340,8 @@ export default function CompanyDetailsSection() {
       </div>
 
       {/* 💻 ৩. ডেস্কটপ সাইডবার + ডানদিকের কনটেন্ট গ্রিড */}
-      <div className="grid grid-cols-1 md:grid-cols-12 min-h-110">
-        {/* ডেস্কটপ বাম সাইডবার (শুধু md বা তার বড় স্ক্রিনে দেখাবে) */}
+      <div className="grid grid-cols-1 md:grid-cols-12 md:min-h-110">
+        {/* ডেস্কটপ বাম সাইডবার */}
         <div className="hidden md:block md:col-span-4 border-r border-neutral-100 bg-neutral-50/40 p-3 space-y-1.5">
           {sections.map((item) => {
             const Icon = item.icon;
@@ -382,11 +392,18 @@ export default function CompanyDetailsSection() {
           })}
         </div>
 
-        {/* ৪. ডানদিকের মূল ট্যাব এরিয়া (মোবাইলে ফুল-উইডথ, ডেস্কটপে স্টিকি) */}
+        {/* ৪. ডানদিকের মূল ট্যাব এরিয়া */}
         <div
           ref={contentAreaRef}
-          className="md:col-span-8 p-4 sm:p-6 lg:p-8 md:sticky md:top-40 self-start min-w-0"
+          className="md:col-span-8 p-4 sm:p-6 lg:p-8 md:sticky md:top-40 self-start min-w-0 w-full"
         >
+          {/* 📱 মোবাইলে ট্যাব বারের ঠিক নিচে ফুল-উইডথ ক্লিন Edit / Save অ্যাকশন বার */}
+          {canEditTab && (
+            <div className="md:hidden pb-4 mb-4 border-b border-neutral-100">
+              {renderActionButtons(true)}
+            </div>
+          )}
+
           {activeTab === "basic" && (
             <OrgBasicTab
               isEditing={isEditing}

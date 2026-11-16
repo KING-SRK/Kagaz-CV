@@ -112,15 +112,15 @@ export default function PrimaryIdentity() {
 
   if (loading) {
     return (
-      <div className="bg-white border border-neutral-200/80 p-7 min-h-[380px] animate-pulse rounded-xs flex flex-col justify-between" />
+      <div className="bg-white border border-neutral-200/80 p-5 sm:p-7 min-h-80 sm:min-h-95 animate-pulse rounded-xs flex flex-col justify-between" />
     );
   }
 
   return (
-    <div className="bg-white border border-neutral-200/80 p-6 sm:p-7 shadow-xs rounded-xs flex flex-col justify-between min-h-[380px] relative overflow-hidden">
+    <div className="bg-white border border-neutral-200/80 p-4 sm:p-6 md:p-7 shadow-xs rounded-xs flex flex-col justify-between sm:min-h-95 relative overflow-hidden">
       {/* টপ প্রোফাইল প্রিভিউ ও স্ট্যাটাস */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 border-b border-neutral-100 pb-6">
-        <div className="relative h-20 w-20 sm:h-22 sm:w-22 shrink-0 rounded-full overflow-hidden border-2 border-neutral-200 bg-neutral-100 shadow-2xs">
+      <div className="flex items-center gap-3.5 sm:gap-5 border-b border-neutral-100 pb-4 sm:pb-6">
+        <div className="relative h-16 w-16 sm:h-20 sm:w-20 shrink-0 rounded-full overflow-hidden border-2 border-neutral-200 bg-neutral-100 shadow-2xs">
           {profile?.avatar_url ? (
             <Image
               src={profile.avatar_url}
@@ -132,49 +132,49 @@ export default function PrimaryIdentity() {
             />
           ) : (
             <div className="h-full w-full flex items-center justify-center text-neutral-400 bg-neutral-100">
-              <User className="h-10 w-10" />
+              <User className="h-8 w-8 sm:h-10 sm:w-10" />
             </div>
           )}
         </div>
 
         <div className="min-w-0 flex-1 space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400 font-bold">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span className="text-[9.5px] sm:text-[10px] font-mono uppercase tracking-wider text-neutral-400 font-bold">
               Primary Profile
             </span>
-            <span className="inline-flex items-center gap-1 text-[9px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
-              <ShieldCheck className="h-3 w-3" />
+            <span className="inline-flex items-center gap-1 text-[9px] font-mono uppercase px-1.5 sm:px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
+              <ShieldCheck className="h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0" />
               Verified
             </span>
           </div>
 
-          <h2 className="text-xl font-serif font-bold text-neutral-950 truncate tracking-tight">
+          <h2 className="text-lg sm:text-xl font-serif font-bold text-neutral-950 truncate tracking-tight">
             {profile?.full_name}
           </h2>
 
-          <p className="text-xs font-mono text-neutral-500 truncate">
+          <p className="text-[11px] sm:text-xs font-mono text-neutral-500 truncate">
             {profile?.title}
           </p>
         </div>
       </div>
 
       {/* মেম্বারশিপ ফিল্ড ডিটেইলস */}
-      <div className="py-4 space-y-2.5">
+      <div className="py-3.5 sm:py-4 space-y-2 sm:space-y-2.5">
         {/* Email */}
-        <div className="flex items-center justify-between p-3 bg-neutral-50/50 border border-neutral-200/70 rounded-xs text-xs">
-          <span className="font-mono text-neutral-500 flex items-center gap-2.5">
-            <Mail className="h-4 w-4 text-neutral-400" />
-            Account Email
+        <div className="flex items-center justify-between gap-2 p-2.5 sm:p-3 bg-neutral-50/50 border border-neutral-200/70 rounded-xs text-[11px] sm:text-xs">
+          <span className="font-mono text-neutral-500 flex items-center gap-2 shrink-0">
+            <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-neutral-400 shrink-0" />
+            <span>Email</span>
           </span>
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="font-mono text-neutral-900 font-medium truncate max-w-[190px] sm:max-w-[220px]">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="font-mono text-neutral-900 font-medium truncate max-w-35 sm:max-w-55">
               {profile?.email}
             </span>
             {profile?.email && profile.email !== "Not linked" && (
               <button
                 type="button"
                 onClick={handleCopyEmail}
-                className="text-neutral-400 hover:text-neutral-700 p-0.5 transition-colors cursor-pointer"
+                className="text-neutral-400 hover:text-neutral-700 p-0.5 transition-colors cursor-pointer shrink-0"
                 title="Copy email"
               >
                 {copied ? (
@@ -188,32 +188,32 @@ export default function PrimaryIdentity() {
         </div>
 
         {/* Mobile */}
-        <div className="flex items-center justify-between p-3 bg-neutral-50/50 border border-neutral-200/70 rounded-xs text-xs">
-          <span className="font-mono text-neutral-500 flex items-center gap-2.5">
-            <Phone className="h-4 w-4 text-neutral-400" />
-            Registered Mobile
+        <div className="flex items-center justify-between gap-2 p-2.5 sm:p-3 bg-neutral-50/50 border border-neutral-200/70 rounded-xs text-[11px] sm:text-xs">
+          <span className="font-mono text-neutral-500 flex items-center gap-2 shrink-0">
+            <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-neutral-400 shrink-0" />
+            <span>Mobile</span>
           </span>
-          <span className="font-mono text-neutral-900 font-medium">
+          <span className="font-mono text-neutral-900 font-medium truncate">
             {profile?.phone}
           </span>
         </div>
 
         {/* Date of Birth */}
-        <div className="flex items-center justify-between p-3 bg-neutral-50/50 border border-neutral-200/70 rounded-xs text-xs">
-          <span className="font-mono text-neutral-500 flex items-center gap-2.5">
-            <Cake className="h-4 w-4 text-neutral-400" />
-            Date of Birth
+        <div className="flex items-center justify-between gap-2 p-2.5 sm:p-3 bg-neutral-50/50 border border-neutral-200/70 rounded-xs text-[11px] sm:text-xs">
+          <span className="font-mono text-neutral-500 flex items-center gap-2 shrink-0">
+            <Cake className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-neutral-400 shrink-0" />
+            <span>Date of Birth</span>
           </span>
-          <span className="font-mono text-neutral-900 font-medium">
+          <span className="font-mono text-neutral-900 font-medium truncate">
             {profile?.dob}
           </span>
         </div>
       </div>
 
       {/* ফুটার নোট */}
-      <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] font-mono text-neutral-400">
-        <span>SutraNet Node ID</span>
-        <span className="text-neutral-700 font-medium">
+      <div className="pt-2 border-t border-neutral-100 flex items-center justify-between gap-2 text-[10.5px] sm:text-[11px] font-mono text-neutral-400">
+        <span className="shrink-0">SutraNet Node ID</span>
+        <span className="text-neutral-700 font-medium truncate">
           {profile?.kagaz_id}
         </span>
       </div>

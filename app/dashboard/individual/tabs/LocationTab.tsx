@@ -16,7 +16,6 @@ export default function LocationTab({
   locations = [],
   onChange,
 }: TabProps) {
-  // প্রথম প্রাইমারি লোকেশনটি রিড করা
   const primaryLoc: LocationItem = locations[0] || {
     address_line: "",
     city: "",
@@ -42,7 +41,6 @@ export default function LocationTab({
     onChange([updated]);
   };
 
-  // ডিভাইস GPS দিয়ে অটোমেটিক লোকেশন বের করা
   const handleGetCurrentLocation = () => {
     if (!navigator.geolocation) {
       setGeoError("Geolocation is not supported by your browser.");
@@ -121,45 +119,44 @@ export default function LocationTab({
     : "";
 
   return (
-    <div className="space-y-5 animate-in fade-in-50 duration-200">
-
+    <div className="space-y-4 sm:space-y-5 animate-in fade-in-50 duration-200">
       {!isEditing ? (
         /* READ ONLY VIEW */
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="p-3 bg-neutral-50/70 border border-neutral-200/80 rounded-xs">
+        <div className="space-y-3.5 sm:space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
+            <div className="p-2.5 sm:p-3 bg-neutral-50/70 border border-neutral-200/80 rounded-xs min-w-0">
               <span className="text-[10px] font-mono uppercase text-neutral-400 block">
                 City / Town
               </span>
-              <p className="text-xs font-mono font-medium text-neutral-900 mt-0.5">
+              <p className="text-xs font-mono font-medium text-neutral-900 mt-0.5 truncate">
                 {primaryLoc.city || "Not Set"}
               </p>
             </div>
-            <div className="p-3 bg-neutral-50/70 border border-neutral-200/80 rounded-xs">
+            <div className="p-2.5 sm:p-3 bg-neutral-50/70 border border-neutral-200/80 rounded-xs min-w-0">
               <span className="text-[10px] font-mono uppercase text-neutral-400 block">
                 State
               </span>
-              <p className="text-xs font-mono font-medium text-neutral-900 mt-0.5">
+              <p className="text-xs font-mono font-medium text-neutral-900 mt-0.5 truncate">
                 {primaryLoc.state || "Not Set"}
               </p>
             </div>
-            <div className="p-3 bg-neutral-50/70 border border-neutral-200/80 rounded-xs">
+            <div className="p-2.5 sm:p-3 bg-neutral-50/70 border border-neutral-200/80 rounded-xs min-w-0">
               <span className="text-[10px] font-mono uppercase text-neutral-400 block">
                 PIN Code
               </span>
-              <p className="text-xs font-mono font-medium text-neutral-900 mt-0.5">
+              <p className="text-xs font-mono font-medium text-neutral-900 mt-0.5 truncate">
                 {primaryLoc.pincode || "Not Set"}
               </p>
             </div>
           </div>
 
-          <div className="p-3.5 bg-neutral-50/70 border border-neutral-200/80 rounded-xs flex items-start gap-3">
+          <div className="p-3 sm:p-3.5 bg-neutral-50/70 border border-neutral-200/80 rounded-xs flex items-start gap-2.5 sm:gap-3">
             <MapPin className="h-4 w-4 text-neutral-600 mt-0.5 shrink-0" />
             <div className="min-w-0 flex-1">
               <span className="text-[10px] font-mono uppercase text-neutral-400 block">
                 Full Address
               </span>
-              <p className="text-xs font-sans text-neutral-800 mt-0.5">
+              <p className="text-xs font-sans text-neutral-800 mt-0.5 wrap-break-word">
                 {primaryLoc.address_line || "No address added yet."}
               </p>
             </div>
@@ -168,22 +165,22 @@ export default function LocationTab({
           {/* গুগল ম্যাপ প্রিভিউ */}
           {googleMapEmbedUrl ? (
             <div className="border border-neutral-200/80 rounded-xs overflow-hidden bg-neutral-50">
-              <div className="p-2.5 bg-neutral-100/70 border-b border-neutral-200/70 flex justify-between items-center text-[10px] font-mono text-neutral-500">
+              <div className="p-2.5 bg-neutral-100/70 border-b border-neutral-200/70 flex flex-wrap justify-between items-center gap-2 text-[10px] font-mono text-neutral-500">
                 <span className="flex items-center gap-1.5 font-medium text-neutral-700">
-                  <MapPin className="h-3 w-3 text-neutral-500" />
-                  Map View
+                  <MapPin className="h-3 w-3 text-neutral-500 shrink-0" />
+                  <span>Map View</span>
                 </span>
                 <a
                   href={`https://www.google.com/maps?q=${mapQuery}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-1 text-neutral-800 hover:text-black font-semibold transition-colors"
+                  className="flex items-center gap-1 text-neutral-800 hover:text-black font-semibold transition-colors shrink-0"
                 >
                   <span>Open in Google Maps</span>
                   <ExternalLink className="h-2.5 w-2.5" />
                 </a>
               </div>
-              <div className="h-52 w-full bg-neutral-200">
+              <div className="h-44 sm:h-52 w-full bg-neutral-200">
                 <iframe
                   title="Google Map Location View"
                   src={googleMapEmbedUrl}
@@ -194,7 +191,7 @@ export default function LocationTab({
               </div>
             </div>
           ) : (
-            <div className="p-6 border border-dashed border-neutral-300 bg-neutral-50/40 rounded-xs text-center space-y-1">
+            <div className="p-5 sm:p-6 border border-dashed border-neutral-300 bg-neutral-50/40 rounded-xs text-center space-y-1">
               <MapPin className="h-5 w-5 text-neutral-400 mx-auto" />
               <p className="text-xs font-mono text-neutral-600">
                 No map location added.
@@ -208,11 +205,11 @@ export default function LocationTab({
       ) : (
         /* EDIT MODE */
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-neutral-50 border border-neutral-200/80 rounded-xs">
-            <div className="space-y-0.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-3.5 bg-neutral-50 border border-neutral-200/80 rounded-xs">
+            <div className="space-y-0.5 min-w-0">
               <span className="text-xs font-mono font-semibold text-neutral-900 flex items-center gap-1.5">
-                <Navigation className="h-3.5 w-3.5 text-neutral-800" />
-                Auto-Find My Location
+                <Navigation className="h-3.5 w-3.5 text-neutral-800 shrink-0" />
+                <span>Auto-Find My Location</span>
               </span>
               <p className="text-[11px] font-mono text-neutral-500">
                 Click to detect your current location and auto-fill your
@@ -223,7 +220,7 @@ export default function LocationTab({
               type="button"
               onClick={handleGetCurrentLocation}
               disabled={isLocating}
-              className="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 bg-neutral-950 hover:bg-neutral-800 disabled:bg-neutral-400 text-white text-xs font-mono uppercase tracking-wider rounded-xs cursor-pointer transition-colors shadow-2xs shrink-0"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-3.5 py-2 sm:py-1.5 bg-neutral-950 hover:bg-neutral-800 disabled:bg-neutral-400 text-white text-xs font-mono uppercase tracking-wider rounded-xs cursor-pointer transition-colors shadow-2xs shrink-0"
             >
               {isLocating ? (
                 <>
@@ -255,7 +252,7 @@ export default function LocationTab({
                 value={primaryLoc.city || ""}
                 placeholder="e.g. Kolkata"
                 onChange={(e) => updateLocationField("city", e.target.value)}
-                className="w-full border border-neutral-200 bg-neutral-50/30 px-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white"
+                className="w-full border border-neutral-200 bg-neutral-50/30 px-3 sm:px-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
               />
             </div>
             <div>
@@ -267,7 +264,7 @@ export default function LocationTab({
                 value={primaryLoc.state || ""}
                 placeholder="e.g. West Bengal"
                 onChange={(e) => updateLocationField("state", e.target.value)}
-                className="w-full border border-neutral-200 bg-neutral-50/30 px-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white"
+                className="w-full border border-neutral-200 bg-neutral-50/30 px-3 sm:px-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
               />
             </div>
             <div>
@@ -279,7 +276,7 @@ export default function LocationTab({
                 value={primaryLoc.pincode || ""}
                 placeholder="e.g. 700014"
                 onChange={(e) => updateLocationField("pincode", e.target.value)}
-                className="w-full border border-neutral-200 bg-neutral-50/30 px-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white"
+                className="w-full border border-neutral-200 bg-neutral-50/30 px-3 sm:px-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
               />
             </div>
           </div>
@@ -295,17 +292,17 @@ export default function LocationTab({
               onChange={(e) =>
                 updateLocationField("address_line", e.target.value)
               }
-              className="w-full border border-neutral-200 bg-neutral-50/30 px-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white"
+              className="w-full border border-neutral-200 bg-neutral-50/30 px-3 sm:px-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
             />
           </div>
 
           {googleMapEmbedUrl && (
             <div className="border border-neutral-200/80 rounded-xs overflow-hidden bg-neutral-50">
-              <div className="p-2 bg-neutral-100 border-b border-neutral-200 text-[10px] font-mono text-neutral-500 flex justify-between items-center">
+              <div className="p-2 bg-neutral-100 border-b border-neutral-200 text-[10px] font-mono text-neutral-500 flex flex-wrap justify-between items-center gap-1">
                 <span>Map Preview</span>
                 <span className="text-[9.5px]">Auto-updates with location</span>
               </div>
-              <div className="h-44 w-full bg-neutral-200">
+              <div className="h-40 sm:h-44 w-full bg-neutral-200">
                 <iframe
                   title="Google Map Edit Preview"
                   src={googleMapEmbedUrl}

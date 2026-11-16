@@ -62,6 +62,7 @@ export default function Navbar() {
     localStorage.removeItem("kagaz_active_id");
     localStorage.removeItem("kagaz_card_id");
     localStorage.removeItem("kagaz_role");
+    localStorage.removeItem("pending_google_role");
     await supabase.auth.signOut();
     setIsLoggedIn(false);
     setMobileMenuOpen(false);

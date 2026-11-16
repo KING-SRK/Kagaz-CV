@@ -1,4 +1,4 @@
-// app/dashboard/_components/profile/tabs/components/EducationCard.tsx
+// app/dashboard/individual/tabs/_components/EducationCard.tsx
 "use client";
 
 import { Trash2 } from "lucide-react";
@@ -25,7 +25,7 @@ export default function EducationCard({
   const isCollege = item.type === "college";
 
   return (
-    <div className="p-4 border border-neutral-200/90 bg-neutral-50/40 rounded-xs space-y-3">
+    <div className="p-3 sm:p-4 border border-neutral-200/90 bg-neutral-50/40 rounded-xs space-y-3">
       {/* কার্ড হেডার */}
       <div className="flex items-center justify-between border-b border-neutral-200/60 pb-2">
         <div className="flex items-center gap-2">
@@ -57,7 +57,7 @@ export default function EducationCard({
             onChange={(e) =>
               onUpdate(item.id, "type", e.target.value as EducationType)
             }
-            className="w-full border border-neutral-200 bg-white px-3 py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 cursor-pointer"
+            className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 cursor-pointer rounded-xs"
           >
             <option value="school">School</option>
             <option value="college">College</option>
@@ -79,7 +79,7 @@ export default function EducationCard({
               onChange={(e) =>
                 onUpdate(item.id, "degreeOrStandard", e.target.value)
               }
-              className="w-full border border-neutral-200 bg-white px-3 py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 cursor-pointer"
+              className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 cursor-pointer rounded-xs"
             >
               {SCHOOL_STANDARDS.map((std) => (
                 <option key={std} value={std}>
@@ -99,7 +99,7 @@ export default function EducationCard({
               onChange={(e) =>
                 onUpdate(item.id, "degreeOrStandard", e.target.value)
               }
-              className="w-full border border-neutral-200 bg-white px-3 py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950"
+              className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 rounded-xs"
             />
           )}
         </div>
@@ -130,7 +130,7 @@ export default function EducationCard({
             onChange={(e) =>
               onUpdate(item.id, "institutionName", e.target.value)
             }
-            className="w-full border border-neutral-200 bg-white px-3 py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950"
+            className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 rounded-xs"
           />
         </div>
 
@@ -146,7 +146,7 @@ export default function EducationCard({
               onChange={(e) =>
                 onUpdate(item.id, "universityName", e.target.value)
               }
-              className="w-full border border-neutral-200 bg-white px-3 py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950"
+              className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 rounded-xs"
             />
           </div>
         )}
@@ -170,7 +170,7 @@ export default function EducationCard({
                   e.target.value as "pursuing" | "completed",
                 )
               }
-              className="w-full border border-neutral-200 bg-white px-3 py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 cursor-pointer"
+              className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 cursor-pointer rounded-xs"
             >
               <option value="pursuing">Currently Studying (Pursuing)</option>
               <option value="completed">Completed</option>
@@ -197,7 +197,7 @@ export default function EducationCard({
                 : "e.g. 2021 - 2023"
             }
             onChange={(e) => onUpdate(item.id, "session", e.target.value)}
-            className="w-full border border-neutral-200 bg-white px-3 py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950"
+            className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 rounded-xs"
           />
         </div>
 
@@ -210,7 +210,7 @@ export default function EducationCard({
             value={item.gradeOrScore}
             placeholder="e.g. 80% or A+"
             onChange={(e) => onUpdate(item.id, "gradeOrScore", e.target.value)}
-            className="w-full border border-neutral-200 bg-white px-3 py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950"
+            className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 rounded-xs"
           />
         </div>
       </div>

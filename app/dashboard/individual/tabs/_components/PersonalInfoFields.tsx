@@ -1,4 +1,3 @@
-// app/dashboard/_components/profile/tabs/components/PersonalInfoFields.tsx
 "use client";
 
 import { useRef, useState, ChangeEvent } from "react";
@@ -24,7 +23,7 @@ export interface PersonalInfoData {
   gender: string;
   bloodGroup: string;
   nationality: string;
-  languages: string; // JSON string অথবা কমা-সেপারেটেড হিসেবে ব্যাকওয়ার্ড কম্প্যাটিবল থাকবে
+  languages: string;
   bio: string;
 }
 
@@ -41,14 +40,12 @@ interface Props {
   onChange: (field: keyof PersonalInfoData, value: string) => void;
 }
 
-// পুরনো কমা-সেপারেটেড বা নতুন JSON স্ট্রিং পার্স করার হেল্পার
 function parseLanguages(raw: string): LanguageItem[] {
   if (!raw) return [];
   try {
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed)) return parsed;
   } catch {
-    // যদি পুরনো "Bengali, English" ফরম্যাটে থাকে
     return raw
       .split(",")
       .map((s) => s.trim())
@@ -125,8 +122,8 @@ export default function PersonalInfoFields({
     return (
       <div className="space-y-4">
         {/* প্রোফাইল কার্ড */}
-        <div className="p-3.5 bg-neutral-50/70 border border-neutral-200/80 rounded-xs flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-full overflow-hidden border border-neutral-300 bg-white flex items-center justify-center shrink-0 shadow-2xs">
+        <div className="p-3 sm:p-3.5 bg-neutral-50/70 border border-neutral-200/80 rounded-xs flex items-center gap-3 sm:gap-3.5">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden border border-neutral-300 bg-white flex items-center justify-center shrink-0 shadow-2xs">
             {data.avatarUrl ? (
               <img
                 src={data.avatarUrl}
@@ -134,55 +131,55 @@ export default function PersonalInfoFields({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <User className="h-6 w-6 text-neutral-400" />
+              <User className="h-5 w-5 sm:h-6 sm:w-6 text-neutral-400" />
             )}
           </div>
           <div className="min-w-0 flex-1">
             <h2 className="text-sm font-serif font-bold text-neutral-950 truncate">
               {data.fullName || "Name Not Set"}
             </h2>
-            <p className="text-xs font-mono text-neutral-500 truncate">
+            <p className="text-[11px] sm:text-xs font-mono text-neutral-500 truncate">
               {data.headline || "Headline Not Set"}
             </p>
           </div>
         </div>
 
         {/* বেসিক ইনফো গ্রিড */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
-          <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 text-xs font-mono">
+          <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs min-w-0">
             <div className="flex items-center gap-1 text-neutral-400 mb-0.5">
-              <Calendar className="h-3 w-3" />
-              <span className="text-[9px] uppercase">Birth Date</span>
+              <Calendar className="h-3 w-3 shrink-0" />
+              <span className="text-[9px] uppercase truncate">Birth Date</span>
             </div>
-            <p className="font-medium text-neutral-900">
+            <p className="font-medium text-neutral-900 truncate">
               {data.dob || "Not Set"}
             </p>
           </div>
 
-          <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs">
+          <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs min-w-0">
             <div className="flex items-center gap-1 text-neutral-400 mb-0.5">
-              <User className="h-3 w-3" />
-              <span className="text-[9px] uppercase">Gender</span>
+              <User className="h-3 w-3 shrink-0" />
+              <span className="text-[9px] uppercase truncate">Gender</span>
             </div>
-            <p className="font-medium text-neutral-900">
+            <p className="font-medium text-neutral-900 truncate">
               {data.gender || "Not Set"}
             </p>
           </div>
 
-          <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs">
+          <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs min-w-0">
             <div className="flex items-center gap-1 text-red-500/80 mb-0.5">
-              <Droplet className="h-3 w-3" />
-              <span className="text-[9px] uppercase">Blood Group</span>
+              <Droplet className="h-3 w-3 shrink-0" />
+              <span className="text-[9px] uppercase truncate">Blood Group</span>
             </div>
-            <p className="font-medium text-neutral-900">
+            <p className="font-medium text-neutral-900 truncate">
               {data.bloodGroup || "Not Set"}
             </p>
           </div>
 
-          <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs">
+          <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs min-w-0">
             <div className="flex items-center gap-1 text-neutral-400 mb-0.5">
-              <Globe2 className="h-3 w-3" />
-              <span className="text-[9px] uppercase">Nationality</span>
+              <Globe2 className="h-3 w-3 shrink-0" />
+              <span className="text-[9px] uppercase truncate">Nationality</span>
             </div>
             <p className="font-medium text-neutral-900 truncate">
               {data.nationality || "Not Set"}
@@ -193,7 +190,7 @@ export default function PersonalInfoFields({
         {/* জানা ভাষা ও দক্ষতা (Proficiency) */}
         <div className="p-3 bg-neutral-50/50 border border-neutral-200/70 rounded-xs">
           <div className="flex items-center gap-1 text-neutral-400 mb-2">
-            <Languages className="h-3.5 w-3.5" />
+            <Languages className="h-3.5 w-3.5 shrink-0" />
             <span className="text-[9px] font-mono uppercase">
               Languages & Proficiency
             </span>
@@ -203,24 +200,24 @@ export default function PersonalInfoFields({
               {langList.map((lang, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between px-2.5 py-1.5 bg-white border border-neutral-200 rounded-xs text-xs font-mono"
+                  className="flex flex-wrap items-center justify-between gap-1.5 px-2.5 py-1.5 bg-white border border-neutral-200 rounded-xs text-xs font-mono"
                 >
-                  <span className="font-semibold text-neutral-900">
+                  <span className="font-semibold text-neutral-900 truncate">
                     {lang.name}
                   </span>
-                  <div className="flex items-center gap-1 text-[9.5px]">
+                  <div className="flex items-center gap-1 text-[9.5px] shrink-0">
                     {lang.read && (
-                      <span className="px-1.5 py-0.2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xs">
+                      <span className="px-1.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xs">
                         Read
                       </span>
                     )}
                     {lang.write && (
-                      <span className="px-1.5 py-0.2 bg-blue-50 text-blue-700 border border-blue-200 rounded-xs">
+                      <span className="px-1.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-xs">
                         Write
                       </span>
                     )}
                     {lang.speak && (
-                      <span className="px-1.5 py-0.2 bg-amber-50 text-amber-700 border border-amber-200 rounded-xs">
+                      <span className="px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-xs">
                         Speak
                       </span>
                     )}
@@ -248,7 +245,7 @@ export default function PersonalInfoFields({
   return (
     <div className="space-y-4">
       {/* প্রোফাইল ফটো আপলোড */}
-      <div className="p-3 bg-neutral-50/60 border border-neutral-200/80 rounded-xs flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <div className="p-3 bg-neutral-50/60 border border-neutral-200/80 rounded-xs flex items-center gap-3.5 sm:gap-4">
         <div className="relative w-14 h-14 rounded-full overflow-hidden border border-neutral-300 bg-white flex items-center justify-center shrink-0 shadow-2xs group">
           {uploading ? (
             <div className="flex items-center justify-center w-full h-full bg-neutral-950/20">
@@ -274,7 +271,7 @@ export default function PersonalInfoFields({
           )}
         </div>
 
-        <div className="flex-1 space-y-1">
+        <div className="flex-1 min-w-0 space-y-1">
           <span className="text-[10px] font-mono uppercase text-neutral-400 font-bold block">
             Profile Photo
           </span>
@@ -286,12 +283,12 @@ export default function PersonalInfoFields({
             onChange={handleFileChange}
             disabled={uploading}
           />
-          <div className="flex items-center gap-2 pt-0.5">
+          <div className="flex flex-wrap items-center gap-2 pt-0.5">
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="inline-flex items-center gap-1.5 text-[10.5px] font-mono uppercase px-2.5 py-1 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-[10.5px] font-mono uppercase px-2.5 py-1.5 sm:py-1 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xs cursor-pointer"
             >
               {uploading && <Loader2 className="w-3 h-3 animate-spin" />}
               <span>{uploading ? "Uploading..." : "Upload Photo"}</span>
@@ -300,7 +297,7 @@ export default function PersonalInfoFields({
               <button
                 type="button"
                 onClick={handleRemoveAvatar}
-                className="text-[10.5px] font-mono uppercase px-2 py-1 text-red-600 hover:bg-red-50 rounded-xs flex items-center gap-1 cursor-pointer"
+                className="text-[10.5px] font-mono uppercase px-2 py-1.5 sm:py-1 text-red-600 hover:bg-red-50 rounded-xs flex items-center gap-1 cursor-pointer"
               >
                 <Trash2 className="w-3 h-3" />
                 <span>Remove</span>
@@ -321,7 +318,7 @@ export default function PersonalInfoFields({
             value={data.fullName}
             placeholder="Enter your full name"
             onChange={(e) => onChange("fullName", e.target.value)}
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
+            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
           />
         </div>
         <div>
@@ -333,13 +330,13 @@ export default function PersonalInfoFields({
             value={data.headline}
             placeholder="Enter your work title or headline"
             onChange={(e) => onChange("headline", e.target.value)}
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
+            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
           />
         </div>
       </div>
 
       {/* জন্মতারিখ, লিঙ্গ, রক্তের গ্রুপ ও ন্যাশনালিটি */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
         <div>
           <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
             Date of Birth
@@ -348,7 +345,7 @@ export default function PersonalInfoFields({
             type="date"
             value={data.dob}
             onChange={(e) => onChange("dob", e.target.value)}
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-2.5 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
+            className="w-full border border-neutral-200 bg-neutral-50/30 px-2.5 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
           />
         </div>
         <div>
@@ -358,7 +355,7 @@ export default function PersonalInfoFields({
           <select
             value={data.gender}
             onChange={(e) => onChange("gender", e.target.value)}
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-2.5 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
+            className="w-full border border-neutral-200 bg-neutral-50/30 px-2.5 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
           >
             <option value="">Select</option>
             <option value="Male">Male</option>
@@ -373,7 +370,7 @@ export default function PersonalInfoFields({
           <select
             value={data.bloodGroup}
             onChange={(e) => onChange("bloodGroup", e.target.value)}
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-2.5 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
+            className="w-full border border-neutral-200 bg-neutral-50/30 px-2.5 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
           >
             <option value="">Select</option>
             <option value="A+">A+</option>
@@ -396,7 +393,7 @@ export default function PersonalInfoFields({
             value={data.nationality}
             onChange={(e) => onChange("nationality", e.target.value)}
             placeholder="e.g. Indian"
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-2.5 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
+            className="w-full border border-neutral-200 bg-neutral-50/30 px-2.5 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
           />
         </div>
       </div>
@@ -418,12 +415,12 @@ export default function PersonalInfoFields({
               }
             }}
             placeholder="e.g. Bengali, English, Hindi..."
-            className="flex-1 border border-neutral-200 bg-white px-3 py-1.5 text-xs font-mono outline-none focus:border-neutral-950"
+            className="flex-1 min-w-0 border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
           />
           <button
             type="button"
             onClick={handleAddLanguage}
-            className="px-3 py-1.5 bg-neutral-900 text-white text-xs font-mono uppercase rounded-xs cursor-pointer flex items-center gap-1"
+            className="px-3 py-2 sm:py-1.5 bg-neutral-900 text-white text-xs font-mono uppercase rounded-xs cursor-pointer flex items-center gap-1 shrink-0"
           >
             <Plus className="h-3.5 w-3.5" /> Add
           </button>
@@ -433,12 +430,12 @@ export default function PersonalInfoFields({
           {langList.map((lang, idx) => (
             <div
               key={idx}
-              className="flex flex-wrap items-center justify-between gap-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-xs text-xs font-mono"
+              className="flex flex-wrap items-center justify-between gap-2 bg-white border border-neutral-200 px-3 py-2 sm:py-1.5 rounded-xs text-xs font-mono"
             >
               <span className="font-semibold text-neutral-900">
                 {lang.name}
               </span>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5 sm:gap-3">
                 <label className="flex items-center gap-1 cursor-pointer text-[11px]">
                   <input
                     type="checkbox"
@@ -486,7 +483,7 @@ export default function PersonalInfoFields({
           value={data.bio}
           onChange={(e) => onChange("bio", e.target.value)}
           placeholder="Write your professional introduction, career objective & summary..."
-          className="w-full border border-neutral-200 bg-neutral-50/30 p-3 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white resize-none"
+          className="w-full border border-neutral-200 bg-neutral-50/30 p-3 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white resize-none rounded-xs"
         />
       </div>
     </div>

@@ -58,7 +58,7 @@ export default function IndividualDashboardPage() {
 
   if (checkingAuth) {
     return (
-      <div className="min-h-screen bg-[#FDFCFB] flex flex-col items-center justify-center gap-2 text-neutral-500 font-mono text-xs">
+      <div className="min-h-screen bg-[#FDFCFB] flex flex-col items-center justify-center gap-2 text-neutral-500 font-mono text-xs px-4 text-center">
         <Loader2 className="h-5 w-5 animate-spin text-neutral-900" />
         <span>Verifying identity workspace...</span>
       </div>
@@ -66,22 +66,23 @@ export default function IndividualDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB] text-neutral-950">
-      <main className="max-w-7xl mx-auto px-6 py-10 space-y-8">
+    <div className="min-h-screen bg-[#FDFCFB] text-neutral-950 overflow-x-hidden">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-6 sm:space-y-8">
         {/* ব্যানার হেডার */}
-        <div className="flex items-center justify-between border-b border-neutral-200 pb-5">
-          <div>
-            <span className="text-sm font-mono uppercase tracking-wider font-semibold text-slate-500 flex items-center gap-2">
-              <Fingerprint className="h-4 w-4 text-slate-500" />
-              Verified Primary Identity
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-200 pb-4 sm:pb-5">
+          <div className="min-w-0">
+            <span className="text-xs sm:text-sm font-mono uppercase tracking-wider font-semibold text-slate-500 flex items-center gap-1.5 sm:gap-2">
+              <Fingerprint className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-500 shrink-0" />
+              <span className="truncate">Verified Primary Identity</span>
             </span>
-            <h1 className="text-3xl font-serif font-normal text-neutral-950 mt-1">
+            <h1 className="text-2xl sm:text-3xl font-serif font-normal text-neutral-950 mt-1 truncate">
               Welcome{userName ? `, ${userName}` : ""}
             </h1>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-mono text-neutral-500 uppercase">
+
+          <div className="inline-flex items-center gap-2 self-start sm:self-auto bg-neutral-100/80 sm:bg-transparent px-2.5 py-1 sm:p-0 rounded-xs border border-neutral-200/80 sm:border-0 shrink-0">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="text-[11px] sm:text-xs font-mono text-neutral-600 sm:text-neutral-500 uppercase">
               Active Network
             </span>
           </div>
@@ -91,18 +92,18 @@ export default function IndividualDashboardPage() {
         <IdentityBadge />
 
         {/* ওপরের গ্রিড */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          <div className="lg:col-span-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
+          <div className="lg:col-span-6 w-full">
             <PrimaryIdentity />
           </div>
 
-          <div className="lg:col-span-6">
+          <div className="lg:col-span-6 w-full">
             <CardSection />
           </div>
         </div>
 
         {/* নিচের প্রোফাইল ডিটেইলস */}
-        <div className="pt-2">
+        <div className="pt-1 sm:pt-2">
           <ProfileDetailsSection />
         </div>
       </main>

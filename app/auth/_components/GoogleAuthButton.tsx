@@ -19,9 +19,13 @@ export default function GoogleAuthButton({
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
-      // যদি রেজিস্ট্রেশন থেকে আসে, তবে রোলটি মনে রাখবে
+
+      // 🍪 কুকিতে রোল সেভ করে রাখা হচ্ছে (১০ মিনিটের জন্য)
       if (role) {
-        localStorage.setItem("pending_google_role", role);
+        document.cookie = `sutranet_pending_role=${role}; path=/; max-age=600; SameSite=Lax`;
+      } else {
+        document.cookie =
+          "sutranet_pending_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
       }
 
       const { error } = await supabase.auth.signInWithOAuth({

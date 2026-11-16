@@ -1,7 +1,7 @@
 // app/dashboard/individual/ProfileDetailsSection.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   User,
   MapPin,
@@ -28,7 +28,6 @@ import EducationTab from "./tabs/EducationTab";
 import SkillsTab from "./tabs/SkillsTab";
 import GovtVaultTab from "./tabs/GovtVaultTab";
 import CareerPreferencesTab from "./tabs/CareerPreferencesTab";
-// নতুন ৩টি ট্যাব ইমপোর্ট (এগুলো আমরা পরের ধাপে বানাবো)
 import ExperienceTab, { ExperienceItem } from "./tabs/ExperienceTab";
 import ProjectsTab, { ProjectItem } from "./tabs/ProjectsTab";
 import CredentialsTab, {
@@ -50,7 +49,6 @@ import {
   LocationItem,
 } from "@/lib/individualService";
 
-// এক্সটেন্ডেড টাইপ যাতে নতুন ফিল্ডগুলো টাইপসেফ থাকে
 export interface ExtendedIndividualProfile extends FullIndividualProfile {
   interests?: string[];
   experience?: ExperienceItem[];
@@ -67,7 +65,8 @@ export default function ProfileDetailsSection() {
   const [saving, setSaving] = useState<boolean>(false);
   const [userId, setUserId] = useState<string>("");
 
-  // সেন্ট্রাল প্রোফাইল স্টেট
+  const contentAreaRef = useRef<HTMLDivElement>(null);
+
   const [profile, setProfile] = useState<ExtendedIndividualProfile>({
     id: "",
     kagaz_id: "",
@@ -122,67 +121,76 @@ export default function ProfileDetailsSection() {
     loadData();
   }, []);
 
-  // বাঁদিকের মেনু সেকশনসমূহ (নতুন ৩টি সহ মোট ৯টি ক্লিন সেকশন)
   const sections = [
     {
       id: "about",
+      shortTitle: "Personal",
       title: "Personal Details",
       desc: "Summary, birth details, languages & social links.",
       icon: User,
     },
     {
-      id: "skills",
-      title: "Skills & Interests",
-      desc: "Work sector, core skills & personal hobbies.",
-      icon: Briefcase,
+      id: "family",
+      shortTitle: "Family",
+      title: "Family Details",
+      desc: "Parents, siblings & emergency contact info.",
+      icon: Users,
     },
     {
-      id: "experience",
-      title: "Work History",
-      desc: "Employment history, companies & responsibilities.",
-      icon: Building2,
-    },
-    {
-      id: "projects",
-      title: "Projects & Portfolio",
-      desc: "Showcase live projects, tech stack & images.",
-      icon: FolderGit2,
+      id: "location",
+      shortTitle: "Address",
+      title: "Address & Map",
+      desc: "Residential address & Google Maps GPS location.",
+      icon: MapPin,
     },
     {
       id: "education",
+      shortTitle: "Education",
       title: "Education",
       desc: "Degrees, institutions, session years & status.",
       icon: GraduationCap,
     },
     {
       id: "credentials",
+      shortTitle: "Honors",
       title: "Honors & References",
       desc: "Certifications, achievements & professional refs.",
       icon: Award,
     },
     {
-      id: "location",
-      title: "Address & Map",
-      desc: "Residential address & Google Maps GPS location.",
-      icon: MapPin,
+      id: "skills",
+      shortTitle: "Skills",
+      title: "Skills & Interests",
+      desc: "Work sector, core skills & personal hobbies.",
+      icon: Briefcase,
     },
     {
-      id: "family",
-      title: "Family Details",
-      desc: "Parents, siblings & emergency contact info.",
-      icon: Users,
+      id: "projects",
+      shortTitle: "Projects",
+      title: "Projects & Portfolio",
+      desc: "Showcase live projects, tech stack & images.",
+      icon: FolderGit2,
     },
     {
-      id: "vault",
-      title: "Personal Vault",
-      desc: "Official IDs & important personal documents.",
-      icon: ShieldCheck,
+      id: "experience",
+      shortTitle: "Work",
+      title: "Work History",
+      desc: "Employment history, companies & responsibilities.",
+      icon: Building2,
     },
     {
       id: "preferences",
+      shortTitle: "Careers",
       title: "Career Preferences",
       desc: "Open to work, freelance availability, preferred role & location.",
       icon: Target,
+    },
+    {
+      id: "vault",
+      shortTitle: "Govt IDs",
+      title: "Government Authorized Documents",
+      desc: "Official IDs & important personal documents.",
+      icon: ShieldCheck,
     },
   ];
 
@@ -190,6 +198,19 @@ export default function ProfileDetailsSection() {
     setActiveTab(newTabId);
     setDraft(profile);
     setIsEditing(false);
+
+    if (
+      typeof window !== "undefined" &&
+      window.innerWidth < 768 &&
+      contentAreaRef.current
+    ) {
+      const yOffset = -120;
+      const y =
+        contentAreaRef.current.getBoundingClientRect().top +
+        window.pageYOffset +
+        yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
   };
 
   const handleStartEdit = () => {
@@ -223,14 +244,12 @@ export default function ProfileDetailsSection() {
         skills: Array.isArray(draft.skills) ? draft.skills : [],
         interests: Array.isArray(draft.interests) ? draft.interests : [],
         social_links: draft.social_links || [],
-        // নতুন ক্যারিয়ার ডেটা
         experience: draft.experience || [],
         projects: draft.projects || [],
         certifications: draft.certifications || [],
         achievements: draft.achievements || [],
         references_list: draft.references_list || [],
         career_preferences: draft.career_preferences,
-
         address_line: primaryLoc.address_line || "",
         city: primaryLoc.city || "",
         state: primaryLoc.state || "",
@@ -264,7 +283,7 @@ export default function ProfileDetailsSection() {
 
   if (loading) {
     return (
-      <div className="border border-neutral-200/80 bg-white p-12 text-center flex flex-col items-center justify-center gap-2 rounded-xs">
+      <div className="border border-neutral-200/80 bg-white p-8 sm:p-12 text-center flex flex-col items-center justify-center gap-2 rounded-xs">
         <Loader2 className="h-5 w-5 animate-spin text-neutral-500" />
         <span className="text-xs font-mono text-neutral-500">
           Loading SutraNet profile details...
@@ -273,61 +292,78 @@ export default function ProfileDetailsSection() {
     );
   }
 
+  const activeSection = sections.find((s) => s.id === activeTab);
+
+  const renderActionButtons = (isMobile = false) => {
+    if (!isEditing) {
+      return (
+        <button
+          type="button"
+          onClick={handleStartEdit}
+          className={`${
+            isMobile ? "w-full justify-center py-2.5" : "px-4 py-2"
+          } inline-flex items-center gap-2 bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-mono uppercase tracking-wider rounded-xs transition-colors cursor-pointer shadow-2xs`}
+        >
+          <Pencil className="h-3.5 w-3.5 text-neutral-300 shrink-0" />
+          <span>Edit {isMobile ? activeSection?.shortTitle : "Details"}</span>
+        </button>
+      );
+    }
+
+    return (
+      <div className={`flex items-center gap-2 ${isMobile ? "w-full" : ""}`}>
+        <button
+          type="button"
+          onClick={handleCancel}
+          disabled={saving}
+          className={`${
+            isMobile ? "flex-1 justify-center py-2.5" : "px-3.5 py-2"
+          } inline-flex items-center gap-1.5 border border-neutral-300 bg-white hover:bg-neutral-100 text-neutral-700 text-xs font-mono uppercase tracking-wider rounded-xs transition-colors cursor-pointer disabled:opacity-50`}
+        >
+          <X className="h-3.5 w-3.5 shrink-0" />
+          <span>Cancel</span>
+        </button>
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving}
+          className={`${
+            isMobile ? "flex-1 justify-center py-2.5" : "px-4 py-2"
+          } inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-mono uppercase tracking-wider rounded-xs transition-colors cursor-pointer shadow-xs disabled:opacity-50`}
+        >
+          {saving ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" />
+          ) : (
+            <Check className="h-3.5 w-3.5 shrink-0" />
+          )}
+          <span>{saving ? "Saving..." : "Save"}</span>
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="border border-neutral-200/80 bg-white shadow-xs select-none rounded-xs">
       {/* ১. সেকশন হেডার */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 p-6 sticky top-20 z-20 bg-white">
-        <div>
+      <div className="flex items-center justify-between gap-4 border-b border-neutral-100 p-4 sm:p-6 md:sticky md:top-20 z-20 bg-white">
+        <div className="min-w-0">
           <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-600 font-semibold flex items-center gap-1.5">
-            <Sparkles className="h-3 w-3" /> Profile Details
+            <Sparkles className="h-3 w-3 shrink-0" /> Profile Details
           </span>
-          <h2 className="text-xl font-serif text-neutral-950 mt-1">
+          <h2 className="text-lg sm:text-xl font-serif text-neutral-950 mt-0.5 sm:mt-1 truncate">
             Personal, Career & Portfolio Information
           </h2>
         </div>
 
-        <div className="flex items-center gap-3">
-          {!isEditing ? (
-            <button
-              type="button"
-              onClick={handleStartEdit}
-              className="inline-flex items-center gap-2 bg-neutral-950 hover:bg-neutral-800 text-white px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-xs transition-colors cursor-pointer"
-            >
-              <Pencil className="h-3.5 w-3.5 text-neutral-300" />
-              <span>Edit Details</span>
-            </button>
-          ) : (
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={handleCancel}
-                disabled={saving}
-                className="inline-flex items-center gap-1.5 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 px-3.5 py-2 text-xs font-mono uppercase tracking-wider rounded-xs transition-colors cursor-pointer disabled:opacity-50"
-              >
-                <X className="h-3.5 w-3.5" />
-                <span>Cancel</span>
-              </button>
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={saving}
-                className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-xs transition-colors cursor-pointer shadow-xs disabled:opacity-50"
-              >
-                {saving ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <Check className="h-3.5 w-3.5" />
-                )}
-                <span>{saving ? "Saving..." : "Save"}</span>
-              </button>
-            </div>
-          )}
+        {/* 💻 শুধুমাত্র ডেস্কটপে হেডারের ডানদিকে বাটন থাকবে */}
+        <div className="hidden md:flex items-center gap-3 shrink-0">
+          {renderActionButtons(false)}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 min-h-110">
-        {/* ২. বাঁদিকের সাইডবার ট্যাব লিস্ট */}
-        <div className="md:col-span-4 border-b md:border-b-0 md:border-r border-neutral-100 bg-neutral-50/40 p-3 space-y-1.5">
+      {/* 📱 ২. মোবাইল ও ট্যাবলেট স্টিকি কমপ্যাক্ট হরাইজন্টাল ট্যাব বার (< md) */}
+      <div className="md:hidden sticky top-16 z-10 border-b border-neutral-200/80 bg-neutral-50/90 backdrop-blur-xs px-3 py-2.5 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-2 w-max">
           {sections.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -336,7 +372,37 @@ export default function ProfileDetailsSection() {
                 key={item.id}
                 type="button"
                 onClick={() => handleTabChange(item.id)}
-                className={`w-full flex items-start justify-between p-3 text-left transition-colors duration-150 rounded-xs cursor-pointer outline-none border ${
+                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xs text-[11px] font-mono uppercase tracking-wider border transition-colors cursor-pointer whitespace-nowrap ${
+                  isActive
+                    ? "bg-neutral-950 text-white border-neutral-950 font-bold shadow-2xs"
+                    : "bg-white text-neutral-600 border-neutral-200/90 hover:border-neutral-400"
+                }`}
+              >
+                <Icon
+                  className={`h-3.5 w-3.5 ${
+                    isActive ? "text-emerald-400" : "text-neutral-500"
+                  }`}
+                />
+                <span>{item.shortTitle}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 💻 ৩. ডেস্কটপ সাইডবার + ডানদিকের কনটেন্ট গ্রিড */}
+      <div className="grid grid-cols-1 md:grid-cols-12 md:min-h-110">
+        {/* ডেস্কটপ বাম সাইডবার */}
+        <div className="hidden md:block md:col-span-4 border-r border-neutral-100 bg-neutral-50/40 p-3 space-y-1.5">
+          {sections.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => handleTabChange(item.id)}
+                className={`w-full flex items-start justify-between p-3.5 text-left transition-colors duration-150 rounded-xs cursor-pointer outline-none border ${
                   isActive
                     ? "bg-white text-neutral-950 shadow-xs border-neutral-200/80"
                     : "bg-transparent border-transparent text-neutral-500 hover:bg-neutral-100/60 hover:text-neutral-900"
@@ -360,7 +426,7 @@ export default function ProfileDetailsSection() {
                     >
                       {item.title}
                     </span>
-                    <p className="text-[11px] font-sans text-neutral-500 mt-0.5 line-clamp-1 leading-relaxed">
+                    <p className="text-[11px] font-sans text-neutral-500 mt-0.5 line-clamp-2 leading-relaxed">
                       {item.desc}
                     </p>
                   </div>
@@ -377,9 +443,17 @@ export default function ProfileDetailsSection() {
           })}
         </div>
 
-        {/* ৩. ডানদিকের মূল কনটেন্ট এরিয়া */}
-        <div className="md:col-span-8 p-6 sm:p-8 flex flex-col justify-between md:sticky md:top-44 self-start">
-          <div className="min-h-80">
+        {/* ৪. ডানদিকের মূল কনটেন্ট এরিয়া */}
+        <div
+          ref={contentAreaRef}
+          className="md:col-span-8 p-4 sm:p-6 md:p-8 flex flex-col justify-between md:sticky md:top-44 self-start w-full min-w-0"
+        >
+          {/* 📱 মোবাইলে ট্যাব বারের ঠিক নিচে ফুল-উইডথ ক্লিন Edit / Save অ্যাকশন বার */}
+          <div className="md:hidden pb-4 mb-4 border-b border-neutral-100">
+            {renderActionButtons(true)}
+          </div>
+
+          <div className="min-h-70 sm:min-h-80 w-full min-w-0">
             {activeTab === "about" && (
               <AboutTab
                 isEditing={isEditing}
@@ -476,7 +550,6 @@ export default function ProfileDetailsSection() {
               />
             )}
 
-            {/* 🆕 নতুন ১: Work History / Employment */}
             {activeTab === "experience" && (
               <ExperienceTab
                 isEditing={isEditing}
@@ -489,7 +562,6 @@ export default function ProfileDetailsSection() {
               />
             )}
 
-            {/* 🆕 নতুন ২: Projects & Portfolio */}
             {activeTab === "projects" && (
               <ProjectsTab
                 isEditing={isEditing}
@@ -516,7 +588,6 @@ export default function ProfileDetailsSection() {
               />
             )}
 
-            {/* 🆕 নতুন ৩: Certifications, Achievements & References */}
             {activeTab === "credentials" && (
               <CredentialsTab
                 isEditing={isEditing}

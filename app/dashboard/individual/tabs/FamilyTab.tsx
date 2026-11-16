@@ -57,17 +57,19 @@ export default function FamilyTab({
   return (
     <div className="space-y-4 animate-in fade-in-50 duration-200">
       {/* হেডার ও মেম্বার যুক্ত করার বাটন */}
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
-          <Users className="h-3.5 w-3.5 text-emerald-600" />
-          Family & Emergency Contacts ({displayList.length})
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5 min-w-0">
+          <Users className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+          <span className="truncate">
+            Family & Emergency Contacts ({displayList.length})
+          </span>
         </span>
 
         {isEditing && (
           <button
             type="button"
             onClick={addMember}
-            className="inline-flex items-center gap-1.5 text-[11px] font-mono uppercase text-white bg-neutral-900 hover:bg-neutral-800 px-3 py-1.5 transition-colors cursor-pointer rounded-xs"
+            className="inline-flex items-center gap-1.5 text-[11px] font-mono uppercase text-white bg-neutral-900 hover:bg-neutral-800 px-3 py-1.5 transition-colors cursor-pointer rounded-xs shrink-0"
           >
             <Plus className="h-3 w-3" />
             <span>Add Member</span>
@@ -77,26 +79,26 @@ export default function FamilyTab({
 
       {!isEditing ? (
         /* ==================== VIEW MODE ==================== */
-        <div className="space-y-4">
+        <div className="space-y-3.5 sm:space-y-4">
           {displayList.map((member, index) => (
             <div
               key={member.id || index}
-              className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3"
+              className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-2.5 sm:space-y-3"
             >
               {/* কার্ড হেডার */}
-              <div className="flex items-center justify-between border-b border-neutral-200/80 pb-2">
+              <div className="flex items-center justify-between gap-2 border-b border-neutral-200/80 pb-2">
                 <span className="text-[11px] font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
-                  <HeartHandshake className="h-3.5 w-3.5 text-neutral-500" />
+                  <HeartHandshake className="h-3.5 w-3.5 text-neutral-500 shrink-0" />
                   Member #{index + 1}
                 </span>
-                <span className="px-2 py-0.5 bg-white border border-neutral-200 text-[10px] font-mono text-neutral-700 uppercase rounded-xs">
+                <span className="px-2 py-0.5 bg-white border border-neutral-200 text-[10px] font-mono text-neutral-700 uppercase rounded-xs shrink-0">
                   {member.relation || "Father"}
                 </span>
               </div>
 
               {/* ফিল্ডসমূহ */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
-                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-2.5 text-xs font-mono">
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                   <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                     Full Name
                   </span>
@@ -109,7 +111,7 @@ export default function FamilyTab({
                   </p>
                 </div>
 
-                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                   <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                     Occupation
                   </span>
@@ -124,7 +126,7 @@ export default function FamilyTab({
                   </p>
                 </div>
 
-                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                   <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                     Phone / Contact
                   </span>
@@ -142,11 +144,11 @@ export default function FamilyTab({
         </div>
       ) : (
         /* ==================== EDIT MODE ==================== */
-        <div className="space-y-4">
+        <div className="space-y-3.5 sm:space-y-4">
           {displayList.map((member, index) => (
             <div
               key={member.id || index}
-              className="p-4 border border-neutral-200/90 bg-neutral-50/40 rounded-xs space-y-3"
+              className="p-3 sm:p-4 border border-neutral-200/90 bg-neutral-50/40 rounded-xs space-y-3"
             >
               <div className="flex items-center justify-between border-b border-neutral-200/60 pb-2">
                 <span className="text-[10px] font-mono uppercase text-neutral-500 font-bold">
@@ -174,7 +176,7 @@ export default function FamilyTab({
                     onChange={(e) =>
                       updateMember(index, "relation", e.target.value)
                     }
-                    className="w-full border border-neutral-200 bg-white px-3 py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 cursor-pointer"
+                    className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 cursor-pointer rounded-xs"
                   >
                     <option value="Father">Father</option>
                     <option value="Mother">Mother</option>
@@ -197,7 +199,7 @@ export default function FamilyTab({
                     onChange={(e) =>
                       updateMember(index, "name", e.target.value)
                     }
-                    className="w-full border border-neutral-200 bg-white px-3 py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950"
+                    className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 rounded-xs"
                   />
                 </div>
               </div>
@@ -214,7 +216,7 @@ export default function FamilyTab({
                     onChange={(e) =>
                       updateMember(index, "occupation", e.target.value)
                     }
-                    className="w-full border border-neutral-200 bg-white px-3 py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950"
+                    className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 rounded-xs"
                   />
                 </div>
 
@@ -229,7 +231,7 @@ export default function FamilyTab({
                     onChange={(e) =>
                       updateMember(index, "contact", e.target.value)
                     }
-                    className="w-full border border-neutral-200 bg-white px-3 py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950"
+                    className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 rounded-xs"
                   />
                 </div>
               </div>

@@ -73,7 +73,6 @@ export default function CredentialsTab({
   references = [],
   onChange,
 }: Props) {
-  // ⚡ এডিট মোডে গেলে এবং যেকোনো সেকশন খালি থাকলে অটোমেটিক ১টি করে ডিফল্ট কার্ড ওপেন থাকবে
   useEffect(() => {
     if (isEditing) {
       const updates: {
@@ -100,6 +99,7 @@ export default function CredentialsTab({
         onChange(updates);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditing]);
 
   const displayCerts =
@@ -109,21 +109,18 @@ export default function CredentialsTab({
   const displayReferences =
     references.length > 0 ? references : [createDefaultReference()];
 
-  // ---- Certification Handlers ----
   const addCert = () => {
     onChange({
       certifications: [...displayCerts, createDefaultCert()],
     });
   };
 
-  // ---- Achievement Handlers ----
   const addAchievement = () => {
     onChange({
       achievements: [...displayAchievements, createDefaultAchievement()],
     });
   };
 
-  // ---- Reference Handlers ----
   const addReference = () => {
     onChange({
       references: [...displayReferences, createDefaultReference()],
@@ -133,12 +130,12 @@ export default function CredentialsTab({
   // ==================== VIEW MODE ====================
   if (!isEditing) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-5 sm:space-y-6 animate-in fade-in-50 duration-200">
         {/* ১. সার্টিফিকেশন */}
         <div className="space-y-2.5">
-          <h3 className="text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
-            <Award className="h-3.5 w-3.5 text-emerald-600" /> Certifications (
-            {certifications.length})
+          <h3 className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
+            <Award className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+            <span>Certifications ({certifications.length})</span>
           </h3>
           {certifications.length === 0 ? (
             <p className="text-xs font-mono text-neutral-400">
@@ -149,17 +146,17 @@ export default function CredentialsTab({
               {certifications.map((c) => (
                 <div
                   key={c.id}
-                  className="p-3 bg-neutral-50/70 border border-neutral-200/80 rounded-xs space-y-1"
+                  className="p-3 bg-neutral-50/70 border border-neutral-200/80 rounded-xs space-y-1 min-w-0"
                 >
-                  <p className="text-xs font-bold text-neutral-900">
+                  <p className="text-xs font-bold text-neutral-900 truncate">
                     {c.name || "Untitled Certificate"}
                   </p>
-                  <p className="text-[11px] font-mono text-neutral-600">
+                  <p className="text-[11px] font-mono text-neutral-600 truncate">
                     {c.issuer || "Issuer Not Set"} •{" "}
                     {c.issueDate || "Date Not Set"}
                   </p>
                   {c.credentialId && (
-                    <p className="text-[10px] font-mono text-neutral-400">
+                    <p className="text-[10px] font-mono text-neutral-400 truncate">
                       ID: {c.credentialId}
                     </p>
                   )}
@@ -171,9 +168,9 @@ export default function CredentialsTab({
 
         {/* ২. অ্যাচিভমেন্ট */}
         <div className="space-y-2.5 border-t border-neutral-100 pt-4">
-          <h3 className="text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
-            <Trophy className="h-3.5 w-3.5 text-amber-500" /> Honors &
-            Achievements ({achievements.length})
+          <h3 className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
+            <Trophy className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+            <span>Honors & Achievements ({achievements.length})</span>
           </h3>
           {achievements.length === 0 ? (
             <p className="text-xs font-mono text-neutral-400">
@@ -184,21 +181,21 @@ export default function CredentialsTab({
               {achievements.map((a) => (
                 <div
                   key={a.id}
-                  className="p-3 bg-neutral-50/70 border border-neutral-200/80 rounded-xs space-y-1"
+                  className="p-3 bg-neutral-50/70 border border-neutral-200/80 rounded-xs space-y-1 min-w-0"
                 >
-                  <div className="flex justify-between text-xs">
-                    <span className="font-bold text-neutral-900">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-0.5 sm:gap-2 text-xs">
+                    <span className="font-bold text-neutral-900 truncate">
                       {a.title || "Untitled Achievement"}
                     </span>
-                    <span className="font-mono text-neutral-500">
+                    <span className="font-mono text-[11px] sm:text-xs text-neutral-500 shrink-0">
                       {a.date || "Date Not Set"}
                     </span>
                   </div>
-                  <p className="text-[11px] font-mono text-neutral-600">
+                  <p className="text-[11px] font-mono text-neutral-600 truncate">
                     {a.organization || "Organization Not Set"}
                   </p>
                   {a.description && (
-                    <p className="text-xs text-neutral-700 mt-1">
+                    <p className="text-xs text-neutral-700 mt-1 wrap-break-word">
                       {a.description}
                     </p>
                   )}
@@ -210,9 +207,9 @@ export default function CredentialsTab({
 
         {/* ৩. রেফারেন্স */}
         <div className="space-y-2.5 border-t border-neutral-100 pt-4">
-          <h3 className="text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
-            <UserCheck className="h-3.5 w-3.5 text-blue-600" /> Professional
-            References ({references.length})
+          <h3 className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
+            <UserCheck className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+            <span>Professional References ({references.length})</span>
           </h3>
           {references.length === 0 ? (
             <p className="text-xs font-mono text-neutral-400">
@@ -223,17 +220,17 @@ export default function CredentialsTab({
               {references.map((r) => (
                 <div
                   key={r.id}
-                  className="p-3 bg-neutral-50/70 border border-neutral-200/80 rounded-xs space-y-1"
+                  className="p-3 bg-neutral-50/70 border border-neutral-200/80 rounded-xs space-y-1 min-w-0"
                 >
-                  <p className="text-xs font-bold text-neutral-900">
+                  <p className="text-xs font-bold text-neutral-900 truncate">
                     {r.name || "Reference Name Not Set"}
                   </p>
-                  <p className="text-[11px] font-mono text-neutral-600">
+                  <p className="text-[11px] font-mono text-neutral-600 truncate">
                     {r.designation || "Designation"},{" "}
                     {r.organization || "Organization"}
                   </p>
                   {r.consentGiven && r.contact && (
-                    <p className="text-[10.5px] font-mono text-neutral-500 mt-1">
+                    <p className="text-[10.5px] font-mono text-neutral-500 mt-1 truncate">
                       Contact: {r.contact}
                     </p>
                   )}
@@ -248,17 +245,17 @@ export default function CredentialsTab({
 
   // ==================== EDIT MODE ====================
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6 animate-in fade-in-50 duration-200">
       {/* ১. সার্টিফিকেশন এডিট */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono uppercase font-bold text-neutral-700">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-700">
             1. Certifications ({displayCerts.length})
           </span>
           <button
             type="button"
             onClick={addCert}
-            className="inline-flex items-center gap-1 bg-neutral-900 text-white px-2.5 py-1 text-[10px] font-mono uppercase rounded-xs cursor-pointer"
+            className="inline-flex items-center gap-1 bg-neutral-900 hover:bg-neutral-800 text-white px-2.5 py-1.5 sm:py-1 text-[10px] font-mono uppercase rounded-xs cursor-pointer shrink-0 transition-colors"
           >
             <Plus className="h-3 w-3" /> Add Certificate
           </button>
@@ -267,7 +264,7 @@ export default function CredentialsTab({
         {displayCerts.map((cert, idx) => (
           <div
             key={cert.id}
-            className="p-3 bg-neutral-50 border border-neutral-200 rounded-xs space-y-2"
+            className="p-3 bg-neutral-50 border border-neutral-200 rounded-xs space-y-2.5"
           >
             <div className="flex items-center justify-between border-b border-neutral-200/70 pb-2">
               <span className="text-[10px] font-mono uppercase text-neutral-400 font-bold">
@@ -301,7 +298,7 @@ export default function CredentialsTab({
                     ),
                   })
                 }
-                className="border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-2.5 py-2 sm:py-1.5 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
               <input
                 type="text"
@@ -314,7 +311,7 @@ export default function CredentialsTab({
                     ),
                   })
                 }
-                className="border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-2.5 py-2 sm:py-1.5 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
               <input
                 type="month"
@@ -328,7 +325,7 @@ export default function CredentialsTab({
                     ),
                   })
                 }
-                className="border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-2.5 py-2 sm:py-1.5 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
               <input
                 type="text"
@@ -343,7 +340,7 @@ export default function CredentialsTab({
                     ),
                   })
                 }
-                className="border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-2.5 py-2 sm:py-1.5 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
             </div>
           </div>
@@ -352,14 +349,14 @@ export default function CredentialsTab({
 
       {/* ২. অ্যাচিভমেন্ট এডিট */}
       <div className="space-y-3 border-t border-neutral-200 pt-4">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono uppercase font-bold text-neutral-700">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-700">
             2. Achievements ({displayAchievements.length})
           </span>
           <button
             type="button"
             onClick={addAchievement}
-            className="inline-flex items-center gap-1 bg-neutral-900 text-white px-2.5 py-1 text-[10px] font-mono uppercase rounded-xs cursor-pointer"
+            className="inline-flex items-center gap-1 bg-neutral-900 hover:bg-neutral-800 text-white px-2.5 py-1.5 sm:py-1 text-[10px] font-mono uppercase rounded-xs cursor-pointer shrink-0 transition-colors"
           >
             <Plus className="h-3 w-3" /> Add Achievement
           </button>
@@ -368,7 +365,7 @@ export default function CredentialsTab({
         {displayAchievements.map((ach, idx) => (
           <div
             key={ach.id}
-            className="p-3 bg-neutral-50 border border-neutral-200 rounded-xs space-y-2"
+            className="p-3 bg-neutral-50 border border-neutral-200 rounded-xs space-y-2.5"
           >
             <div className="flex items-center justify-between border-b border-neutral-200/70 pb-2">
               <span className="text-[10px] font-mono uppercase text-neutral-400 font-bold">
@@ -402,7 +399,7 @@ export default function CredentialsTab({
                     ),
                   })
                 }
-                className="border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-2.5 py-2 sm:py-1.5 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
               <input
                 type="text"
@@ -417,7 +414,7 @@ export default function CredentialsTab({
                     ),
                   })
                 }
-                className="border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-2.5 py-2 sm:py-1.5 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
               <input
                 type="month"
@@ -429,7 +426,7 @@ export default function CredentialsTab({
                     ),
                   })
                 }
-                className="border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-2.5 py-2 sm:py-1.5 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
             </div>
             <input
@@ -443,7 +440,7 @@ export default function CredentialsTab({
                   ),
                 })
               }
-              className="w-full border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-mono outline-none focus:border-neutral-950"
+              className="w-full border border-neutral-200 bg-white px-2.5 py-2 sm:py-1.5 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
             />
           </div>
         ))}
@@ -451,14 +448,14 @@ export default function CredentialsTab({
 
       {/* ৩. রেফারেন্স এডিট */}
       <div className="space-y-3 border-t border-neutral-200 pt-4">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono uppercase font-bold text-neutral-700">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-700">
             3. References ({displayReferences.length})
           </span>
           <button
             type="button"
             onClick={addReference}
-            className="inline-flex items-center gap-1 bg-neutral-900 text-white px-2.5 py-1 text-[10px] font-mono uppercase rounded-xs cursor-pointer"
+            className="inline-flex items-center gap-1 bg-neutral-900 hover:bg-neutral-800 text-white px-2.5 py-1.5 sm:py-1 text-[10px] font-mono uppercase rounded-xs cursor-pointer shrink-0 transition-colors"
           >
             <Plus className="h-3 w-3" /> Add Reference
           </button>
@@ -467,7 +464,7 @@ export default function CredentialsTab({
         {displayReferences.map((ref, idx) => (
           <div
             key={ref.id}
-            className="p-3 bg-neutral-50 border border-neutral-200 rounded-xs space-y-2"
+            className="p-3 bg-neutral-50 border border-neutral-200 rounded-xs space-y-2.5"
           >
             <div className="flex items-center justify-between border-b border-neutral-200/70 pb-2">
               <span className="text-[10px] font-mono uppercase text-neutral-400 font-bold">
@@ -501,7 +498,7 @@ export default function CredentialsTab({
                     ),
                   })
                 }
-                className="border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-2.5 py-2 sm:py-1.5 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
               <input
                 type="text"
@@ -516,7 +513,7 @@ export default function CredentialsTab({
                     ),
                   })
                 }
-                className="border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-2.5 py-2 sm:py-1.5 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
               <input
                 type="text"
@@ -531,7 +528,7 @@ export default function CredentialsTab({
                     ),
                   })
                 }
-                className="border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-2.5 py-2 sm:py-1.5 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
               <input
                 type="text"
@@ -544,10 +541,10 @@ export default function CredentialsTab({
                     ),
                   })
                 }
-                className="border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-2.5 py-2 sm:py-1.5 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
             </div>
-            <label className="flex items-center gap-1.5 text-[11px] font-mono text-neutral-600 cursor-pointer pt-1">
+            <label className="flex items-start sm:items-center gap-2 text-[11px] font-mono text-neutral-600 cursor-pointer pt-1">
               <input
                 type="checkbox"
                 checked={ref.consentGiven}
@@ -560,6 +557,7 @@ export default function CredentialsTab({
                     ),
                   })
                 }
+                className="mt-0.5 sm:mt-0 shrink-0"
               />
               <span>I confirm I have consent to display this contact info</span>
             </label>

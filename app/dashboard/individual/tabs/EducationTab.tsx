@@ -115,11 +115,11 @@ export default function EducationTab({
     syncToParent([...uiItems, newItem]);
   };
 
-  // ⚡ `handleAddEducation` ওপরে ডিক্লেয়ার করার পর এখন `useEffect` তাকে নিরাপদে কল করতে পারবে
   useEffect(() => {
     if (isEditing && educationList.length === 0) {
       handleAddEducation("college");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditing, educationList.length]);
 
   const displayUiItems =
@@ -163,31 +163,31 @@ export default function EducationTab({
     <div className="space-y-4 animate-in fade-in-50 duration-200">
       {/* এডিট মোডে দ্রুত আইটেম অ্যাড করার কন্ট্রোল বার */}
       {isEditing && (
-        <div className="flex items-center justify-between flex-wrap pb-1 gap-2">
-          <span className="text-xs font-mono uppercase text-neutral-500 font-bold">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-1 gap-2">
+          <span className="text-[11px] sm:text-xs font-mono uppercase text-neutral-500 font-bold">
             Education Records ({displayUiItems.length})
           </span>
           <div className="flex items-center gap-1.5 flex-wrap">
             <button
               type="button"
               onClick={() => handleAddEducation("school")}
-              className="inline-flex items-center gap-1 text-[11px] font-mono uppercase text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200/80 px-2.5 py-1.5 rounded-xs transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1 text-[10.5px] sm:text-[11px] font-mono uppercase text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200/80 px-2.5 py-1.5 rounded-xs transition-colors cursor-pointer"
             >
-              <Plus className="h-3 w-3" /> School
+              <Plus className="h-3 w-3 shrink-0" /> School
             </button>
             <button
               type="button"
               onClick={() => handleAddEducation("college")}
-              className="inline-flex items-center gap-1 text-[11px] font-mono uppercase text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200/80 px-2.5 py-1.5 rounded-xs transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1 text-[10.5px] sm:text-[11px] font-mono uppercase text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200/80 px-2.5 py-1.5 rounded-xs transition-colors cursor-pointer"
             >
-              <Plus className="h-3 w-3" /> College
+              <Plus className="h-3 w-3 shrink-0" /> College
             </button>
             <button
               type="button"
               onClick={() => handleAddEducation("institute")}
-              className="inline-flex items-center gap-1 text-[11px] font-mono uppercase text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200/80 px-2.5 py-1.5 rounded-xs transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1 text-[10.5px] sm:text-[11px] font-mono uppercase text-neutral-800 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200/80 px-2.5 py-1.5 rounded-xs transition-colors cursor-pointer"
             >
-              <Plus className="h-3 w-3" /> Institute
+              <Plus className="h-3 w-3 shrink-0" /> Institute
             </button>
           </div>
         </div>
@@ -195,15 +195,17 @@ export default function EducationTab({
 
       {!isEditing ? (
         /* ==================== VIEW MODE ==================== */
-        <div className="space-y-4">
+        <div className="space-y-3.5 sm:space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
-              <GraduationCap className="h-3.5 w-3.5 text-blue-600" />
-              Education & Academic Records ({displayUiItems.length})
+            <span className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5 min-w-0">
+              <GraduationCap className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+              <span className="truncate">
+                Education & Academic Records ({displayUiItems.length})
+              </span>
             </span>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3.5 sm:space-y-4">
             {displayUiItems.map((item, idx) => {
               const Icon = getIcon(item.type);
               const isCollege = item.type === "college";
@@ -211,10 +213,10 @@ export default function EducationTab({
               return (
                 <div
                   key={item.id}
-                  className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
+                  className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3"
                 >
                   {/* কার্ড হেডার */}
-                  <div className="flex items-center justify-between border-b border-neutral-200/80 pb-2.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200/80 pb-2 sm:pb-2.5">
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] font-mono uppercase font-bold text-neutral-700">
                         Education #{idx + 1}
@@ -226,7 +228,7 @@ export default function EducationTab({
 
                     {isCollege && item.status && (
                       <span
-                        className={`px-2 py-0.5 text-[10px] font-mono uppercase rounded-xs border ${
+                        className={`px-2 py-0.5 text-[10px] font-mono uppercase rounded-xs border shrink-0 ${
                           item.status === "completed"
                             ? "bg-neutral-100 text-neutral-700 border-neutral-200"
                             : "bg-emerald-50 text-emerald-700 border-emerald-200"
@@ -238,8 +240,8 @@ export default function EducationTab({
                   </div>
 
                   {/* রো ১: Degree / Course & Institution */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs font-mono">
-                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-2.5 text-xs font-mono">
+                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                       <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                         Degree / Standard / Course
                       </span>
@@ -254,9 +256,9 @@ export default function EducationTab({
                       </p>
                     </div>
 
-                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                       <span className="text-[9.5px] uppercase text-neutral-400 flex items-center gap-1 mb-0.5">
-                        <Icon className="h-3 w-3" /> Institution Name
+                        <Icon className="h-3 w-3 shrink-0" /> Institution Name
                       </span>
                       <p
                         className={`font-medium truncate ${
@@ -270,7 +272,7 @@ export default function EducationTab({
                     </div>
 
                     {isCollege && (
-                      <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                      <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                         <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                           University Name
                         </span>
@@ -288,8 +290,8 @@ export default function EducationTab({
                   </div>
 
                   {/* রো ২: Session & Score */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-mono">
-                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 text-xs font-mono">
+                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                       <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                         Session / Year
                       </span>
@@ -302,7 +304,7 @@ export default function EducationTab({
                       </p>
                     </div>
 
-                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                       <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                         Score / Percentage
                       </span>
@@ -324,7 +326,7 @@ export default function EducationTab({
         </div>
       ) : (
         /* ==================== EDIT MODE ==================== */
-        <div className="space-y-4">
+        <div className="space-y-3.5 sm:space-y-4">
           {displayUiItems.map((item, index) => (
             <EducationCard
               key={item.id}
@@ -335,27 +337,27 @@ export default function EducationTab({
             />
           ))}
 
-          <div className="grid grid-cols-3 gap-2 pt-1">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
             <button
               type="button"
               onClick={() => handleAddEducation("school")}
               className="py-2.5 border border-dashed border-neutral-300 text-xs font-mono uppercase text-neutral-600 hover:border-neutral-950 hover:text-neutral-950 transition-colors flex items-center justify-center gap-1.5 cursor-pointer bg-neutral-50/20 rounded-xs"
             >
-              <Plus className="h-3.5 w-3.5" /> + Add School
+              <Plus className="h-3.5 w-3.5 shrink-0" /> Add School
             </button>
             <button
               type="button"
               onClick={() => handleAddEducation("college")}
               className="py-2.5 border border-dashed border-neutral-300 text-xs font-mono uppercase text-neutral-600 hover:border-neutral-950 hover:text-neutral-950 transition-colors flex items-center justify-center gap-1.5 cursor-pointer bg-neutral-50/20 rounded-xs"
             >
-              <Plus className="h-3.5 w-3.5" /> + Add College
+              <Plus className="h-3.5 w-3.5 shrink-0" /> Add College
             </button>
             <button
               type="button"
               onClick={() => handleAddEducation("institute")}
               className="py-2.5 border border-dashed border-neutral-300 text-xs font-mono uppercase text-neutral-600 hover:border-neutral-950 hover:text-neutral-950 transition-colors flex items-center justify-center gap-1.5 cursor-pointer bg-neutral-50/20 rounded-xs"
             >
-              <Plus className="h-3.5 w-3.5" /> + Add Institute
+              <Plus className="h-3.5 w-3.5 shrink-0" /> Add Institute
             </button>
           </div>
         </div>

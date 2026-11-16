@@ -62,17 +62,17 @@ export default function SkillsTab({
     "Work Category Not Selected";
 
   return (
-    <div className="space-y-6 animate-in fade-in-50 duration-200">
+    <div className="space-y-5 sm:space-y-6 animate-in fade-in-50 duration-200">
       {!isEditing ? (
         /* ==================== VIEW MODE ==================== */
-        <div className="space-y-5">
+        <div className="space-y-4 sm:space-y-5">
           {/* কাজ ও ক্যাটাগরি কার্ড */}
-          <div className="p-3.5 bg-neutral-50/70 border border-neutral-200/80 rounded-xs flex items-center gap-3">
-            <div className="p-2.5 bg-white border border-neutral-200 rounded text-neutral-800 shrink-0 shadow-2xs">
-              <Briefcase className="h-5 w-5" />
+          <div className="p-3 sm:p-3.5 bg-neutral-50/70 border border-neutral-200/80 rounded-xs flex items-center gap-3">
+            <div className="p-2 sm:p-2.5 bg-white border border-neutral-200 rounded text-neutral-800 shrink-0 shadow-2xs">
+              <Briefcase className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
-            <div className="min-w-0">
-              <span className="text-[10px] font-mono uppercase text-neutral-400 block tracking-wider">
+            <div className="min-w-0 flex-1">
+              <span className="text-[10px] font-mono uppercase text-neutral-400 block tracking-wider truncate">
                 {sector ? currentSectorLabel : "Category Not Set"}
               </span>
               <h2 className="text-sm font-serif font-bold text-neutral-950 truncate">
@@ -91,11 +91,11 @@ export default function SkillsTab({
                 No skills added yet.
               </p>
             ) : (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {skills.map((skill) => (
                   <span
                     key={skill}
-                    className="px-3 py-1.5 bg-neutral-100 border border-neutral-200/90 text-neutral-900 text-xs font-mono rounded-xs shadow-2xs"
+                    className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-neutral-100 border border-neutral-200/90 text-neutral-900 text-[11px] sm:text-xs font-mono rounded-xs shadow-2xs wrap-break-word"
                   >
                     {skill}
                   </span>
@@ -107,19 +107,19 @@ export default function SkillsTab({
           {/* ইন্টারেস্ট ও হবি লিস্ট */}
           <div className="space-y-2 pt-3 border-t border-neutral-100">
             <span className="text-[10px] font-mono uppercase text-neutral-400 flex items-center gap-1">
-              <Heart className="h-3 w-3 text-rose-500" /> Interests & Hobbies (
-              {interests.length})
+              <Heart className="h-3 w-3 text-rose-500 shrink-0" />
+              <span>Interests & Hobbies ({interests.length})</span>
             </span>
             {interests.length === 0 ? (
               <p className="text-xs font-mono text-neutral-400 italic">
                 No interests or hobbies added yet.
               </p>
             ) : (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {interests.map((item) => (
                   <span
                     key={item}
-                    className="px-3 py-1 bg-rose-50/50 border border-rose-200/70 text-neutral-800 text-xs font-mono rounded-xs"
+                    className="px-2.5 sm:px-3 py-1 bg-rose-50/50 border border-rose-200/70 text-neutral-800 text-[11px] sm:text-xs font-mono rounded-xs wrap-break-word"
                   >
                     {item}
                   </span>
@@ -130,9 +130,9 @@ export default function SkillsTab({
         </div>
       ) : (
         /* ==================== EDIT MODE ==================== */
-        <div className="space-y-5">
+        <div className="space-y-4 sm:space-y-5">
           {/* ১. কাজের ক্ষেত্র ও রোল */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
             <div>
               <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
                 Work Category
@@ -140,7 +140,7 @@ export default function SkillsTab({
               <select
                 value={sector}
                 onChange={(e) => onSectorChange?.(e.target.value)}
-                className="w-full border border-neutral-200 bg-neutral-50/30 px-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white cursor-pointer"
+                className="w-full border border-neutral-200 bg-neutral-50/30 px-3 sm:px-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white cursor-pointer rounded-xs"
               >
                 <option value="">-- Select Work Category --</option>
                 {WORK_SECTORS.map((s) => (
@@ -160,7 +160,7 @@ export default function SkillsTab({
                 value={roleTitle}
                 onChange={(e) => onRoleTitleChange?.(e.target.value)}
                 placeholder="Enter your job title or professional role"
-                className="w-full border border-neutral-200 bg-neutral-50/30 px-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white"
+                className="w-full border border-neutral-200 bg-neutral-50/30 px-3 sm:px-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
               />
             </div>
           </div>
@@ -171,8 +171,8 @@ export default function SkillsTab({
               Add Core Skills (Press Enter)
             </label>
             <div className="flex items-center gap-2">
-              <div className="relative flex-1">
-                <Tag className="h-3.5 w-3.5 text-neutral-400 absolute left-3 top-3 pointer-events-none" />
+              <div className="relative flex-1 min-w-0">
+                <Tag className="h-3.5 w-3.5 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
                   value={skillInput}
@@ -183,21 +183,21 @@ export default function SkillsTab({
                       handleAddSkill();
                     }
                   }}
-                  placeholder="Enter a skill and press Enter (e.g. React, Python)"
-                  className="w-full border border-neutral-200 bg-neutral-50/30 pl-9 pr-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white"
+                  placeholder="e.g. React, Python..."
+                  className="w-full border border-neutral-200 bg-neutral-50/30 pl-9 pr-3 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
                 />
               </div>
               <button
                 type="button"
                 onClick={handleAddSkill}
-                className="px-4 py-2 bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-mono uppercase rounded-xs cursor-pointer flex items-center gap-1.5 shrink-0"
+                className="px-3 sm:px-4 py-2 bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-mono uppercase rounded-xs cursor-pointer flex items-center gap-1.5 shrink-0 transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span>Add</span>
               </button>
             </div>
 
-            <div className="border border-neutral-200/80 bg-neutral-50/40 p-3 rounded-xs flex flex-wrap gap-2">
+            <div className="border border-neutral-200/80 bg-neutral-50/40 p-2.5 sm:p-3 rounded-xs flex flex-wrap gap-1.5 sm:gap-2">
               {skills.length === 0 ? (
                 <span className="text-xs font-mono text-neutral-400 italic">
                   No skills added yet.
@@ -206,13 +206,13 @@ export default function SkillsTab({
                 skills.map((skill) => (
                   <span
                     key={skill}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-neutral-300/80 text-neutral-800 text-xs font-mono rounded-xs"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-neutral-300/80 text-neutral-800 text-[11px] sm:text-xs font-mono rounded-xs max-w-full"
                   >
-                    <span>{skill}</span>
+                    <span className="truncate">{skill}</span>
                     <button
                       type="button"
                       onClick={() => handleRemoveSkill(skill)}
-                      className="text-neutral-400 hover:text-red-600 cursor-pointer"
+                      className="text-neutral-400 hover:text-red-600 cursor-pointer shrink-0"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -228,8 +228,8 @@ export default function SkillsTab({
               Professional Interests & Hobbies
             </label>
             <div className="flex items-center gap-2">
-              <div className="relative flex-1">
-                <Heart className="h-3.5 w-3.5 text-neutral-400 absolute left-3 top-3 pointer-events-none" />
+              <div className="relative flex-1 min-w-0">
+                <Heart className="h-3.5 w-3.5 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
                   value={interestInput}
@@ -240,21 +240,21 @@ export default function SkillsTab({
                       handleAddInterest();
                     }
                   }}
-                  placeholder="Enter an interest or hobby and press Enter"
-                  className="w-full border border-neutral-200 bg-neutral-50/30 pl-9 pr-3.5 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white"
+                  placeholder="e.g. Open Source, Gaming..."
+                  className="w-full border border-neutral-200 bg-neutral-50/30 pl-9 pr-3 py-2 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
                 />
               </div>
               <button
                 type="button"
                 onClick={handleAddInterest}
-                className="px-4 py-2 bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-mono uppercase rounded-xs cursor-pointer flex items-center gap-1.5 shrink-0"
+                className="px-3 sm:px-4 py-2 bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-mono uppercase rounded-xs cursor-pointer flex items-center gap-1.5 shrink-0 transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span>Add</span>
               </button>
             </div>
 
-            <div className="border border-neutral-200/80 bg-neutral-50/40 p-3 rounded-xs flex flex-wrap gap-2">
+            <div className="border border-neutral-200/80 bg-neutral-50/40 p-2.5 sm:p-3 rounded-xs flex flex-wrap gap-1.5 sm:gap-2">
               {interests.length === 0 ? (
                 <span className="text-xs font-mono text-neutral-400 italic">
                   No interests added yet.
@@ -263,13 +263,13 @@ export default function SkillsTab({
                 interests.map((item) => (
                   <span
                     key={item}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-neutral-300/80 text-neutral-800 text-xs font-mono rounded-xs"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-neutral-300/80 text-neutral-800 text-[11px] sm:text-xs font-mono rounded-xs max-w-full"
                   >
-                    <span>{item}</span>
+                    <span className="truncate">{item}</span>
                     <button
                       type="button"
                       onClick={() => handleRemoveInterest(item)}
-                      className="text-neutral-400 hover:text-red-600 cursor-pointer"
+                      className="text-neutral-400 hover:text-red-600 cursor-pointer shrink-0"
                     >
                       <X className="h-3 w-3" />
                     </button>

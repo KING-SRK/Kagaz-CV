@@ -1,13 +1,13 @@
-// app/dashboard/_components/SmartCard.tsx
+// app/dashboard/individual/SmartCard.tsx (বা _components/SmartCard.tsx)
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { RotateCw } from "lucide-react";
 import ObsidianCard from "./cards/ObsidianCard";
 import DuoSplitCard from "./cards/DuoSplitCard";
-import TitaniumGradientCard from "./cards/TitaniumGradientCard"; // নতুন ইমপোর্ট
+import TitaniumGradientCard from "./cards/TitaniumGradientCard";
 
-export type CardDesignType = "duo-split" | "obsidian" | "titanium"; // শুধু ব্ল্যাক অ্যান্ড হোয়াইট থিম
+export type CardDesignType = "duo-split" | "obsidian" | "titanium";
 
 interface SmartCardProps {
   role: "individual" | "organization" | string;
@@ -34,16 +34,39 @@ export default function SmartCard({
   data,
 }: SmartCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [scale, setScale] = useState(1);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  // কার্ডের আসল ডেস্কটপ রেশিও (৪৬০px × ২৭০px)
+  const CARD_WIDTH = 460;
+  const CARD_HEIGHT = 270;
+
+  useEffect(() => {
+    const updateScale = () => {
+      if (wrapperRef.current) {
+        const availableWidth = wrapperRef.current.offsetWidth;
+        if (availableWidth > 0 && availableWidth < CARD_WIDTH) {
+          setScale(availableWidth / CARD_WIDTH);
+        } else {
+          setScale(1);
+        }
+      }
+    };
+
+    updateScale();
+    window.addEventListener("resize", updateScale);
+    return () => window.removeEventListener("resize", updateScale);
+  }, []);
 
   const userProfileUrl =
     typeof window !== "undefined"
       ? `${window.location.origin}/p/${kagazId || "preview"}`
-      : `https://kagazcv.vercel.app/p/${kagazId || "preview"}`;
+      : `https://sutranet.in/p/${kagazId || "preview"}`;
 
   const websiteHomeUrl =
     typeof window !== "undefined"
       ? window.location.origin
-      : "https://kagazcv.vercel.app";
+      : "https://sutranet.in";
 
   const cardProps = {
     role,
@@ -54,19 +77,32 @@ export default function SmartCard({
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="w-full flex flex-col items-center">
+      {/* অটো-স্কেল কন্টেইনার: প্রস্থ ও উচ্চতা দুটোই সমান অনুপাতে ছোট হবে */}
       <div
-        className="w-95 sm:w-115 h-67.5 perspective-distant cursor-pointer group select-none"
-        onClick={() => setIsFlipped(!isFlipped)}
+        ref={wrapperRef}
+        style={{ height: `${CARD_HEIGHT * scale}px` }}
+        className="w-full max-w-115 flex items-center justify-center relative"
       >
         <div
-          className={`relative w-full h-full duration-700 transform-3d transition-transform ${
-            isFlipped ? "transform-[rotateY(180deg)]" : ""
-          }`}
+          style={{
+            width: `${CARD_WIDTH}px`,
+            height: `${CARD_HEIGHT}px`,
+            transform: `scale(${scale})`,
+            transformOrigin: "center center",
+          }}
+          className="shrink-0 perspective-distant cursor-pointer group select-none"
+          onClick={() => setIsFlipped(!isFlipped)}
         >
-          {design === "duo-split" && <DuoSplitCard {...cardProps} />}
-          {design === "obsidian" && <ObsidianCard {...cardProps} />}
-          {design === "titanium" && <TitaniumGradientCard {...cardProps} />}
+          <div
+            className={`relative w-full h-full duration-700 transform-3d transition-transform ${
+              isFlipped ? "transform-[rotateY(180deg)]" : ""
+            }`}
+          >
+            {design === "duo-split" && <DuoSplitCard {...cardProps} />}
+            {design === "obsidian" && <ObsidianCard {...cardProps} />}
+            {design === "titanium" && <TitaniumGradientCard {...cardProps} />}
+          </div>
         </div>
       </div>
 

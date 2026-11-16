@@ -2,14 +2,7 @@
 "use client";
 
 import { useEffect } from "react";
-import {
-  FolderGit2,
-  ExternalLink,
-  Plus,
-  Trash2,
-  Code2,
-  Calendar,
-} from "lucide-react";
+import { FolderGit2, ExternalLink, Plus, Trash2, Code2 } from "lucide-react";
 
 export interface ProjectItem {
   id: string;
@@ -44,7 +37,6 @@ export default function ProjectsTab({
   projectsList = [],
   onChange,
 }: Props) {
-  // ⚡ এডিট মোডে গেলে এবং লিস্ট খালি থাকলে অটোমেটিক ১টি ফর্ম ওপেন থাকবে
   useEffect(() => {
     if (isEditing && projectsList.length === 0) {
       onChange([createDefaultProject()]);
@@ -75,24 +67,26 @@ export default function ProjectsTab({
   // ==================== VIEW MODE ====================
   if (!isEditing) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 animate-in fade-in-50 duration-200">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
-            <FolderGit2 className="h-3.5 w-3.5 text-blue-600" />
-            Projects & Portfolio Showcase ({displayList.length})
+          <span className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5 min-w-0">
+            <FolderGit2 className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+            <span className="truncate">
+              Projects & Portfolio Showcase ({displayList.length})
+            </span>
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
           {displayList.map((proj, idx) => (
             <div
               key={proj.id}
-              className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs flex flex-col justify-between space-y-3.5"
+              className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs flex flex-col justify-between space-y-3 sm:space-y-3.5 min-w-0"
             >
               <div className="space-y-2.5">
                 {/* কার্ড হেডার ও লিংক */}
                 <div className="flex items-start justify-between gap-2 border-b border-neutral-200/80 pb-2.5">
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <span className="text-[10px] font-mono uppercase text-neutral-400 font-bold block">
                       Project #{idx + 1}
                     </span>
@@ -139,7 +133,7 @@ export default function ProjectsTab({
                     Description
                   </span>
                   <p
-                    className={`leading-relaxed ${
+                    className={`leading-relaxed wrap-break-word ${
                       proj.description
                         ? "text-neutral-700"
                         : "text-neutral-400 font-mono"
@@ -179,15 +173,15 @@ export default function ProjectsTab({
 
   // ==================== EDIT MODE ====================
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-mono uppercase text-neutral-500 font-bold">
+    <div className="space-y-4 animate-in fade-in-50 duration-200">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="text-[11px] sm:text-xs font-mono uppercase text-neutral-500 font-bold min-w-0 truncate">
           Projects & Portfolio Showcase ({displayList.length})
         </span>
         <button
           type="button"
           onClick={handleAdd}
-          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white px-3.5 py-1.5 text-[11px] font-mono uppercase rounded-xs cursor-pointer"
+          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white px-3 sm:px-3.5 py-1.5 text-[11px] font-mono uppercase rounded-xs cursor-pointer shrink-0 transition-colors"
         >
           <Plus className="h-3.5 w-3.5" />
           <span>Add Project</span>
@@ -197,17 +191,18 @@ export default function ProjectsTab({
       {displayList.map((proj, idx) => (
         <div
           key={proj.id}
-          className="p-4 bg-neutral-50/50 border border-neutral-200 rounded-xs space-y-3"
+          className="p-3 sm:p-4 bg-neutral-50/50 border border-neutral-200 rounded-xs space-y-3"
         >
           <div className="flex items-center justify-between border-b border-neutral-200/70 pb-2">
             <span className="text-[10px] font-mono uppercase text-neutral-400 font-bold flex items-center gap-1">
-              <Code2 className="h-3 w-3" /> Project #{idx + 1}
+              <Code2 className="h-3 w-3 shrink-0" /> Project #{idx + 1}
             </span>
             {displayList.length > 1 && (
               <button
                 type="button"
                 onClick={() => handleRemove(proj.id)}
                 className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
+                title="Remove"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -224,7 +219,7 @@ export default function ProjectsTab({
                 value={proj.title}
                 onChange={(e) => handleUpdate(proj.id, "title", e.target.value)}
                 placeholder="Enter your project title"
-                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
             </div>
             <div>
@@ -238,7 +233,7 @@ export default function ProjectsTab({
                   handleUpdate(proj.id, "projectUrl", e.target.value)
                 }
                 placeholder="Enter live website URL"
-                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
             </div>
           </div>
@@ -255,7 +250,7 @@ export default function ProjectsTab({
                   handleUpdate(proj.id, "githubUrl", e.target.value)
                 }
                 placeholder="Enter GitHub repository URL"
-                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
             </div>
             <div>
@@ -269,7 +264,7 @@ export default function ProjectsTab({
                   handleUpdate(proj.id, "demoUrl", e.target.value)
                 }
                 placeholder="Enter video demo URL (YouTube / Drive)"
-                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950"
+                className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
               />
             </div>
           </div>
@@ -285,7 +280,7 @@ export default function ProjectsTab({
                 handleUpdate(proj.id, "technologies", e.target.value)
               }
               placeholder="Enter technologies (e.g. Next.js, Tailwind CSS, Supabase)"
-              className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950"
+              className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
             />
           </div>
 
@@ -300,7 +295,7 @@ export default function ProjectsTab({
                 handleUpdate(proj.id, "description", e.target.value)
               }
               placeholder="Enter your project description, key features and your role"
-              className="w-full border border-neutral-200 bg-white p-2.5 text-xs font-mono outline-none focus:border-neutral-950 resize-none"
+              className="w-full border border-neutral-200 bg-white p-2.5 text-xs font-mono outline-none focus:border-neutral-950 resize-none rounded-xs"
             />
           </div>
         </div>
