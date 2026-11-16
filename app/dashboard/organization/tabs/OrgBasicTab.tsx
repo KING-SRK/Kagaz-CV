@@ -101,9 +101,9 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
     const displayCategory = formatOtherDisplay(data.business_category);
 
     return (
-      <div className="space-y-5">
-        <div className="p-4 bg-neutral-50/70 border border-neutral-200/80 rounded-xs flex items-center gap-4">
-          <div className="w-14 h-14 rounded-xs border border-neutral-300 bg-white flex items-center justify-center overflow-hidden shrink-0">
+      <div className="space-y-4 sm:space-y-5 animate-in fade-in-50 duration-200">
+        <div className="p-3 sm:p-4 bg-neutral-50/70 border border-neutral-200/80 rounded-xs flex items-start sm:items-center gap-3 sm:gap-4">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xs border border-neutral-300 bg-white flex items-center justify-center overflow-hidden shrink-0">
             {data.logo_url ? (
               <img
                 src={data.logo_url}
@@ -111,12 +111,12 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <Building2 className="h-7 w-7 text-neutral-400" />
+              <Building2 className="h-6 w-6 sm:h-7 sm:w-7 text-neutral-400" />
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between gap-2">
-              <h3 className="text-base font-serif font-bold text-neutral-950 truncate">
+            <div className="flex flex-wrap items-center justify-between gap-1.5 sm:gap-2">
+              <h3 className="text-sm sm:text-base font-serif font-bold text-neutral-950 truncate">
                 {data.company_name || "Organization Name Not Set"}
               </h3>
               {data.kagaz_id && (
@@ -125,7 +125,7 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
                 </span>
               )}
             </div>
-            <p className="text-xs font-mono text-neutral-600 truncate mt-0.5">
+            <p className="text-[11px] sm:text-xs font-mono text-neutral-600 truncate mt-0.5">
               {data.short_description || "No short description added yet"}
             </p>
             <div className="flex flex-wrap gap-1.5 mt-2">
@@ -148,34 +148,34 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
-          <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs">
-            <span className="text-[9px] uppercase text-neutral-400 block mb-0.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 text-xs font-mono">
+          <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs min-w-0">
+            <span className="text-[9px] uppercase text-neutral-400 block mb-0.5 truncate">
               Business Category
             </span>
             <p className="font-medium text-neutral-900 truncate">
               {displayCategory || "Not Set"}
             </p>
           </div>
-          <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs">
+          <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs min-w-0">
             <span className="text-[9px] uppercase text-neutral-400 flex items-center gap-1 mb-0.5">
-              <Calendar className="h-3 w-3" /> Est. Year
+              <Calendar className="h-3 w-3 shrink-0" /> Est. Year
             </span>
-            <p className="font-medium text-neutral-900">
+            <p className="font-medium text-neutral-900 truncate">
               {data.est_year || "Not Set"}
             </p>
           </div>
-          <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs">
+          <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs min-w-0">
             <span className="text-[9px] uppercase text-neutral-400 flex items-center gap-1 mb-0.5">
-              <Users className="h-3 w-3" /> Business Size
+              <Users className="h-3 w-3 shrink-0" /> Business Size
             </span>
             <p className="font-medium text-neutral-900 truncate">
               {data.business_size || "Not Set"}
             </p>
           </div>
-          <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs">
+          <div className="p-2.5 bg-neutral-50/50 border border-neutral-200/70 rounded-xs min-w-0">
             <span className="text-[9px] uppercase text-neutral-400 flex items-center gap-1 mb-0.5">
-              <Globe className="h-3 w-3" /> Website
+              <Globe className="h-3 w-3 shrink-0" /> Website
             </span>
             {data.website ? (
               <a
@@ -192,11 +192,11 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
           </div>
         </div>
 
-        <div className="p-3.5 bg-neutral-50/70 border border-neutral-200/80 rounded-xs space-y-1">
+        <div className="p-3 sm:p-3.5 bg-neutral-50/70 border border-neutral-200/80 rounded-xs space-y-1">
           <span className="text-[9.5px] font-mono uppercase text-neutral-400 block">
             Detailed Description
           </span>
-          <p className="text-xs text-neutral-700 leading-relaxed whitespace-pre-line">
+          <p className="text-xs text-neutral-700 leading-relaxed whitespace-pre-line wrap-break-word">
             {data.detailed_description || "No detailed description added yet."}
           </p>
         </div>
@@ -215,7 +215,7 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-neutral-200 hover:border-neutral-400 text-xs font-mono text-neutral-800 rounded-xs"
                 >
-                  <LinkIcon className="h-3 w-3 text-neutral-500" />
+                  <LinkIcon className="h-3 w-3 text-neutral-500 shrink-0" />
                   <span>{link.platform}</span>
                 </a>
               ))}
@@ -228,10 +228,10 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
 
   // ==================== EDIT MODE ====================
   return (
-    <div className="space-y-4">
-      <div className="p-3 bg-neutral-50/60 border border-neutral-200/80 rounded-xs flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="relative w-14 h-14 rounded-xs overflow-hidden border border-neutral-300 bg-white flex items-center justify-center shrink-0">
+    <div className="space-y-4 animate-in fade-in-50 duration-200">
+      <div className="p-3 bg-neutral-50/60 border border-neutral-200/80 rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-xs overflow-hidden border border-neutral-300 bg-white flex items-center justify-center shrink-0">
             {uploadingLogo ? (
               <Loader2 className="w-5 h-5 animate-spin text-neutral-800" />
             ) : data.logo_url ? (
@@ -241,7 +241,7 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <Building2 className="w-7 h-7 text-neutral-400" />
+              <Building2 className="w-6 h-6 sm:w-7 sm:h-7 text-neutral-400" />
             )}
             <button
               type="button"
@@ -251,8 +251,8 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
               <Camera className="w-4 h-4" />
             </button>
           </div>
-          <div>
-            <span className="text-[10px] font-mono uppercase text-neutral-500 font-bold block">
+          <div className="min-w-0">
+            <span className="text-[10px] font-mono uppercase text-neutral-500 font-bold block truncate">
               Business Logo (Recommended)
             </span>
             <input
@@ -265,14 +265,14 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
             <button
               type="button"
               onClick={() => logoInputRef.current?.click()}
-              className="mt-1.5 px-3 py-1 bg-neutral-900 text-white text-[10.5px] font-mono uppercase rounded-xs cursor-pointer"
+              className="mt-1.5 px-3 py-1 bg-neutral-900 hover:bg-neutral-800 text-white text-[10.5px] font-mono uppercase rounded-xs cursor-pointer transition-colors"
             >
               {uploadingLogo ? "Uploading..." : "Upload Logo"}
             </button>
           </div>
         </div>
 
-        <div className="px-3 py-2 bg-white border border-neutral-200 rounded-xs">
+        <div className="px-3 py-2 bg-white border border-neutral-200 rounded-xs self-start sm:self-auto w-full sm:w-auto">
           <span className="text-[9px] font-mono uppercase text-neutral-400 block">
             Company Profile ID *
           </span>
@@ -343,7 +343,7 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
           value={data.detailed_description}
           onChange={(e) => onChange({ detailed_description: e.target.value })}
           placeholder="Enter your detailed company overview, mission & expertise"
-          className="w-full border border-neutral-200 bg-neutral-50/30 p-3 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white resize-none"
+          className="w-full border border-neutral-200 bg-neutral-50/30 p-3 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white resize-none rounded-xs"
         />
       </div>
 
@@ -365,7 +365,7 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
           <select
             value={data.business_size}
             onChange={(e) => onChange({ business_size: e.target.value })}
-            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
+            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white rounded-xs cursor-pointer"
           >
             <option value="">Select business size</option>
             {BUSINESS_SIZES.map((sz) => (
@@ -386,27 +386,30 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
       </div>
 
       <div className="p-3 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-2.5">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="text-[11px] font-mono uppercase text-neutral-600 font-bold">
             Social & Digital Links
           </span>
           <button
             type="button"
             onClick={addSocialLink}
-            className="inline-flex items-center gap-1 px-2.5 py-1 bg-neutral-900 text-white text-[10px] font-mono uppercase rounded-xs cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 sm:py-1 bg-neutral-900 hover:bg-neutral-800 text-white text-[10px] font-mono uppercase rounded-xs cursor-pointer shrink-0 transition-colors"
           >
             <Plus className="h-3 w-3" /> Add Link
           </button>
         </div>
 
         {(data.social_links || []).map((link) => (
-          <div key={link.id} className="flex items-center gap-2">
+          <div
+            key={link.id}
+            className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-2 sm:p-0 bg-white sm:bg-transparent border sm:border-0 border-neutral-200 rounded-xs"
+          >
             <select
               value={link.platform}
               onChange={(e) =>
                 updateSocialLink(link.id, "platform", e.target.value)
               }
-              className="border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-mono"
+              className="w-full sm:w-44 border border-neutral-200 bg-white px-2.5 py-2 sm:py-1.5 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs cursor-pointer"
             >
               <option value="LinkedIn">LinkedIn</option>
               <option value="Instagram">Instagram</option>
@@ -418,20 +421,25 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
               <option value="Online Store">Online Store</option>
               <option value="Other">Other</option>
             </select>
-            <input
-              type="url"
-              value={link.url}
-              onChange={(e) => updateSocialLink(link.id, "url", e.target.value)}
-              placeholder="Enter your social or profile URL"
-              className="flex-1 border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-mono"
-            />
-            <button
-              type="button"
-              onClick={() => removeSocialLink(link.id)}
-              className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <input
+                type="url"
+                value={link.url}
+                onChange={(e) =>
+                  updateSocialLink(link.id, "url", e.target.value)
+                }
+                placeholder="Enter your social or profile URL"
+                className="flex-1 min-w-0 border border-neutral-200 bg-white px-2.5 py-2 sm:py-1.5 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs"
+              />
+              <button
+                type="button"
+                onClick={() => removeSocialLink(link.id)}
+                className="text-red-500 hover:text-red-700 p-2 sm:p-1 cursor-pointer shrink-0 border sm:border-0 border-neutral-200 rounded-xs"
+                title="Remove"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         ))}
       </div>

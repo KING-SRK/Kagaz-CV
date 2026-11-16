@@ -47,7 +47,6 @@ export default function OrgContactTab({
   website = "",
   onChange,
 }: Props) {
-  // Edit Mode অন হলে এবং কোনো কন্টাক্ট না থাকলে অটোমেটিক ১টি ডিফল্ট ফর্ম খুলে দেবে
   useEffect(() => {
     if (isEditing && contacts.length === 0) {
       onChange({ contacts: [createDefaultContact()] });
@@ -77,14 +76,14 @@ export default function OrgContactTab({
   const displayContacts =
     contacts.length > 0 ? contacts : [createDefaultContact()];
 
-  // ==================== VIEW MODE (Edit Mode-এর মতোই একই গ্রিড লেআউট) ====================
+  // ==================== VIEW MODE ====================
   if (!isEditing) {
     return (
-      <div className="space-y-5">
+      <div className="space-y-4 sm:space-y-5 animate-in fade-in-50 duration-200">
         {/* ১. অফিসিয়াল ওয়েবসাইট */}
-        <div className="p-3.5 bg-neutral-50/70 border border-neutral-200/80 rounded-xs">
+        <div className="p-3 sm:p-3.5 bg-neutral-50/70 border border-neutral-200/80 rounded-xs">
           <span className="text-[10px] font-mono uppercase text-neutral-400 flex items-center gap-1.5 mb-1">
-            <Globe className="h-3 w-3" /> Official Website URL
+            <Globe className="h-3 w-3 shrink-0" /> Official Website URL
           </span>
           {website ? (
             <a
@@ -101,11 +100,13 @@ export default function OrgContactTab({
         </div>
 
         {/* ২. কন্টাক্ট চ্যানেলসমূহ */}
-        <div className="space-y-4">
+        <div className="space-y-3.5 sm:space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
-              <PhoneCall className="h-3.5 w-3.5 text-emerald-600" />
-              Department & Contact Directory ({displayContacts.length})
+            <span className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5 min-w-0">
+              <PhoneCall className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+              <span className="truncate">
+                Department & Contact Directory ({displayContacts.length})
+              </span>
             </span>
           </div>
 
@@ -114,15 +115,15 @@ export default function OrgContactTab({
             return (
               <div
                 key={c.id}
-                className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
+                className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3 sm:space-y-3.5"
               >
                 {/* কার্ড হেডার */}
-                <div className="flex items-center justify-between border-b border-neutral-200/80 pb-2.5">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200/80 pb-2 sm:pb-2.5">
                   <span className="text-[11px] font-mono uppercase font-bold text-neutral-700">
                     Contact Channel #{idx + 1}
                   </span>
                   <span
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[10px] font-mono uppercase rounded-xs border ${
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[10px] font-mono uppercase rounded-xs border shrink-0 ${
                       c.isPublic
                         ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                         : "bg-amber-50 text-amber-700 border-amber-200"
@@ -130,19 +131,19 @@ export default function OrgContactTab({
                   >
                     {c.isPublic ? (
                       <>
-                        <Eye className="h-3 w-3" /> Public
+                        <Eye className="h-3 w-3 shrink-0" /> Public
                       </>
                     ) : (
                       <>
-                        <EyeOff className="h-3 w-3" /> Private
+                        <EyeOff className="h-3 w-3 shrink-0" /> Private
                       </>
                     )}
                   </span>
                 </div>
 
                 {/* রো ১: Department, Contact Person, Designation */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-2.5 text-xs font-mono">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                       Department / Purpose
                     </span>
@@ -151,7 +152,7 @@ export default function OrgContactTab({
                     </p>
                   </div>
 
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                       Contact Person
                     </span>
@@ -164,7 +165,7 @@ export default function OrgContactTab({
                     </p>
                   </div>
 
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                       Designation
                     </span>
@@ -179,8 +180,8 @@ export default function OrgContactTab({
                 </div>
 
                 {/* রো ২: Official Email & Business Enquiry Email */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-mono">
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 text-xs font-mono">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                       Official Email
                     </span>
@@ -193,7 +194,7 @@ export default function OrgContactTab({
                     </p>
                   </div>
 
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                       Business Enquiry Email
                     </span>
@@ -208,8 +209,8 @@ export default function OrgContactTab({
                 </div>
 
                 {/* রো ৩: Primary, Secondary, WhatsApp & Customer Support Numbers */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs font-mono">
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 text-xs font-mono">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                       Primary Mobile
                     </span>
@@ -222,7 +223,7 @@ export default function OrgContactTab({
                     </p>
                   </div>
 
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                       Secondary Mobile
                     </span>
@@ -237,7 +238,7 @@ export default function OrgContactTab({
                     </p>
                   </div>
 
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                       WhatsApp Number
                     </span>
@@ -250,7 +251,7 @@ export default function OrgContactTab({
                     </p>
                   </div>
 
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                       Customer Support
                     </span>
@@ -273,9 +274,9 @@ export default function OrgContactTab({
 
   // ==================== EDIT MODE ====================
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 sm:space-y-5 animate-in fade-in-50 duration-200">
       {/* ১. অফিসিয়াল ওয়েবসাইট */}
-      <div className="p-3.5 bg-neutral-50/60 border border-neutral-200/80 rounded-xs">
+      <div className="p-3 sm:p-3.5 bg-neutral-50/60 border border-neutral-200/80 rounded-xs">
         <FormInput
           label="Official Website URL"
           type="url"
@@ -286,8 +287,8 @@ export default function OrgContactTab({
       </div>
 
       {/* ২. একাধিক কন্টাক্ট পার্সন ও ডিপার্টমেন্ট হেডার */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-wrap items-center justify-between gap-2.5">
+        <div className="min-w-0">
           <span className="text-xs font-mono uppercase font-bold text-neutral-800 block">
             Department & Contact Persons ({displayContacts.length})
           </span>
@@ -299,18 +300,18 @@ export default function OrgContactTab({
         <button
           type="button"
           onClick={addContact}
-          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white px-3.5 py-2 text-[11px] font-mono uppercase rounded-xs cursor-pointer shrink-0"
+          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white px-3.5 py-2 text-[11px] font-mono uppercase rounded-xs cursor-pointer shrink-0 transition-colors"
         >
           <Plus className="h-3.5 w-3.5" /> Add More
         </button>
       </div>
 
       {/* প্রতিটি কন্টাক্ট কার্ড */}
-      <div className="space-y-4">
+      <div className="space-y-3.5 sm:space-y-4">
         {displayContacts.map((c, idx) => (
           <div
             key={c.id}
-            className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
+            className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
           >
             {/* কার্ড হেডার */}
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200/80 pb-2.5">
@@ -318,11 +319,11 @@ export default function OrgContactTab({
                 Contact Channel #{idx + 1}
               </span>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4">
                 <button
                   type="button"
                   onClick={() => updateContact(c.id, "isPublic", !c.isPublic)}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10.5px] font-mono uppercase rounded-xs border cursor-pointer transition-colors ${
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] sm:text-[10.5px] font-mono uppercase rounded-xs border cursor-pointer transition-colors ${
                     c.isPublic
                       ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                       : "bg-amber-50 text-amber-700 border-amber-200"
@@ -330,11 +331,11 @@ export default function OrgContactTab({
                 >
                   {c.isPublic ? (
                     <>
-                      <Eye className="h-3 w-3" /> Publicly Visible
+                      <Eye className="h-3 w-3 shrink-0" /> Publicly Visible
                     </>
                   ) : (
                     <>
-                      <EyeOff className="h-3 w-3" /> Private Only
+                      <EyeOff className="h-3 w-3 shrink-0" /> Private Only
                     </>
                   )}
                 </button>
@@ -344,7 +345,7 @@ export default function OrgContactTab({
                     type="button"
                     onClick={() => removeContact(c.id)}
                     title="Remove Contact"
-                    className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
+                    className="text-red-500 hover:text-red-700 p-1 cursor-pointer shrink-0"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>

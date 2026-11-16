@@ -76,15 +76,17 @@ export default function OrgOfferingsTab({
   // ==================== VIEW MODE ====================
   if (!isEditing) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 animate-in fade-in-50 duration-200">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
-            <Package className="h-3.5 w-3.5 text-emerald-600" />
-            Products & Services Catalog ({displayOfferings.length})
+          <span className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5 min-w-0">
+            <Package className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+            <span className="truncate">
+              Products & Services Catalog ({displayOfferings.length})
+            </span>
           </span>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3.5 sm:space-y-4">
           {displayOfferings.map((item, idx) => {
             const categoryLabel = formatOtherDisplay(item.category);
             const isAvailable = item.availability !== "Unavailable";
@@ -92,33 +94,33 @@ export default function OrgOfferingsTab({
             return (
               <div
                 key={item.id}
-                className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
+                className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3 sm:space-y-3.5"
               >
                 {/* কার্ড হেডার */}
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200/80 pb-2.5">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200/80 pb-2 sm:pb-2.5">
                   <div className="flex items-center gap-2">
                     <span className="text-[11px] font-mono uppercase font-bold text-neutral-700">
                       Offering #{idx + 1}
                     </span>
                     <span
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono uppercase rounded-xs ${
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono uppercase rounded-xs shrink-0 ${
                         item.type === "Service"
                           ? "bg-blue-950 text-white"
                           : "bg-neutral-900 text-white"
                       }`}
                     >
                       {item.type === "Service" ? (
-                        <Wrench className="h-2.5 w-2.5" />
+                        <Wrench className="h-2.5 w-2.5 shrink-0" />
                       ) : (
-                        <Package className="h-2.5 w-2.5" />
+                        <Package className="h-2.5 w-2.5 shrink-0" />
                       )}
                       {item.type || "Product"}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2.5">
                     <span
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono uppercase rounded-xs border ${
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono uppercase rounded-xs border shrink-0 ${
                         isAvailable
                           ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                           : "bg-red-50 text-red-700 border-red-200"
@@ -126,11 +128,12 @@ export default function OrgOfferingsTab({
                     >
                       {isAvailable ? (
                         <>
-                          <CheckCircle2 className="h-3 w-3" /> Available
+                          <CheckCircle2 className="h-3 w-3 shrink-0" />{" "}
+                          Available
                         </>
                       ) : (
                         <>
-                          <XCircle className="h-3 w-3" /> Unavailable
+                          <XCircle className="h-3 w-3 shrink-0" /> Unavailable
                         </>
                       )}
                     </span>
@@ -140,18 +143,18 @@ export default function OrgOfferingsTab({
                         href={item.link}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-white border border-neutral-300 hover:bg-neutral-100 text-[10px] font-mono uppercase text-neutral-900 rounded-xs"
+                        className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-white border border-neutral-300 hover:bg-neutral-100 text-[10px] font-mono uppercase text-neutral-900 rounded-xs shrink-0"
                       >
                         <span>Enquire / Link</span>
-                        <ExternalLink className="h-2.5 w-2.5" />
+                        <ExternalLink className="h-2.5 w-2.5 shrink-0" />
                       </a>
                     )}
                   </div>
                 </div>
 
                 {/* গ্রিড ফিল্ডস */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs font-mono">
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 text-xs font-mono">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                       Product / Service Name
                     </span>
@@ -164,7 +167,7 @@ export default function OrgOfferingsTab({
                     </p>
                   </div>
 
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                       Category
                     </span>
@@ -177,7 +180,7 @@ export default function OrgOfferingsTab({
                     </p>
                   </div>
 
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                       Pricing Type
                     </span>
@@ -186,7 +189,7 @@ export default function OrgOfferingsTab({
                     </p>
                   </div>
 
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                       Price
                     </span>
@@ -210,7 +213,7 @@ export default function OrgOfferingsTab({
                     Description
                   </span>
                   <p
-                    className={`leading-relaxed ${
+                    className={`leading-relaxed wrap-break-word ${
                       item.description
                         ? "text-neutral-700"
                         : "text-neutral-400 font-mono"
@@ -229,10 +232,10 @@ export default function OrgOfferingsTab({
 
   // ==================== EDIT MODE ====================
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 sm:space-y-5 animate-in fade-in-50 duration-200">
       {/* হেডার ও নতুন প্রোডাক্ট/সার্ভিস যোগ করার বাটন */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-wrap items-center justify-between gap-2.5">
+        <div className="min-w-0">
           <span className="text-xs font-mono uppercase font-bold text-neutral-800 block">
             Products & Services Catalog ({displayOfferings.length})
           </span>
@@ -243,18 +246,18 @@ export default function OrgOfferingsTab({
         <button
           type="button"
           onClick={addOffering}
-          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white px-3.5 py-2 text-[11px] font-mono uppercase rounded-xs cursor-pointer shrink-0"
+          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white px-3.5 py-2 text-[11px] font-mono uppercase rounded-xs cursor-pointer shrink-0 transition-colors"
         >
           <Plus className="h-3.5 w-3.5" /> Add Offering
         </button>
       </div>
 
       {/* প্রতিটি অফারিং ফর্ম কার্ড */}
-      <div className="space-y-4">
+      <div className="space-y-3.5 sm:space-y-4">
         {displayOfferings.map((item, idx) => (
           <div
             key={item.id}
-            className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
+            className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
           >
             {/* কার্ড হেডার */}
             <div className="flex items-center justify-between border-b border-neutral-200/80 pb-2.5">
@@ -289,7 +292,7 @@ export default function OrgOfferingsTab({
                       e.target.value as "Product" | "Service",
                     )
                   }
-                  className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
+                  className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs cursor-pointer"
                 >
                   {OFFERING_TYPES.map((t) => (
                     <option key={t} value={t}>
@@ -327,7 +330,7 @@ export default function OrgOfferingsTab({
                   onChange={(e) =>
                     updateOffering(item.id, "pricingType", e.target.value)
                   }
-                  className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
+                  className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs cursor-pointer"
                 >
                   {PRICING_TYPES.map((pt) => (
                     <option key={pt} value={pt}>
@@ -358,7 +361,7 @@ export default function OrgOfferingsTab({
                   onChange={(e) =>
                     updateOffering(item.id, "availability", e.target.value)
                   }
-                  className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white"
+                  className="w-full border border-neutral-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 rounded-xs cursor-pointer"
                 >
                   {AVAILABILITY_STATUS.map((st) => (
                     <option key={st} value={st}>
@@ -389,7 +392,7 @@ export default function OrgOfferingsTab({
                   updateOffering(item.id, "description", e.target.value)
                 }
                 placeholder="Enter your detailed product or service description"
-                className="w-full border border-neutral-200 bg-neutral-50/30 p-2.5 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white resize-none"
+                className="w-full border border-neutral-200 bg-white p-2.5 text-xs font-mono outline-none focus:border-neutral-950 resize-none rounded-xs"
               />
             </div>
           </div>

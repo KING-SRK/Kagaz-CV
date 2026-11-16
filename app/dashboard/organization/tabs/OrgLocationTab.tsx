@@ -86,11 +86,13 @@ export default function OrgLocationTab({
   // ==================== VIEW MODE ====================
   if (!isEditing) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 animate-in fade-in-50 duration-200">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
-            <MapPin className="h-3.5 w-3.5 text-blue-600" />
-            Business Locations & Branches ({displayBranches.length})
+          <span className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5 min-w-0">
+            <MapPin className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+            <span className="truncate">
+              Business Locations & Branches ({displayBranches.length})
+            </span>
           </span>
         </div>
 
@@ -103,10 +105,10 @@ export default function OrgLocationTab({
           return (
             <div
               key={b.id}
-              className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
+              className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3 sm:space-y-3.5"
             >
               {/* কার্ড হেডার */}
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200/80 pb-2.5">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200/80 pb-2 sm:pb-2.5">
                 <div className="flex items-center gap-2">
                   <span className="text-[11px] font-mono uppercase font-bold text-neutral-700">
                     Location #{idx + 1}
@@ -121,22 +123,22 @@ export default function OrgLocationTab({
                     href={b.mapUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-neutral-300 hover:bg-neutral-100 text-[10.5px] font-mono uppercase text-neutral-900 rounded-xs transition-colors"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-neutral-300 hover:bg-neutral-100 text-[10px] sm:text-[10.5px] font-mono uppercase text-neutral-900 rounded-xs transition-colors shrink-0"
                   >
-                    <Navigation className="h-3 w-3 text-blue-600" />
+                    <Navigation className="h-3 w-3 text-blue-600 shrink-0" />
                     <span>View on Google Maps</span>
-                    <ExternalLink className="h-2.5 w-2.5 text-neutral-400" />
+                    <ExternalLink className="h-2.5 w-2.5 text-neutral-400 shrink-0" />
                   </a>
                 ) : (
-                  <span className="text-[10px] font-mono text-neutral-400">
+                  <span className="text-[10px] font-mono text-neutral-400 shrink-0">
                     Map Link: Not Set
                   </span>
                 )}
               </div>
 
               {/* রো ১: Location Type, Country, State */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
-                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-2.5 text-xs font-mono">
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                   <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                     Location Type
                   </span>
@@ -145,7 +147,7 @@ export default function OrgLocationTab({
                   </p>
                 </div>
 
-                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                   <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                     Country
                   </span>
@@ -158,7 +160,7 @@ export default function OrgLocationTab({
                   </p>
                 </div>
 
-                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                   <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                     State / Province
                   </span>
@@ -173,8 +175,8 @@ export default function OrgLocationTab({
               </div>
 
               {/* রো ২: District, City, Area / Locality, PIN Code */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
-                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 text-xs font-mono">
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                   <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                     District
                   </span>
@@ -187,7 +189,7 @@ export default function OrgLocationTab({
                   </p>
                 </div>
 
-                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                   <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                     City / Town
                   </span>
@@ -200,7 +202,7 @@ export default function OrgLocationTab({
                   </p>
                 </div>
 
-                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                   <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                     Area / Locality
                   </span>
@@ -213,7 +215,7 @@ export default function OrgLocationTab({
                   </p>
                 </div>
 
-                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                   <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                     PIN / ZIP Code
                   </span>
@@ -228,8 +230,8 @@ export default function OrgLocationTab({
               </div>
 
               {/* রো ৩: Building / Shop Number & Street Address */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-mono">
-                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 text-xs font-mono">
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                   <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                     Building / Shop Number
                   </span>
@@ -242,7 +244,7 @@ export default function OrgLocationTab({
                   </p>
                 </div>
 
-                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                   <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                     Street Address
                   </span>
@@ -264,10 +266,10 @@ export default function OrgLocationTab({
 
   // ==================== EDIT MODE ====================
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 sm:space-y-5 animate-in fade-in-50 duration-200">
       {/* হেডার ও নতুন ব্রাঞ্চ যোগ করার বাটন */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-wrap items-center justify-between gap-2.5">
+        <div className="min-w-0">
           <span className="text-xs font-mono uppercase font-bold text-neutral-800 block">
             Business Addresses & Branches ({displayBranches.length})
           </span>
@@ -279,14 +281,14 @@ export default function OrgLocationTab({
         <button
           type="button"
           onClick={addBranch}
-          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white px-3.5 py-2 text-[11px] font-mono uppercase rounded-xs cursor-pointer shrink-0"
+          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white px-3.5 py-2 text-[11px] font-mono uppercase rounded-xs cursor-pointer shrink-0 transition-colors"
         >
           <Plus className="h-3.5 w-3.5" /> Add Branch
         </button>
       </div>
 
       {/* প্রতিটি লোকেশন কার্ড */}
-      <div className="space-y-4">
+      <div className="space-y-3.5 sm:space-y-4">
         {displayBranches.map((b, idx) => {
           const isIndia = b.country === "India";
           const districtOptions =
@@ -297,7 +299,7 @@ export default function OrgLocationTab({
           return (
             <div
               key={b.id}
-              className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
+              className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
             >
               {/* কার্ড হেডার */}
               <div className="flex items-center justify-between border-b border-neutral-200/80 pb-2.5">

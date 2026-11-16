@@ -35,7 +35,7 @@ const createDefaultAchievement = (): OrgAchievementItem => ({
   description: "",
   certificationId: "",
   verificationUrl: "",
-  isVerified: false, // ডিফল্টভাবে সবসময় unverified থাকবে
+  isVerified: false,
 });
 
 export default function OrgAchievementsTab({
@@ -75,37 +75,41 @@ export default function OrgAchievementsTab({
   // ==================== VIEW MODE ====================
   if (!isEditing) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 animate-in fade-in-50 duration-200">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
-            <Award className="h-3.5 w-3.5 text-amber-600" />
-            Achievements & Certifications ({displayItems.length})
+          <span className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5 min-w-0">
+            <Award className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+            <span className="truncate">
+              Achievements & Certifications ({displayItems.length})
+            </span>
           </span>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3.5 sm:space-y-4">
           {displayItems.map((item, idx) => {
             const categoryLabel = formatOtherDisplay(item.category);
 
             return (
               <div
                 key={item.id}
-                className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
+                className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3 sm:space-y-3.5"
               >
                 {/* কার্ড হেডার */}
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200/80 pb-2.5">
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200/80 pb-2 sm:pb-2.5">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                     <span className="text-[11px] font-mono uppercase font-bold text-neutral-700">
                       Credential #{idx + 1}
                     </span>
 
                     {item.isVerified ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono uppercase rounded-xs">
-                        <CheckCircle2 className="h-3 w-3" /> Verified Claim
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono uppercase rounded-xs shrink-0">
+                        <CheckCircle2 className="h-3 w-3 shrink-0" /> Verified
+                        Claim
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-neutral-100 text-neutral-600 border border-neutral-200 text-[10px] font-mono uppercase rounded-xs">
-                        <ShieldAlert className="h-3 w-3" /> Self-Declared
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-neutral-100 text-neutral-600 border border-neutral-200 text-[10px] font-mono uppercase rounded-xs shrink-0">
+                        <ShieldAlert className="h-3 w-3 shrink-0" />{" "}
+                        Self-Declared
                       </span>
                     )}
                   </div>
@@ -115,21 +119,21 @@ export default function OrgAchievementsTab({
                       href={item.verificationUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-neutral-300 hover:bg-neutral-100 text-[10.5px] font-mono uppercase text-neutral-900 rounded-xs"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-neutral-300 hover:bg-neutral-100 text-[10px] sm:text-[10.5px] font-mono uppercase text-neutral-900 rounded-xs shrink-0 transition-colors"
                     >
                       <span>Verify Certificate</span>
-                      <ExternalLink className="h-2.5 w-2.5" />
+                      <ExternalLink className="h-2.5 w-2.5 shrink-0" />
                     </a>
                   ) : (
-                    <span className="text-[10px] font-mono text-neutral-400">
+                    <span className="text-[10px] font-mono text-neutral-400 shrink-0">
                       Verification URL: Not Set
                     </span>
                   )}
                 </div>
 
                 {/* রো ১: Award Name, Category, Awarding Organisation */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-2.5 text-xs font-mono">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                       Award / Certification Name
                     </span>
@@ -142,7 +146,7 @@ export default function OrgAchievementsTab({
                     </p>
                   </div>
 
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                       Recognition Type
                     </span>
@@ -155,9 +159,10 @@ export default function OrgAchievementsTab({
                     </p>
                   </div>
 
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 flex items-center gap-1 mb-0.5">
-                      <Building className="h-3 w-3" /> Awarding Organisation
+                      <Building className="h-3 w-3 shrink-0" /> Awarding
+                      Organisation
                     </span>
                     <p
                       className={`font-medium truncate ${
@@ -170,10 +175,11 @@ export default function OrgAchievementsTab({
                 </div>
 
                 {/* রো ২: Award Date & Certification ID */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-mono">
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 text-xs font-mono">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 flex items-center gap-1 mb-0.5">
-                      <Calendar className="h-3 w-3" /> Award / Issue Date
+                      <Calendar className="h-3 w-3 shrink-0" /> Award / Issue
+                      Date
                     </span>
                     <p
                       className={`font-medium truncate ${
@@ -184,9 +190,9 @@ export default function OrgAchievementsTab({
                     </p>
                   </div>
 
-                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                     <span className="text-[9.5px] uppercase text-neutral-400 flex items-center gap-1 mb-0.5">
-                      <Hash className="h-3 w-3" /> Certification ID
+                      <Hash className="h-3 w-3 shrink-0" /> Certification ID
                     </span>
                     <p
                       className={`font-medium truncate ${
@@ -206,7 +212,7 @@ export default function OrgAchievementsTab({
                     Achievement Description
                   </span>
                   <p
-                    className={`leading-relaxed ${
+                    className={`leading-relaxed wrap-break-word ${
                       item.description
                         ? "text-neutral-700"
                         : "text-neutral-400 font-mono"
@@ -225,10 +231,10 @@ export default function OrgAchievementsTab({
 
   // ==================== EDIT MODE ====================
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 sm:space-y-5 animate-in fade-in-50 duration-200">
       {/* হেডার ও নতুন অ্যাওয়ার্ড যোগ করার বাটন */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-wrap items-center justify-between gap-2.5">
+        <div className="min-w-0">
           <span className="text-xs font-mono uppercase font-bold text-neutral-800 block">
             Achievements & Certifications ({displayItems.length})
           </span>
@@ -240,7 +246,7 @@ export default function OrgAchievementsTab({
         <button
           type="button"
           onClick={addAchievement}
-          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white px-3.5 py-2 text-[11px] font-mono uppercase rounded-xs cursor-pointer shrink-0"
+          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white px-3.5 py-2 text-[11px] font-mono uppercase rounded-xs cursor-pointer shrink-0 transition-colors"
         >
           <Plus className="h-3.5 w-3.5" /> Add Credential
         </button>
@@ -249,7 +255,7 @@ export default function OrgAchievementsTab({
       {/* ভেরিফিকেশন পলিসি নোট */}
       <div className="p-3 bg-neutral-100/80 border border-neutral-200 rounded-xs flex items-start gap-2.5 text-[11px] font-sans text-neutral-700">
         <ShieldAlert className="h-4 w-4 text-neutral-600 shrink-0 mt-0.5" />
-        <p>
+        <p className="leading-relaxed">
           All newly added awards and certifications appear as{" "}
           <strong>Self-Declared</strong> until SutraNet verifies the credential
           ID and official verification URL.
@@ -257,11 +263,11 @@ export default function OrgAchievementsTab({
       </div>
 
       {/* প্রতিটি অ্যাওয়ার্ড ফর্ম কার্ড */}
-      <div className="space-y-4">
+      <div className="space-y-3.5 sm:space-y-4">
         {displayItems.map((item, idx) => (
           <div
             key={item.id}
-            className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
+            className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
           >
             {/* কার্ড হেডার */}
             <div className="flex items-center justify-between border-b border-neutral-200/80 pb-2.5">
@@ -348,7 +354,7 @@ export default function OrgAchievementsTab({
                   updateAchievement(item.id, "description", e.target.value)
                 }
                 placeholder="Enter details about this achievement or certification"
-                className="w-full border border-neutral-200 bg-neutral-50/30 p-2.5 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white resize-none"
+                className="w-full border border-neutral-200 bg-white p-2.5 text-xs font-mono outline-none focus:border-neutral-950 resize-none rounded-xs"
               />
             </div>
           </div>

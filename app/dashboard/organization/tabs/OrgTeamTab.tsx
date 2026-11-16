@@ -126,7 +126,6 @@ export default function OrgTeamTab({
         return;
       }
 
-      // প্রোফাইল পাওয়া গেলে নাম, ছবি ও ইন্ট্রো অটো-ফিল হবে (তবে Consent থাকবে Pending!)
       onChange(
         teamMembers.map((m) =>
           m.id === member.id
@@ -169,15 +168,17 @@ export default function OrgTeamTab({
   // ==================== VIEW MODE ====================
   if (!isEditing) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 animate-in fade-in-50 duration-200">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5">
-            <Users className="h-3.5 w-3.5 text-emerald-600" />
-            Company Team & Management ({displayMembers.length})
+          <span className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-700 flex items-center gap-1.5 min-w-0">
+            <Users className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+            <span className="truncate">
+              Company Team & Management ({displayMembers.length})
+            </span>
           </span>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3.5 sm:space-y-4">
           {displayMembers.map((m, idx) => {
             const designationLabel = formatOtherDisplay(m.designation);
             const departmentLabel = formatOtherDisplay(m.department);
@@ -186,43 +187,43 @@ export default function OrgTeamTab({
             return (
               <div
                 key={m.id}
-                className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
+                className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3 sm:space-y-3.5"
               >
                 {/* কার্ড হেডার */}
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200/80 pb-2.5">
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200/80 pb-2 sm:pb-2.5">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                     <span className="text-[11px] font-mono uppercase font-bold text-neutral-700">
                       Team Member #{idx + 1}
                     </span>
 
                     {isAccepted ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono uppercase rounded-xs">
-                        <CheckCircle2 className="h-3 w-3" /> Consent Accepted
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono uppercase rounded-xs shrink-0">
+                        <CheckCircle2 className="h-3 w-3 shrink-0" /> Consent
+                        Accepted
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-mono uppercase rounded-xs">
-                        <Clock className="h-3 w-3" /> Pending Consent
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-mono uppercase rounded-xs shrink-0">
+                        <Clock className="h-3 w-3 shrink-0" /> Pending Consent
                       </span>
                     )}
                   </div>
 
-                  {/* কানেক্টেড প্রোফাইল লিংক (শুধুমাত্র ID থাকলে) */}
+                  {/* কানেক্টেড প্রোফাইল লিংক */}
                   {m.kagazId && (
                     <Link
                       href={`/p/${m.kagazId}`}
                       target="_blank"
-                      className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-white border border-neutral-300 hover:bg-neutral-100 text-[10px] font-mono uppercase text-neutral-900 rounded-xs"
+                      className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-white border border-neutral-300 hover:bg-neutral-100 text-[10px] font-mono uppercase text-neutral-900 rounded-xs shrink-0 transition-colors"
                     >
                       <span>View SutraNet Profile</span>
-                      <ExternalLink className="h-2.5 w-2.5" />
+                      <ExternalLink className="h-2.5 w-2.5 shrink-0" />
                     </Link>
                   )}
                 </div>
 
                 {/* ছবি ও গ্রিড ফিল্ডস */}
-                <div className="flex flex-col sm:flex-row gap-3.5 items-start">
-                  {/* SutraNet প্রোফাইল থেকে আসা ছবি (ঐচ্ছিক) */}
-                  <div className="w-14 h-14 rounded-xs border border-neutral-200 bg-white flex items-center justify-center overflow-hidden shrink-0">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-3.5 items-start">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xs border border-neutral-200 bg-white flex items-center justify-center overflow-hidden shrink-0">
                     {m.avatarUrl ? (
                       <img
                         src={m.avatarUrl}
@@ -230,13 +231,13 @@ export default function OrgTeamTab({
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <UserCheck className="h-6 w-6 text-neutral-300" />
+                      <UserCheck className="h-5 w-5 sm:h-6 sm:w-6 text-neutral-300" />
                     )}
                   </div>
 
                   {/* ৪টি মূল ফিল্ড */}
-                  <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs font-mono">
-                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                  <div className="flex-1 w-full min-w-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 text-xs font-mono">
+                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                       <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                         Person Name
                       </span>
@@ -249,7 +250,7 @@ export default function OrgTeamTab({
                       </p>
                     </div>
 
-                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                       <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                         SutraNet Profile ID
                       </span>
@@ -262,7 +263,7 @@ export default function OrgTeamTab({
                       </p>
                     </div>
 
-                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                       <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                         Designation
                       </span>
@@ -277,7 +278,7 @@ export default function OrgTeamTab({
                       </p>
                     </div>
 
-                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+                    <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                       <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                         Department
                       </span>
@@ -300,7 +301,7 @@ export default function OrgTeamTab({
                     Professional Introduction
                   </span>
                   <p
-                    className={`leading-relaxed ${
+                    className={`leading-relaxed wrap-break-word ${
                       m.intro
                         ? "text-neutral-700"
                         : "text-neutral-400 font-mono"
@@ -319,10 +320,10 @@ export default function OrgTeamTab({
 
   // ==================== EDIT MODE ====================
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 sm:space-y-5 animate-in fade-in-50 duration-200">
       {/* হেডার ও নতুন মেম্বার যোগ করার বাটন */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-wrap items-center justify-between gap-2.5">
+        <div className="min-w-0">
           <span className="text-xs font-mono uppercase font-bold text-neutral-800 block">
             Company Team & Management ({displayMembers.length})
           </span>
@@ -334,7 +335,7 @@ export default function OrgTeamTab({
         <button
           type="button"
           onClick={addMember}
-          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white px-3.5 py-2 text-[11px] font-mono uppercase rounded-xs cursor-pointer shrink-0"
+          className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white px-3.5 py-2 text-[11px] font-mono uppercase rounded-xs cursor-pointer shrink-0 transition-colors"
         >
           <Plus className="h-3.5 w-3.5" /> Add Member
         </button>
@@ -343,7 +344,7 @@ export default function OrgTeamTab({
       {/* সতর্কবার্তা / Consent Policy নোট */}
       <div className="p-3 bg-amber-50/70 border border-amber-200/80 rounded-xs flex items-start gap-2.5 text-[11px] font-sans text-amber-900">
         <ShieldAlert className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-        <p>
+        <p className="leading-relaxed">
           Connecting a SutraNet Profile ID sends a link request. A member is
           shown as a verified team connection on the public page only after they
           accept consent.
@@ -351,23 +352,23 @@ export default function OrgTeamTab({
       </div>
 
       {/* প্রতিটি মেম্বার কার্ড */}
-      <div className="space-y-4">
+      <div className="space-y-3.5 sm:space-y-4">
         {displayMembers.map((m, idx) => {
           const feedback = lookupFeedback[m.id];
 
           return (
             <div
               key={m.id}
-              className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
+              className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5"
             >
               {/* কার্ড হেডার */}
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200/80 pb-2.5">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                   <span className="text-[11px] font-mono uppercase font-bold text-neutral-700">
                     Team Member #{idx + 1}
                   </span>
                   <span
-                    className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono uppercase rounded-xs border ${
+                    className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono uppercase rounded-xs border shrink-0 ${
                       m.consentVerified || m.status === "Accepted"
                         ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                         : "bg-amber-50 text-amber-700 border-amber-200"
@@ -375,11 +376,13 @@ export default function OrgTeamTab({
                   >
                     {m.consentVerified || m.status === "Accepted" ? (
                       <>
-                        <CheckCircle2 className="h-3 w-3" /> Consent Accepted
+                        <CheckCircle2 className="h-3 w-3 shrink-0" /> Consent
+                        Accepted
                       </>
                     ) : (
                       <>
-                        <Clock className="h-3 w-3" /> Pending Member Consent
+                        <Clock className="h-3 w-3 shrink-0" /> Pending Member
+                        Consent
                       </>
                     )}
                   </span>
@@ -390,7 +393,7 @@ export default function OrgTeamTab({
                     type="button"
                     onClick={() => removeMember(m.id)}
                     title="Remove Member"
-                    className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
+                    className="text-red-500 hover:text-red-700 p-1 cursor-pointer shrink-0"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -398,9 +401,9 @@ export default function OrgTeamTab({
               </div>
 
               {/* Connect Existing SutraNet Profile বার */}
-              <div className="p-3 bg-white border border-neutral-200/80 rounded-xs space-y-2">
+              <div className="p-2.5 sm:p-3 bg-white border border-neutral-200/80 rounded-xs space-y-2">
                 <div className="flex flex-col sm:flex-row sm:items-end gap-2.5">
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <FormInput
                       label="Connect Existing SutraNet Profile ID (Optional)"
                       value={m.kagazId || ""}
@@ -412,7 +415,7 @@ export default function OrgTeamTab({
                     type="button"
                     onClick={() => handleConnectSutraNetProfile(m)}
                     disabled={lookingUpId === m.id}
-                    className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-neutral-900 hover:bg-neutral-800 disabled:bg-neutral-400 text-white text-[11px] font-mono uppercase rounded-xs cursor-pointer shrink-0"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-neutral-900 hover:bg-neutral-800 disabled:bg-neutral-400 text-white text-[11px] font-mono uppercase rounded-xs cursor-pointer shrink-0 transition-colors"
                   >
                     {lookingUpId === m.id ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -425,7 +428,7 @@ export default function OrgTeamTab({
 
                 {feedback && (
                   <p
-                    className={`text-[11px] font-mono ${
+                    className={`text-[11px] font-mono wrap-break-word ${
                       feedback.type === "success"
                         ? "text-emerald-700"
                         : "text-red-600"
@@ -474,7 +477,7 @@ export default function OrgTeamTab({
                   value={m.intro}
                   onChange={(e) => updateMember(m.id, "intro", e.target.value)}
                   placeholder="Enter a short professional introduction or role summary"
-                  className="w-full border border-neutral-200 bg-neutral-50/30 p-2.5 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white resize-none"
+                  className="w-full border border-neutral-200 bg-white p-2.5 text-xs font-mono outline-none focus:border-neutral-950 resize-none rounded-xs"
                 />
               </div>
             </div>

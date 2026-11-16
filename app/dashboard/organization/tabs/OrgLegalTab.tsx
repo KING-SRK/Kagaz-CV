@@ -21,7 +21,6 @@ interface Props {
   onChange: (updated: OrgLegalInfo) => void;
 }
 
-// সংবেদনশীল নম্বর মাস্ক করার হেল্পার (যেমন: ABCDE1234F -> ABCDE****F)
 const maskSensitiveId = (val?: string) => {
   if (!val) return "";
   const clean = val.trim();
@@ -57,25 +56,25 @@ export default function OrgLegalTab({
   // ==================== VIEW MODE ====================
   if (!isEditing) {
     return (
-      <div className="space-y-6">
-        {/* ১. ফাংশন ১: Registration Information */}
-        <div className="space-y-3.5">
+      <div className="space-y-5 sm:space-y-6 animate-in fade-in-50 duration-200">
+        {/* ১. Registration Information */}
+        <div className="space-y-3 sm:space-y-3.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-xs font-mono uppercase font-bold text-neutral-800 flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-neutral-900" />
-              1. Registration Information
+            <span className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-800 flex items-center gap-1.5">
+              <ShieldCheck className="h-4 w-4 text-neutral-900 shrink-0" />
+              <span>1. Registration Information</span>
             </span>
-            <span className="text-[10.5px] font-mono text-neutral-500 flex items-center gap-1">
-              <Lock className="h-3 w-3 text-amber-600" />
-              Confidential numbers are masked or hidden publicly
+            <span className="text-[10px] sm:text-[10.5px] font-mono text-neutral-500 flex items-center gap-1">
+              <Lock className="h-3 w-3 text-amber-600 shrink-0" />
+              <span>Confidential numbers are masked or hidden publicly</span>
             </span>
           </div>
 
-          <div className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3">
-            {/* রো ১: GSTIN (Visibility Toggle সহ) & PAN (সর্বদা Private) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
-              <div className="p-3 bg-white border border-neutral-200/80 rounded-xs flex items-start justify-between gap-2">
-                <div className="min-w-0">
+          <div className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3">
+            {/* রো ১: GSTIN & PAN */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 text-xs font-mono">
+              <div className="p-2.5 sm:p-3 bg-white border border-neutral-200/80 rounded-xs flex items-start justify-between gap-2 min-w-0">
+                <div className="min-w-0 flex-1">
                   <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                     GSTIN
                   </span>
@@ -96,18 +95,18 @@ export default function OrgLegalTab({
                 >
                   {legalInfo.showGstin ? (
                     <>
-                      <Eye className="h-2.5 w-2.5" /> Public
+                      <Eye className="h-2.5 w-2.5 shrink-0" /> Public
                     </>
                   ) : (
                     <>
-                      <EyeOff className="h-2.5 w-2.5" /> Private
+                      <EyeOff className="h-2.5 w-2.5 shrink-0" /> Private
                     </>
                   )}
                 </span>
               </div>
 
-              <div className="p-3 bg-white border border-neutral-200/80 rounded-xs flex items-start justify-between gap-2">
-                <div className="min-w-0">
+              <div className="p-2.5 sm:p-3 bg-white border border-neutral-200/80 rounded-xs flex items-start justify-between gap-2 min-w-0">
+                <div className="min-w-0 flex-1">
                   <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                     Company / Business PAN
                   </span>
@@ -120,14 +119,14 @@ export default function OrgLegalTab({
                   </p>
                 </div>
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[9.5px] uppercase rounded-xs border bg-neutral-100 text-neutral-600 border-neutral-200 shrink-0">
-                  <Lock className="h-2.5 w-2.5" /> Always Private
+                  <Lock className="h-2.5 w-2.5 shrink-0" /> Always Private
                 </span>
               </div>
             </div>
 
             {/* রো ২: CIN, LLPIN, Udyam Registration Number */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
-              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-2.5 text-xs font-mono">
+              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                 <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                   CIN (Corporate ID)
                 </span>
@@ -140,7 +139,7 @@ export default function OrgLegalTab({
                 </p>
               </div>
 
-              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                 <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                   LLPIN
                 </span>
@@ -153,7 +152,7 @@ export default function OrgLegalTab({
                 </p>
               </div>
 
-              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                 <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                   Udyam Registration (MSME)
                 </span>
@@ -168,8 +167,8 @@ export default function OrgLegalTab({
             </div>
 
             {/* রো ৩: Shop & Establishment, Trade Licence, FSSAI Licence */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
-              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-2.5 text-xs font-mono">
+              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                 <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                   Shop & Establishment Reg.
                 </span>
@@ -184,7 +183,7 @@ export default function OrgLegalTab({
                 </p>
               </div>
 
-              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                 <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                   Trade Licence
                 </span>
@@ -199,7 +198,7 @@ export default function OrgLegalTab({
                 </p>
               </div>
 
-              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                 <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                   FSSAI Licence
                 </span>
@@ -214,8 +213,8 @@ export default function OrgLegalTab({
             </div>
 
             {/* রো ৪: IEC, Professional Tax & Other Government Licence */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
-              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-2.5 text-xs font-mono">
+              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                 <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                   Import Export Code (IEC)
                 </span>
@@ -228,7 +227,7 @@ export default function OrgLegalTab({
                 </p>
               </div>
 
-              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
+              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
                 <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
                   Professional Tax Reg.
                 </span>
@@ -243,8 +242,8 @@ export default function OrgLegalTab({
                 </p>
               </div>
 
-              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs">
-                <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5">
+              <div className="p-2.5 bg-white border border-neutral-200/80 rounded-xs min-w-0">
+                <span className="text-[9.5px] uppercase text-neutral-400 block mb-0.5 truncate">
                   {legalInfo.otherLicenseName || "Other Government Licence"}
                 </span>
                 <p
@@ -261,34 +260,36 @@ export default function OrgLegalTab({
           </div>
         </div>
 
-        {/* ২. ফাংশন ২: Verification Status (Document images are never published) */}
-        <div className="space-y-3 border-t border-neutral-100 pt-5">
-          <span className="text-xs font-mono uppercase font-bold text-neutral-800 flex items-center gap-1.5">
-            <FileCheck2 className="h-4 w-4 text-emerald-600" />
-            2. Verification Status & Compliance
+        {/* ২. Verification Status & Compliance */}
+        <div className="space-y-3 border-t border-neutral-100 pt-4 sm:pt-5">
+          <span className="text-[11px] sm:text-xs font-mono uppercase font-bold text-neutral-800 flex items-center gap-1.5">
+            <FileCheck2 className="h-4 w-4 text-emerald-600 shrink-0" />
+            <span>2. Verification Status & Compliance</span>
           </span>
 
-          <div className="p-4 bg-neutral-50/70 border border-neutral-200 rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
+          <div className="p-3 sm:p-4 bg-neutral-50/70 border border-neutral-200 rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="space-y-1.5">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-mono font-bold text-neutral-900">
                   Platform Review Status:
                 </span>
                 {status === "Verified" ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono uppercase rounded-xs">
-                    <CheckCircle2 className="h-3 w-3" /> Verified by SutraNet
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono uppercase rounded-xs shrink-0">
+                    <CheckCircle2 className="h-3 w-3 shrink-0" /> Verified by
+                    SutraNet
                   </span>
                 ) : status === "Pending Review" ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-mono uppercase rounded-xs">
-                    <Clock className="h-3 w-3" /> Under Review
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-mono uppercase rounded-xs shrink-0">
+                    <Clock className="h-3 w-3 shrink-0" /> Under Review
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-neutral-100 text-neutral-600 border border-neutral-200 text-[10px] font-mono uppercase rounded-xs">
-                    <AlertCircle className="h-3 w-3" /> Not Verified Yet
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-neutral-100 text-neutral-600 border border-neutral-200 text-[10px] font-mono uppercase rounded-xs shrink-0">
+                    <AlertCircle className="h-3 w-3 shrink-0" /> Not Verified
+                    Yet
                   </span>
                 )}
               </div>
-              <p className="text-[11px] font-sans text-neutral-500">
+              <p className="text-[11px] font-sans text-neutral-500 leading-relaxed">
                 Verification badges are issued only after manual compliance
                 review. Supporting links are kept strictly confidential and
                 never displayed publicly.
@@ -302,11 +303,11 @@ export default function OrgLegalTab({
 
   // ==================== EDIT MODE ====================
   return (
-    <div className="space-y-6">
-      {/* ১. ফাংশন ১: Registration Information */}
-      <div className="space-y-3.5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
+    <div className="space-y-5 sm:space-y-6 animate-in fade-in-50 duration-200">
+      {/* ১. Registration Information */}
+      <div className="space-y-3 sm:space-y-3.5">
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
+          <div className="min-w-0">
             <span className="text-xs font-mono uppercase font-bold text-neutral-800 block">
               1. Registration Information (All Optional)
             </span>
@@ -318,15 +319,15 @@ export default function OrgLegalTab({
           <button
             type="button"
             onClick={handleClearSensitiveData}
-            className="inline-flex items-center gap-1 px-2.5 py-1 border border-red-200 bg-red-50/60 hover:bg-red-100 text-red-700 text-[10px] font-mono uppercase rounded-xs cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 sm:py-1 border border-red-200 bg-red-50/60 hover:bg-red-100 text-red-700 text-[10px] font-mono uppercase rounded-xs cursor-pointer shrink-0 transition-colors"
           >
-            <Trash2 className="h-3 w-3" /> Purge All Legal Data
+            <Trash2 className="h-3 w-3 shrink-0" /> Purge All Legal Data
           </button>
         </div>
 
-        <div className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-4">
-          {/* GSTIN (Public/Private কন্ট্রোল সহ) & PAN (সর্বদা Private) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
+        <div className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-4">
+          {/* GSTIN & PAN */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 items-start">
             <div className="space-y-2">
               <FormInput
                 label="GSTIN (Optional)"
@@ -339,7 +340,7 @@ export default function OrgLegalTab({
                 onClick={() =>
                   updateField("showGstin", !Boolean(legalInfo.showGstin))
                 }
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono uppercase rounded-xs border cursor-pointer ${
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono uppercase rounded-xs border cursor-pointer transition-colors ${
                   legalInfo.showGstin
                     ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                     : "bg-amber-50 text-amber-700 border-amber-200"
@@ -347,11 +348,11 @@ export default function OrgLegalTab({
               >
                 {legalInfo.showGstin ? (
                   <>
-                    <Eye className="h-3 w-3" /> GSTIN Public on Profile
+                    <Eye className="h-3 w-3 shrink-0" /> GSTIN Public on Profile
                   </>
                 ) : (
                   <>
-                    <EyeOff className="h-3 w-3" /> GSTIN Kept Private
+                    <EyeOff className="h-3 w-3 shrink-0" /> GSTIN Kept Private
                   </>
                 )}
               </button>
@@ -365,7 +366,8 @@ export default function OrgLegalTab({
                 placeholder="Enter your 10-character PAN"
               />
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono uppercase rounded-xs border bg-neutral-100 text-neutral-600 border-neutral-200">
-                <Lock className="h-3 w-3" /> Private by Default (Never Public)
+                <Lock className="h-3 w-3 shrink-0" /> Private by Default (Never
+                Public)
               </span>
             </div>
           </div>
@@ -435,7 +437,7 @@ export default function OrgLegalTab({
             />
           </div>
 
-          {/* Other Government Licence (Custom Entry) */}
+          {/* Other Government Licence */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-neutral-200/70">
             <FormInput
               label="Other Government Licence Name (Custom)"
@@ -454,8 +456,8 @@ export default function OrgLegalTab({
         </div>
       </div>
 
-      {/* ২. ফাংশন ২: Verification Documents & Consent */}
-      <div className="space-y-3 border-t border-neutral-200 pt-5">
+      {/* ২. Verification Documents & Consent */}
+      <div className="space-y-3 border-t border-neutral-200 pt-4 sm:pt-5">
         <div>
           <span className="text-xs font-mono uppercase font-bold text-neutral-800 block">
             2. Verification Documents & Compliance Consent (Optional)
@@ -466,7 +468,7 @@ export default function OrgLegalTab({
           </span>
         </div>
 
-        <div className="p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5">
+        <div className="p-3 sm:p-4 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-3.5">
           <FormInput
             label="Supporting Certificate Link (DigiLocker / Drive URL)"
             type="url"
@@ -481,15 +483,14 @@ export default function OrgLegalTab({
             placeholder="Enter your secure verification document URL"
           />
 
-          {/* Consent & Data Privacy Notice */}
-          <label className="flex items-start gap-2.5 p-3 bg-white border border-neutral-200 rounded-xs cursor-pointer">
+          <label className="flex items-start gap-2.5 p-2.5 sm:p-3 bg-white border border-neutral-200 rounded-xs cursor-pointer">
             <input
               type="checkbox"
               checked={Boolean(legalInfo.verificationConsent)}
               onChange={(e) =>
                 updateField("verificationConsent", e.target.checked)
               }
-              className="mt-0.5"
+              className="mt-0.5 shrink-0"
             />
             <span className="text-[11px] font-sans text-neutral-600 leading-relaxed">
               I consent to SutraNet reviewing the submitted registration details

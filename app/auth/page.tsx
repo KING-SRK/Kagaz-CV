@@ -102,7 +102,7 @@ export default function AuthPage() {
         </div>
 
         {/* কার্ড র‍্যাপার */}
-        <div className="relative border border-neutral-200 bg-white p-5 sm:p-8 md:p-10 shadow-[0_4px_25px_rgba(0,0,0,0.02)] min-h-[420px] sm:min-h-[460px] flex items-center justify-center overflow-hidden rounded-xs">
+        <div className="relative border border-neutral-200 bg-white p-5 sm:p-8 md:p-10 shadow-[0_4px_25px_rgba(0,0,0,0.02)] min-h-105 sm:min-h-115 flex items-center justify-center overflow-hidden rounded-xs">
           <AnimatePresence mode="popLayout" custom={direction} initial={false}>
             <motion.div
               key={view}
