@@ -164,31 +164,56 @@ export default function CardSection() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // ⚡ ফোন থেকে ডাউনলোড করলেও একদম ডেস্কটপের মতো ফুল-সাইজ HD কার্ড সেভ হবে
+  // ⚡ এক ক্লিকেই সামনের ও পেছনের দুটো পিঠ আলাদা HD ইমেজ হিসেবে ডাউনলোড হবে
   const handleDownloadCard = async () => {
-    if (!cardRef.current) return;
+    const frontEl = document.getElementById("card-front-side");
+    const backEl = document.getElementById("card-back-side");
+
+    if (!frontEl || !backEl) return;
 
     try {
       setDownloading(true);
-      const dataUrl = await toPng(cardRef.current, {
+
+      // ১. সামনের পিঠ (Front Side) ডাউনলোড
+      const frontDataUrl = await toPng(frontEl, {
         cacheBust: true,
         pixelRatio: 3,
         width: CARD_WIDTH,
         height: CARD_HEIGHT,
         style: {
-          transform: "scale(1)",
-          transformOrigin: "top left",
+          transform: "none",
           width: `${CARD_WIDTH}px`,
           height: `${CARD_HEIGHT}px`,
         },
       });
 
-      const link = document.createElement("a");
-      link.download = `SmartCard-${kagazId || "profile"}.png`;
-      link.href = dataUrl;
-      link.click();
+      const frontLink = document.createElement("a");
+      frontLink.download = `${kagazId || "SmartCard"}-Front.png`;
+      frontLink.href = frontDataUrl;
+      frontLink.click();
+
+      // সামান্য বিরতি দিয়ে পেছনের পিঠ ডাউনলোড (যাতে ব্রাউজার ব্লক না করে)
+      await new Promise((resolve) => setTimeout(resolve, 400));
+
+      // ২. পেছনের পিঠ (Back Side) ডাউনলোড
+      const backDataUrl = await toPng(backEl, {
+        cacheBust: true,
+        pixelRatio: 3,
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
+        style: {
+          transform: "none", // রোটেশন সরিয়ে একদম সোজা ইমেজ ক্যাপচার করবে
+          width: `${CARD_WIDTH}px`,
+          height: `${CARD_HEIGHT}px`,
+        },
+      });
+
+      const backLink = document.createElement("a");
+      backLink.download = `${kagazId || "SmartCard"}-Back.png`;
+      backLink.href = backDataUrl;
+      backLink.click();
     } catch (err) {
-      console.error("Failed to download card image:", err);
+      console.error("Failed to download card images:", err);
     } finally {
       setDownloading(false);
     }
@@ -207,8 +232,13 @@ export default function CardSection() {
           style={{
             width: `${CARD_WIDTH}px`,
             height: `${CARD_HEIGHT}px`,
-            transform: `scale(${scale})`,
-            transformOrigin: "center center",
+            // শুধুমাত্র মোবাইলে স্ক্রিন ছোট হলে তবেই scale অ্যাপ্লাই হবে
+            ...(scale < 1
+              ? {
+                  transform: `scale(${scale})`,
+                  transformOrigin: "center center",
+                }
+              : {}),
           }}
           className="shrink-0 flex items-center justify-center"
         >

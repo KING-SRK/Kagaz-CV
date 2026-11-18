@@ -1,171 +1,191 @@
+// app/dashboard/individual/components/DuoSplitCard.tsx
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
-import {
-  RotateCw,
-  ShieldCheck,
-  Globe,
-  Sparkles,
-  User,
-  Building2,
-} from "lucide-react";
+import { RotateCw, Phone, MapPin, Mail, User, ShieldCheck } from "lucide-react";
 import { CardProps } from "./types";
 
 export default function DuoSplitCard({
-  role,
   kagazId,
   data,
   userProfileUrl,
-  websiteHomeUrl,
 }: CardProps) {
-  const isOrg = role === "organization";
+  const [isFlipped, setIsFlipped] = useState(false);
 
   return (
-    <>
-      {/* FRONT SIDE */}
-      <div className="absolute inset-0 w-full h-full rounded-2xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.18)] border border-neutral-300 flex overflow-hidden backface-hidden ring-1 ring-neutral-200">
-        {/* বাঁদিকের ৬২% অংশ: পিওর হোয়াইট */}
-        <div className="w-[62%] h-full p-6 flex flex-col justify-between bg-white text-neutral-900 relative">
-          <div className="absolute inset-0 bg-[radial-gradient(#000000_0.75px,transparent_0.75px)] bg-size-[14px_14px] opacity-[0.04] pointer-events-none" />
-
-          <div className="flex items-center gap-2.5 z-10">
-            <span className="flex h-6 w-6 items-center justify-center bg-neutral-950 text-white font-mono font-bold text-xs rounded-xs shrink-0">
-              S
-            </span>
-            <span className="text-sm font-semibold tracking-tight text-neutral-950">
-              Sutra<span className="font-serif italic font-light">Net</span>
-            </span>
-          </div>
-
-          <div className="flex items-center gap-3.5 z-10 my-auto">
-            <div className="h-16 w-16 rounded-full border-2 border-neutral-950 p-0.5 shrink-0 bg-neutral-100 overflow-hidden shadow-xs flex items-center justify-center">
-              {data.avatarUrl ? (
-                <Image
-                  src={data.avatarUrl}
-                  alt="Card Avatar"
-                  width={80}
-                  height={80}
-                  className="w-full h-full object-cover rounded-full"
-                />
-              ) : isOrg ? (
-                <Building2 className="h-7 w-7 text-neutral-500" />
-              ) : (
-                <User className="h-7 w-7 text-neutral-500" />
-              )}
+    <div
+      onClick={() => setIsFlipped((prev) => !prev)}
+      title="Click card to flip"
+      className="w-full max-w-[440px] aspect-[1.75/1] mx-auto select-none cursor-pointer"
+      style={{ perspective: "1000px" }}
+    >
+      <div
+        className="relative w-full h-full transition-transform duration-700 ease-in-out"
+        style={{
+          transformStyle: "preserve-3d",
+          transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+        }}
+      >
+        {/* ================= FRONT SIDE (সামনের দিক) ================= */}
+        <div
+          id="card-front-side"
+          className="absolute inset-0 w-full h-full rounded-2xl shadow-xl border border-neutral-500 flex overflow-hidden text-neutral-900"
+          style={{
+            backgroundImage: "url('/cards/ind-front-bg.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+          }}
+        >
+          {/* বাঁদিকের অংশ: নাম, পদবি ও কন্টাক্ট ইনফো */}
+          <div className="w-[62%] h-full p-5 flex flex-col justify-between relative z-10">
+            {/* ওপরের SutraNet লোগো ও নাম */}
+            <div className="flex items-center justify-start gap-2 z-10">
+              <span className="flex h-6 w-6 items-center justify-center bg-slate-900 text-neutral-50 font-mono font-bold text-[11px] rounded-xs shrink-0 shadow-sm">
+                S
+              </span>
+              <span className="text-xs font-semibold tracking-wide text-slate-900 font-mono">
+                Sutra
+                <span className="font-serif italic font-light text-slate-900">
+                  Net
+                </span>
+              </span>
             </div>
 
-            <div className="min-w-0 flex-1 space-y-0.5">
-              <h3 className="text-base font-serif font-bold text-neutral-950 truncate leading-snug">
-                {data.name || "Member Name"}
-              </h3>
-              <p className="text-[10px] font-mono text-neutral-500 truncate uppercase">
-                {isOrg
-                  ? data.tagline || "Enterprise Hub"
-                  : data.title || "Identity Holder"}
+            {/* প্রোফাইল ছবি ও নাম-রোল */}
+            <div className="flex items-center gap-3 my-1">
+              {/* প্রোফাইল ছবি */}
+              <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-neutral-400 bg-white shadow-sm overflow-hidden flex items-center justify-center shrink-0">
+                {data.avatarUrl ? (
+                  <Image
+                    src={data.avatarUrl}
+                    alt="Avatar"
+                    width={50}
+                    height={50}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User className="h-5 w-5 text-neutral-700" />
+                )}
+              </div>
+
+              {/* নাম ও রোল */}
+              <div className="min-w-0 flex-1 space-y-0.5">
+                <h2 className="text-sm sm:text-base font-serif font-bold text-neutral-950 truncate tracking-wide leading-tight">
+                  {data.name || "YOUR NAME"}
+                </h2>
+                <p className="text-[9.5px] sm:text-[10px] font-mono font-semibold tracking-wider uppercase text-neutral-700 truncate">
+                  {data.title || "PROFESSIONAL ROLE"}
+                </p>
+              </div>
+            </div>
+
+            {/* মাঝখানের অংশ: আইডি ঠিক মাঝে হাইলাইটেড */}
+            <div className="my-auto py-1 text-center flex justify-center items-center gap-2 bg-neutral-200/60 py-1 px-2.5 rounded-md border border-neutral-300/60 w-fit mx-auto shadow-xs">
+              <span className="text-[10px] font-mono font-bold uppercase text-neutral-600 tracking-wider">
+                ID:
+              </span>
+              <span className="text-xs sm:text-sm font-mono font-bold text-neutral-950 tracking-wider">
+                {kagazId || "JT-2611-0000"}
+              </span>
+            </div>
+
+            {/* নিচের অংশ: ফোন, লোকেশন ও ইমেইল */}
+            <div className="space-y-1.5 text-[10px] font-mono text-neutral-900 border-t border-neutral-300 pt-2">
+              <div className="flex items-center gap-2 truncate">
+                <div className="p-0.5 text-slate-950 rounded-xs shrink-0">
+                  <Phone className="h-3 w-3" />
+                </div>
+                <span className="truncate font-medium">
+                  {data.phone || "123 - 456799"}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 truncate">
+                <div className="p-0.5 text-slate-950 rounded-xs shrink-0">
+                  <MapPin className="h-3 w-3" />
+                </div>
+                <span className="truncate font-medium">
+                  {data.address || "Kolkata, India"}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 truncate">
+                <div className="p-0.5 text-slate-950 rounded-xs shrink-0">
+                  <Mail className="h-3 w-3" />
+                </div>
+                <span className="truncate font-medium">
+                  {data.email || "youremail@gmail.com"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* ডানদিকের অংশ: ওপরে গ্রিন ভেরিফাইড ব্যাজ এবং একদম নিচে ইউজারের কিউআর কোড */}
+          <div className="w-[38%] h-full relative z-10 flex flex-col justify-between items-end pt-2 p-4 text-white">
+            {/* ওপরের সবুজ ভেরিফাইড ব্যাজ */}
+            <div className="flex items-center gap-1 bg-emerald-950/80 border border-emerald-500/40 px-2 py-0.5 rounded-full text-[8px] font-mono tracking-wider text-emerald-300 shadow-xs">
+              <ShieldCheck className="h-2.5 w-2.5 text-emerald-400 shrink-0" />
+              <span>VERIFIED</span>
+            </div>
+
+            {/* একদম নিচের দিকে ইউজারের কিউআর কোড */}
+            <div className="p-1.5 bg-white rounded-lg shadow-md border border-neutral-700 mt-auto">
+              <QRCodeSVG value={userProfileUrl} size={56} level="M" />
+            </div>
+          </div>
+        </div>
+
+        {/* ================= BACK SIDE (পেছনের দিক) ================= */}
+        <div
+          className="absolute inset-0 w-full h-full rounded-2xl shadow-xl border border-neutral-800"
+          style={{
+            transform: "rotateY(180deg)",
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+          }}
+        >
+          <div
+            id="card-back-side"
+            className="absolute inset-0 w-full h-full rounded-2xl p-5 flex flex-col justify-between text-white"
+            style={{
+              backgroundImage: "url('/cards/ind-back-bg.jpg')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          >
+            {/* ওপরের অংশ: লোগো ও নাম (ডানপাশে ফিক্সড) */}
+            <div className="flex items-center justify-end gap-2.5 z-10">
+              <span className="flex h-6 w-6 items-center justify-center bg-white text-neutral-950 font-mono font-bold text-xs rounded-xs shrink-0 shadow-sm">
+                S
+              </span>
+              <span className="text-base font-semibold tracking-wide text-white font-mono">
+                Sutra
+                <span className="font-serif italic font-light text-neutral-200">
+                  Net
+                </span>
+              </span>
+            </div>
+
+            {/* মাঝখানের অংশ: QR কোড (ডানপাশে গোছানো) */}
+            <div className="flex items-center justify-end my-auto relative z-10">
+              <div className="p-2 bg-white rounded-xl shadow-lg border border-neutral-700 shrink-0">
+                <QRCodeSVG value={userProfileUrl} size={72} level="M" />
+              </div>
+            </div>
+
+            {/* নিচের ফুটার: এক লাইনের বিবরণ */}
+            <div className="flex justify-end items-center text-[9px] sm:text-[9.5px] font-mono text-neutral-200 z-10 font-medium text-right">
+              <p>
+                Official digital identity & tech <br /> solutions portal.
               </p>
-              <span className="inline-block px-1.5 py-0.5 bg-neutral-100 border border-neutral-300 text-[8.5px] font-mono uppercase text-neutral-700 font-semibold rounded-xs mt-1">
-                {isOrg ? "Corporate" : "Individual"}
-              </span>
             </div>
-          </div>
-
-          <div className="space-y-0.5 text-[9px] font-mono text-neutral-600 border-t border-neutral-200/80 pt-2 z-10">
-            <div className="flex justify-between gap-2">
-              <span className="text-neutral-400 shrink-0">TEL</span>
-              <span className="font-medium text-neutral-900 truncate">
-                {data.phone || "N/A"}
-              </span>
-            </div>
-            {!isOrg ? (
-              <div className="flex justify-between gap-2">
-                <span className="text-neutral-400 shrink-0">DOB</span>
-                <span className="font-medium text-neutral-900 truncate">
-                  {data.dob || "DD/MM/YYYY"}
-                </span>
-              </div>
-            ) : (
-              <div className="flex justify-between gap-2">
-                <span className="text-neutral-400 shrink-0">LOC</span>
-                <span className="font-medium text-neutral-900 truncate">
-                  {data.address || "Kolkata"}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* ডানদিকের ৩৮% অংশ: জেট ব্ল্যাক */}
-        <div className="w-[38%] h-full bg-[#0A0A0A] p-5 flex flex-col justify-between items-center text-white relative border-l border-neutral-950">
-          <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none" />
-
-          <div className="flex items-center gap-1 bg-white/10 border border-white/15 px-2 py-0.5 rounded-full text-[8px] font-mono tracking-wider text-neutral-200">
-            <Sparkles className="h-2.5 w-2.5 text-emerald-400 shrink-0" />
-            <span>VERIFIED</span>
-          </div>
-
-          <div className="flex flex-col items-center my-auto z-10">
-            <div className="p-2 bg-white rounded-xl shadow-lg border border-neutral-200">
-              <QRCodeSVG value={userProfileUrl} size={68} level="M" />
-            </div>
-            <span className="text-[7.5px] font-mono uppercase tracking-[0.2em] text-neutral-400 mt-2">
-              SCAN PASS
-            </span>
-          </div>
-
-          <div className="w-full text-center border-t border-neutral-800 pt-1.5 z-10">
-            <span className="text-[10px] font-mono font-bold tracking-widest text-neutral-200 block truncate">
-              {kagazId || "ST-0000-00"}
-            </span>
           </div>
         </div>
       </div>
-
-      {/* BACK SIDE */}
-      <div className="absolute inset-0 w-full h-full rounded-2xl bg-[#FCFBFA] shadow-[0_20px_50px_rgba(0,0,0,0.18)] border border-neutral-300 flex flex-col justify-between overflow-hidden transform-[rotateY(180deg)] backface-hidden ring-1 ring-neutral-200">
-        <div className="h-10 bg-[#0A0A0A] w-full flex items-center justify-between px-6 border-b border-neutral-900 gap-2">
-          <span className="text-[7.5px] font-mono uppercase tracking-[0.3em] text-neutral-400 truncate">
-            SUTRANET SMART CARD • ZERO KNOWLEDGE
-          </span>
-          <span className="text-[8px] font-mono text-emerald-400 font-semibold shrink-0">
-            PASS-V2
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between gap-6 px-8 my-auto">
-          <div className="space-y-1.5 text-left flex-1 min-w-0">
-            <div className="flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-neutral-950 shrink-0" />
-              <span className="text-xs font-mono uppercase tracking-wider text-neutral-950 font-bold truncate">
-                Official Registry
-              </span>
-            </div>
-            <p className="text-[10.5px] text-neutral-600 leading-relaxed font-light line-clamp-3">
-              This identity card provides instant offline and digital credential
-              verification across the SutraNet registry network.
-            </p>
-            <div className="flex items-center gap-1.5 text-[9.5px] font-mono text-neutral-800 pt-1">
-              <Globe className="h-3 w-3 text-neutral-500 shrink-0" />
-              <span className="font-medium truncate">sutranet.in</span>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center shrink-0">
-            <div className="p-2 bg-white rounded-xl shadow-md border-2 border-neutral-950">
-              <QRCodeSVG value={websiteHomeUrl} size={70} level="M" />
-            </div>
-            <span className="text-[7.5px] font-mono uppercase tracking-wider text-neutral-500 mt-1">
-              Portal Link
-            </span>
-          </div>
-        </div>
-
-        <div className="border-t border-neutral-200 px-6 py-2 bg-neutral-50 flex justify-between items-center text-[8.5px] font-mono text-neutral-500">
-          <span className="truncate">ISSUED BY SUTRANET PLATFORM</span>
-          <div className="flex items-center gap-1 shrink-0">
-            <span>Click to flip</span>
-            <RotateCw className="h-2.5 w-2.5" />
-          </div>
-        </div>
-      </div>
-    </>
+    </div>
   );
 }

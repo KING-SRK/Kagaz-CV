@@ -126,26 +126,57 @@ export default function OrganizationDashboardPage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  // ⚡ ফোনে ডাউনলোড করলেও একদম ডেস্কটপের মতো ফুল-সাইজ HD কার্ড সেভ হবে
+  // ⚡ এক ক্লিকেই কোম্পানির সামনের ও পেছনের দুটো পিঠ আলাদা HD ইমেজ হিসেবে ডাউনলোড হবে
   const handleDownloadCard = async () => {
-    if (!cardRef.current) return;
+    const frontEl = document.getElementById("org-card-front");
+    const backEl = document.getElementById("org-card-back");
+
+    if (!frontEl || !backEl) return;
+
     try {
       setDownloading(true);
-      const dataUrl = await toPng(cardRef.current, {
+
+      // ১. সামনের পিঠ (Front Side) ডাউনলোড
+      const frontDataUrl = await toPng(frontEl, {
         cacheBust: true,
         pixelRatio: 3,
-        width: 450,
+        width: 440,
+        height: 265,
+        skipFonts: true,
+        // যদি গুগল ছবি ব্লক করে, তবুও কার্ড ডাউনলোড আটকাবেনা
+        imagePlaceholder:
+          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
         style: {
-          width: "450px",
-          maxWidth: "450px",
-          margin: "0",
+          transform: "none",
+          width: "440px",
+          height: "265px",
         },
       });
-      const link = document.createElement("a");
-      link.download = `CompanyCard-${kagazId || "org"}.png`;
-      link.href = dataUrl;
-      link.click();
+
+      const frontLink = document.createElement("a");
+      frontLink.download = `CompanyCard-${kagazId || "org"}-Front.png`;
+      frontLink.href = frontDataUrl;
+      frontLink.click();
+
+      // সামান্য বিরতি দিয়ে পেছনের পিঠ ডাউনলোড (যাতে ব্রাউজার ডাউনলোড ব্লক না করে)
+      await new Promise((resolve) => setTimeout(resolve, 400));
+
+      // ২. পেছনের পিঠ (Back Side) ডাউনলোড
+      const backDataUrl = await toPng(backEl, {
+        pixelRatio: 3,
+        width: 440,
+        height: 265,
+        style: {
+          transform: "none",
+          width: "440px",
+          height: "265px",
+        },
+      });
+
+      const backLink = document.createElement("a");
+      backLink.download = `CompanyCard-${kagazId || "org"}-Back.png`;
+      backLink.href = backDataUrl;
+      backLink.click();
     } catch (err) {
       console.error("Failed to download company card:", err);
     } finally {
