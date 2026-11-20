@@ -2,11 +2,19 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { Check, Copy, Download, ExternalLink, Loader2 } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Download,
+  ExternalLink,
+  Loader2,
+  Shield,
+} from "lucide-react";
 import { toPng } from "html-to-image";
 import { supabase } from "@/lib/supabaseClient";
 import { getIndividualProfile } from "@/lib/individualService";
 import SmartCard, { CardDesignType } from "./SmartCard";
+import IndividualPrivacyModal from "./components/IndividualPrivacyModal";
 
 export default function CardSection() {
   const [kagazId, setKagazId] = useState("");
@@ -14,6 +22,7 @@ export default function CardSection() {
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [scale, setScale] = useState(1);
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
   const cardRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -48,8 +57,8 @@ export default function CardSection() {
     dob: "DD/MM/YYYY",
     gender: "M",
     tagline: "",
-    address: "Kolkata, WB",
-    estYear: "2025",
+    address: "",
+    email: "",
   });
 
   useEffect(() => {
@@ -82,10 +91,10 @@ export default function CardSection() {
               ? "Certified Member"
               : "Commercial Hub"),
           dob: data.dob || "DD/MM/YYYY",
-          gender: data.gender ? data.gender.charAt(0).toUpperCase() : "M",
+          gender: data.gender ? data.gender.toUpperCase() : "Gender",
           tagline: data.role === "organization" ? "Commercial Hub" : "",
           address: formattedAddress,
-          estYear: "2025",
+          email: data.email || "",
         });
       } else {
         const { data: directData } = await supabase
@@ -113,11 +122,11 @@ export default function CardSection() {
               (directData.role === "individual" ? "Certified Member" : ""),
             dob: directData.dob || "DD/MM/YYYY",
             gender: directData.gender
-              ? directData.gender.charAt(0).toUpperCase()
-              : "M",
+              ? directData.gender.toUpperCase()
+              : "Gender",
             tagline: directData.role === "organization" ? "Commercial Hub" : "",
             address: fallbackAddress,
-            estYear: "2025",
+            email: "",
           });
         }
       }
@@ -252,27 +261,27 @@ export default function CardSection() {
       </div>
 
       {/* ২. কুইক অ্যাকশন বাটন বার (সম্পূর্ণ রেসপন্সিভ) */}
-      <div className="w-full max-w-[380px] sm:max-w-[440px] flex flex-wrap sm:flex-nowrap items-center gap-2 mt-5 px-2 sm:px-0">
+      <div className="w-full max-w-[380px] sm:max-w-[440px] grid grid-cols-2 sm:flex sm:items-center gap-2 mt-5 px-2 sm:px-0">
+        {/* ১. Copy Link */}
         <button
           type="button"
           onClick={handleCopyLink}
-          className="flex-1 min-w-[130px] flex items-center justify-center gap-1.5 sm:gap-2 border border-neutral-300 bg-white py-2.5 px-3 text-[11px] sm:text-xs font-mono uppercase text-neutral-800 hover:bg-neutral-50 transition-colors shadow-xs cursor-pointer rounded-xs"
+          className="flex-1 flex items-center justify-center gap-1.5 border border-neutral-300 bg-white py-2.5 px-3 text-[11px] font-mono uppercase text-neutral-800 hover:bg-neutral-50 transition-colors shadow-xs cursor-pointer rounded-xs"
         >
           {copied ? (
             <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
           ) : (
             <Copy className="h-3.5 w-3.5 text-neutral-600 shrink-0" />
           )}
-          <span className="truncate">
-            {copied ? "Link Copied" : "Copy Link"}
-          </span>
+          <span className="truncate">{copied ? "Copied" : "Copy Link"}</span>
         </button>
 
+        {/* ২. Download Card */}
         <button
           type="button"
           onClick={handleDownloadCard}
           disabled={downloading}
-          className="flex-1 min-w-[140px] flex items-center justify-center gap-1.5 sm:gap-2 border border-neutral-900 bg-neutral-900 py-2.5 px-3 text-[11px] sm:text-xs font-mono uppercase text-white hover:bg-neutral-800 disabled:bg-neutral-600 transition-colors shadow-xs cursor-pointer rounded-xs"
+          className="flex-1 flex items-center justify-center gap-1.5 border border-neutral-900 bg-neutral-900 py-2.5 px-3 text-[11px] font-mono uppercase text-white hover:bg-neutral-800 disabled:bg-neutral-600 transition-colors shadow-xs cursor-pointer rounded-xs"
         >
           {downloading ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin text-white shrink-0" />
@@ -280,19 +289,24 @@ export default function CardSection() {
             <Download className="h-3.5 w-3.5 text-white shrink-0" />
           )}
           <span className="truncate">
-            {downloading ? "Saving..." : "Download Card"}
+            {downloading ? "Saving..." : "Download"}
           </span>
         </button>
 
+        {/* ৩. Public Page (মোবাইলে নিচে পুরো জায়গা নেবে, ডেস্কটপে পাশে বসবে) */}
         <Link
           href={`/p/${kagazId}`}
-          target="_blank"
-          title="Open Public Page"
-          className="flex items-center justify-center border border-neutral-300 bg-white p-2.5 text-neutral-700 hover:text-neutral-950 hover:bg-neutral-50 transition-colors shadow-xs rounded-xs shrink-0"
+          className="col-span-2 sm:flex-1 flex items-center justify-center gap-1.5 border border-emerald-600 bg-emerald-50/70 hover:bg-emerald-600 text-emerald-900 hover:text-white py-2.5 px-3 text-[11px] font-mono font-bold uppercase transition-colors shadow-xs rounded-xs"
         >
-          <ExternalLink className="h-3.5 w-3.5" />
+          <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">Public Page</span>
         </Link>
       </div>
+      <IndividualPrivacyModal
+        isOpen={isPrivacyOpen}
+        onClose={() => setIsPrivacyOpen(false)}
+        profileId={kagazId}
+      />
     </div>
   );
 }

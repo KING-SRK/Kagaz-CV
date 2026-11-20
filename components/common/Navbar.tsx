@@ -84,8 +84,8 @@ export default function Navbar() {
     { name: "Home", href: "/", active: isActive("/") },
     {
       name: "Create CV",
-      href: "/cv-builder",
-      active: isActive("/cv-builder"),
+      href: "/create-cv",
+      active: isActive("/create-cv"),
     },
     {
       name: "Find Talent",

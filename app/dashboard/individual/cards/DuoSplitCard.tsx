@@ -4,7 +4,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
-import { RotateCw, Phone, MapPin, Mail, User, ShieldCheck } from "lucide-react";
+import { UserShield, Phone, MapPin, Mail, User, ShieldCheck, CalendarFold } from "lucide-react";
 import { CardProps } from "./types";
 
 export default function DuoSplitCard({
@@ -44,14 +44,23 @@ export default function DuoSplitCard({
           <div className="w-[62%] h-full p-5 flex flex-col justify-between relative z-10">
             {/* ওপরের SutraNet লোগো ও নাম */}
             <div className="flex items-center justify-start gap-2 z-10">
-              <span className="flex h-6 w-6 items-center justify-center bg-slate-900 text-neutral-50 font-mono font-bold text-[11px] rounded-xs shrink-0 shadow-sm">
-                S
-              </span>
-              <span className="text-xs font-semibold tracking-wide text-slate-900 font-mono">
+              <img
+                src="/images/sutranet-logo.png"
+                alt="SutraNet Logo"
+                className="w-6 h-6 rounded-sm"
+              />
+              <span className="text-sm font-semibold tracking-wide text-slate-900 font-mono">
                 Sutra
-                <span className="font-serif italic font-light text-slate-900">
+                <span className="font-serif italic font-light text-neutral-900">
                   Net
                 </span>
+              </span>
+            </div>
+
+            {/* মাঝখানের অংশ: আইডি ঠিক মাঝে হাইলাইটেড */}
+            <div className=" py-1 text-center flex justify-center items-center gap-2 px-2.5 rounded-md w-fit mx-auto">
+              <span className="text-lg font-mono font-bold text-neutral-950 tracking-wider">
+                {kagazId}
               </span>
             </div>
 
@@ -83,18 +92,28 @@ export default function DuoSplitCard({
               </div>
             </div>
 
-            {/* মাঝখানের অংশ: আইডি ঠিক মাঝে হাইলাইটেড */}
-            <div className="my-auto py-1 text-center flex justify-center items-center gap-2 bg-neutral-200/60 py-1 px-2.5 rounded-md border border-neutral-300/60 w-fit mx-auto shadow-xs">
-              <span className="text-[10px] font-mono font-bold uppercase text-neutral-600 tracking-wider">
-                ID:
-              </span>
-              <span className="text-xs sm:text-sm font-mono font-bold text-neutral-950 tracking-wider">
-                {kagazId || "JT-2611-0000"}
-              </span>
-            </div>
-
             {/* নিচের অংশ: ফোন, লোকেশন ও ইমেইল */}
             <div className="space-y-1.5 text-[10px] font-mono text-neutral-900 border-t border-neutral-300 pt-2">
+              <div className="flex items-center gap-5 truncate">
+                <div className="flex items-center gap-2 truncate">
+                  <div className="p-0.5 text-slate-950 rounded-xs shrink-0">
+                    <CalendarFold className="h-3 w-3" />
+                  </div>
+                  <span className="truncate font-medium">
+                    {data.dob || "DD/MM/YYYY"}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 truncate">
+                  <div className="p-0.5 text-slate-950 rounded-xs shrink-0">
+                    <UserShield className="h-3 w-3" />
+                  </div>
+                  <span className="truncate font-medium">
+                    {data.gender || "GENDER"}
+                  </span>
+                </div>
+              </div>
+
               <div className="flex items-center gap-2 truncate">
                 <div className="p-0.5 text-slate-950 rounded-xs shrink-0">
                   <Phone className="h-3 w-3" />
@@ -125,9 +144,9 @@ export default function DuoSplitCard({
           </div>
 
           {/* ডানদিকের অংশ: ওপরে গ্রিন ভেরিফাইড ব্যাজ এবং একদম নিচে ইউজারের কিউআর কোড */}
-          <div className="w-[38%] h-full relative z-10 flex flex-col justify-between items-end pt-2 p-4 text-white">
+          <div className="w-[38%] h-full relative z-10 flex flex-col justify-between items-end pt-2 p-4 pr-5 text-white">
             {/* ওপরের সবুজ ভেরিফাইড ব্যাজ */}
-            <div className="flex items-center gap-1 bg-emerald-950/80 border border-emerald-500/40 px-2 py-0.5 rounded-full text-[8px] font-mono tracking-wider text-emerald-300 shadow-xs">
+            <div className="flex items-center gap-1 bg-emerald-950/80 border border-emerald-500/40 px-1.5 py-0.5 rounded-full text-[7px] font-mono tracking-wider text-emerald-300 shadow-xs">
               <ShieldCheck className="h-2.5 w-2.5 text-emerald-400 shrink-0" />
               <span>VERIFIED</span>
             </div>
@@ -159,10 +178,12 @@ export default function DuoSplitCard({
           >
             {/* ওপরের অংশ: লোগো ও নাম (ডানপাশে ফিক্সড) */}
             <div className="flex items-center justify-end gap-2.5 z-10">
-              <span className="flex h-6 w-6 items-center justify-center bg-white text-neutral-950 font-mono font-bold text-xs rounded-xs shrink-0 shadow-sm">
-                S
-              </span>
-              <span className="text-base font-semibold tracking-wide text-white font-mono">
+              <img
+                src="/images/sutranet-logo.png"
+                alt="SutraNet Logo"
+                className="w-6 h-6 rounded-sm"
+              />
+              <span className="text-sm font-semibold tracking-wide text-white font-mono">
                 Sutra
                 <span className="font-serif italic font-light text-neutral-200">
                   Net

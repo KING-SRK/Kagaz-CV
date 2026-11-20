@@ -12,11 +12,13 @@ import {
   ExternalLink,
   Loader2,
   ShieldCheck,
+  Shield,
 } from "lucide-react";
 import { toPng } from "html-to-image";
 import CompanySmartCard, { CompanyCardData } from "./CompanySmartCard";
 import { getCompanyProfile } from "@/lib/organizationService";
 import CompanyDetailsSection from "./CompanyDetailsSection";
+import CompanyPrivacyModal from "./components/CompanyPrivacyModal";
 
 export default function OrganizationDashboardPage() {
   const router = useRouter();
@@ -24,6 +26,7 @@ export default function OrganizationDashboardPage() {
   const [kagazId, setKagazId] = useState("");
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [cardData, setCardData] = useState<CompanyCardData>({
@@ -231,11 +234,12 @@ export default function OrganizationDashboardPage() {
               </div>
 
               {/* 📱 রেসপন্সিভ অ্যাকশন বাটন বার */}
-              <div className="w-full max-w-[360px] sm:max-w-[440px] flex flex-wrap sm:flex-nowrap items-center gap-2 mt-4">
+              <div className="w-full max-w-[360px] sm:max-w-[440px] grid grid-cols-2 sm:flex sm:items-center gap-2 mt-4">
+                {/* ১. Copy Link */}
                 <button
                   type="button"
                   onClick={handleCopyLink}
-                  className="flex-1 min-w-[120px] flex items-center justify-center gap-1.5 sm:gap-2 border border-neutral-300 bg-white py-2 px-3 text-[11px] sm:text-xs font-mono uppercase text-neutral-800 hover:bg-neutral-50 cursor-pointer rounded-xs"
+                  className="flex-1 flex items-center justify-center gap-1.5 border border-neutral-300 bg-white py-2 px-3 text-[11px] font-mono uppercase text-neutral-800 hover:bg-neutral-50 cursor-pointer rounded-xs transition-colors"
                 >
                   {copied ? (
                     <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
@@ -247,11 +251,12 @@ export default function OrganizationDashboardPage() {
                   </span>
                 </button>
 
+                {/* ২. Download Card */}
                 <button
                   type="button"
                   onClick={handleDownloadCard}
                   disabled={downloading}
-                  className="flex-1 min-w-[135px] flex items-center justify-center gap-1.5 sm:gap-2 border border-neutral-900 bg-neutral-900 py-2 px-3 text-[11px] sm:text-xs font-mono uppercase text-white hover:bg-neutral-800 cursor-pointer rounded-xs"
+                  className="flex-1 flex items-center justify-center gap-1.5 border border-neutral-900 bg-neutral-900 py-2 px-3 text-[11px] font-mono uppercase text-white hover:bg-neutral-800 cursor-pointer rounded-xs transition-colors"
                 >
                   {downloading ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" />
@@ -259,18 +264,20 @@ export default function OrganizationDashboardPage() {
                     <Download className="h-3.5 w-3.5 shrink-0" />
                   )}
                   <span className="truncate">
-                    {downloading ? "Saving..." : "Download Card"}
+                    {downloading ? "Saving..." : "Download"}
                   </span>
                 </button>
 
-                <Link
-                  href={`/p/${kagazId}`}
-                  target="_blank"
-                  title="Open Public Profile"
-                  className="flex items-center justify-center border border-neutral-300 bg-white p-2 text-neutral-700 hover:bg-neutral-50 rounded-xs shrink-0"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </Link>
+                {/* ৩. Privacy Settings & Public Page */}
+                <div className="col-span-2 sm:col-span-1 flex items-center gap-2">
+                  <Link
+                    href={`/p/${kagazId}`}
+                    className="flex-1 flex items-center justify-center gap-1.5 border border-emerald-600 bg-emerald-50/70 hover:bg-emerald-600 text-emerald-900 hover:text-white py-2 px-3 text-[11px] font-mono font-bold uppercase rounded-xs transition-colors"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate">Public Page</span>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -279,6 +286,11 @@ export default function OrganizationDashboardPage() {
         {/* ২. নিচের কোম্পানি ডিটেইলস কন্টেইনার */}
         <CompanyDetailsSection />
       </div>
+      <CompanyPrivacyModal
+        isOpen={isPrivacyOpen}
+        onClose={() => setIsPrivacyOpen(false)}
+        companyId={kagazId}
+      />
     </div>
   );
 }

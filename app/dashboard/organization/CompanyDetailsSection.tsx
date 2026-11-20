@@ -150,7 +150,7 @@ export default function CompanyDetailsSection() {
     },
     {
       id: "achievements",
-      shortTitle: "Awards",
+      shortTitle: "Achievements",
       title: "Achievements & Certifications",
       desc: "Awards, certifications & recognitions.",
       icon: Award,
