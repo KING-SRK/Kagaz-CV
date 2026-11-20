@@ -109,16 +109,16 @@ export default function IndividualDashboardPage() {
         </div>
 
         {/* নিচের Create / Export CV কল-টু-অ্যাকশন কার্ড */}
-        <div className="border border-neutral-300 bg-white p-5 sm:p-6 rounded-xs shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-start sm:items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xs bg-neutral-900 text-white flex items-center justify-center shrink-0">
-              <FileText className="h-5 w-5 text-emerald-400" />
+        <div className="border border-neutral-300 bg-white p-4 sm:p-6 rounded-xs shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-3 sm:gap-3.5 min-w-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xs bg-neutral-900 text-white flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+              <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-400" />
             </div>
-            <div>
-              <h3 className="text-sm sm:text-base font-serif font-bold text-neutral-950">
+            <div className="min-w-0">
+              <h3 className="text-sm sm:text-base font-serif font-bold text-neutral-950 leading-snug">
                 Ready to generate your ATS-Friendly CV?
               </h3>
-              <p className="text-xs text-neutral-600 mt-0.5">
+              <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
                 Your SutraNet profile details auto-sync into clean executive
                 templates—customize sections and export PDF in seconds.
               </p>
@@ -127,7 +127,7 @@ export default function IndividualDashboardPage() {
 
           <Link
             href="/create-cv"
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-neutral-950 text-white text-xs font-mono uppercase tracking-wider rounded-xs hover:bg-neutral-800 transition-colors shrink-0"
+            className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-2.5 bg-neutral-950 text-white text-xs font-mono uppercase tracking-wider rounded-xs hover:bg-neutral-800 transition-colors shrink-0"
           >
             <span>Create CV</span>
             <ArrowRight className="h-3.5 w-3.5 text-emerald-400" />

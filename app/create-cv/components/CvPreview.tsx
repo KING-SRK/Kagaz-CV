@@ -12,13 +12,12 @@ interface Props {
 export default function CvPreview({ data, template }: Props) {
   const { visibility } = data;
 
-  // টেমপ্লেট অনুযায়ী ফন্ট ও হেডার স্টাইল
   const fontClass =
     template === "classic"
       ? "font-serif"
       : template === "mono"
-      ? "font-mono"
-      : "font-sans";
+        ? "font-mono"
+        : "font-sans";
 
   const hasHeaderContact =
     data.email ||
@@ -26,10 +25,16 @@ export default function CvPreview({ data, template }: Props) {
     data.location ||
     (visibility.socialLinks && data.socialLinks.length > 0);
 
+  const hasPersonalDetails =
+    data.personalDetails.dob ||
+    data.personalDetails.gender ||
+    data.personalDetails.nationality ||
+    data.personalDetails.noticePeriod;
+
   return (
     <div
       id="cv-printable-area"
-      className={`bg-white text-neutral-900 w-full max-w-[210mm] min-h-[297mm] mx-auto shadow-xl border border-neutral-300 p-8 sm:p-11 print:shadow-none print:border-none print:p-0 print:max-w-none ${fontClass}`}
+      className={`bg-white text-neutral-900 w-[680px] aspect-[210/297] mx-auto shadow-lg border border-neutral-300 p-8 sm:p-10 print:w-full print:max-w-none print:aspect-auto print:shadow-none print:border-none print:p-0 ${fontClass}`}
     >
       {/* ১. HEADER SECTION */}
       <header
@@ -37,29 +42,34 @@ export default function CvPreview({ data, template }: Props) {
           template === "classic"
             ? "border-b-2 border-neutral-900"
             : template === "mono"
-            ? "border-b border-dashed border-neutral-500"
-            : "border-b border-neutral-300"
+              ? "border-b border-dashed border-neutral-500"
+              : "border-b border-neutral-300"
         }`}
       >
         <div className="flex items-start justify-between gap-5">
           <div className="space-y-1.5 flex-1">
             <div className="flex flex-wrap items-center gap-2.5">
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950">
+              <h1 className="text-3xl font-bold tracking-tight text-neutral-950">
                 {data.fullName || "Your Full Name"}
               </h1>
 
               {visibility.sutraNetBadge && data.kagazId && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-neutral-100 border border-neutral-300 text-[10px] font-mono text-neutral-800 rounded-xs">
+                <a
+                  href={`/p/${data.kagazId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 px-2 py-0.5 bg-neutral-100 border border-neutral-300 text-[10px] font-mono text-neutral-800 rounded-xs hover:bg-neutral-200 transition-colors"
+                >
                   {data.isVerified && (
                     <ShieldCheck className="h-3 w-3 text-emerald-700" />
                   )}
                   <span>SutraNet ID: {data.kagazId}</span>
-                </span>
+                </a>
               )}
             </div>
 
             {data.title && (
-              <p className="text-sm sm:text-base font-medium text-neutral-700">
+              <p className="text-base font-medium text-neutral-700">
                 {data.title}
               </p>
             )}
@@ -86,9 +96,9 @@ export default function CvPreview({ data, template }: Props) {
             )}
           </div>
 
-          {/* Profile Photo (Optional Toggle) */}
           {visibility.photo && data.avatarUrl && (
-            <div className="h-20 w-20 sm:h-22 sm:w-22 rounded-xs border border-neutral-300 overflow-hidden shrink-0">
+            <div className="h-22 w-22 rounded-xs border border-neutral-300 overflow-hidden shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={data.avatarUrl}
                 alt={data.fullName || "Profile"}
@@ -99,10 +109,22 @@ export default function CvPreview({ data, template }: Props) {
         </div>
       </header>
 
-      {/* ২. PROFESSIONAL SUMMARY */}
+      {/* ২. CAREER OBJECTIVE */}
+      {visibility.objective && data.objective.trim() && (
+        <section className="mb-6">
+          <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-neutral-900 border-b border-neutral-200 pb-1 mb-2">
+            Career Objective
+          </h2>
+          <p className="text-xs sm:text-[13px] font-sans text-neutral-800 leading-relaxed whitespace-pre-line">
+            {data.objective}
+          </p>
+        </section>
+      )}
+
+      {/* ৩. PROFESSIONAL SUMMARY */}
       {visibility.summary && data.summary.trim() && (
         <section className="mb-6">
-          <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-neutral-900 border-b border-neutral-200 pb-1 mb-2.5">
+          <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-neutral-900 border-b border-neutral-200 pb-1 mb-2">
             Professional Summary
           </h2>
           <p className="text-xs sm:text-[13px] font-sans text-neutral-800 leading-relaxed whitespace-pre-line">
@@ -111,7 +133,7 @@ export default function CvPreview({ data, template }: Props) {
         </section>
       )}
 
-      {/* ৩. WORK EXPERIENCE */}
+      {/* ৪. WORK EXPERIENCE */}
       {visibility.experience && data.experience.length > 0 && (
         <section className="mb-6">
           <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-neutral-900 border-b border-neutral-200 pb-1 mb-3">
@@ -145,7 +167,7 @@ export default function CvPreview({ data, template }: Props) {
         </section>
       )}
 
-      {/* ৪. PROJECTS */}
+      {/* ৫. KEY PROJECTS */}
       {visibility.projects && data.projects.length > 0 && (
         <section className="mb-6">
           <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-neutral-900 border-b border-neutral-200 pb-1 mb-3">
@@ -180,7 +202,7 @@ export default function CvPreview({ data, template }: Props) {
         </section>
       )}
 
-      {/* ৫. EDUCATION */}
+      {/* ৬. EDUCATION */}
       {visibility.education && data.education.length > 0 && (
         <section className="mb-6">
           <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-neutral-900 border-b border-neutral-200 pb-1 mb-3">
@@ -213,9 +235,10 @@ export default function CvPreview({ data, template }: Props) {
         </section>
       )}
 
-      {/* ৬. SKILLS & LANGUAGES */}
+      {/* ৭. SKILLS, LANGUAGES & HOBBIES */}
       {((visibility.skills && data.skills.length > 0) ||
-        (visibility.languages && data.languages.length > 0)) && (
+        (visibility.languages && data.languages.length > 0) ||
+        (visibility.hobbies && data.hobbies.length > 0)) && (
         <section className="mb-6 space-y-3">
           {visibility.skills && data.skills.length > 0 && (
             <div>
@@ -238,12 +261,23 @@ export default function CvPreview({ data, template }: Props) {
               </p>
             </div>
           )}
+
+          {visibility.hobbies && data.hobbies.length > 0 && (
+            <div className="pt-1">
+              <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-neutral-900 border-b border-neutral-200 pb-1 mb-2">
+                Extracurricular Activities &amp; Hobbies
+              </h2>
+              <p className="text-xs font-sans text-neutral-800">
+                {data.hobbies.join("  •  ")}
+              </p>
+            </div>
+          )}
         </section>
       )}
 
-      {/* ৭. CERTIFICATIONS */}
+      {/* ৮. CERTIFICATIONS */}
       {visibility.certifications && data.certifications.length > 0 && (
-        <section>
+        <section className="mb-6">
           <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-neutral-900 border-b border-neutral-200 pb-1 mb-2.5">
             Certifications
           </h2>
@@ -264,6 +298,195 @@ export default function CvPreview({ data, template }: Props) {
                 )}
               </div>
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* ৯. ACHIEVEMENTS & AWARDS */}
+      {visibility.achievements && data.achievements.length > 0 && (
+        <section className="mb-6">
+          <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-neutral-900 border-b border-neutral-200 pb-1 mb-2.5">
+            Achievements &amp; Awards
+          </h2>
+          <div className="space-y-1.5">
+            {data.achievements.map((ach) => (
+              <div
+                key={ach.id}
+                className="flex items-baseline justify-between text-xs font-sans"
+              >
+                <span>
+                  <strong className="text-neutral-900">{ach.title}</strong>
+                  {ach.issuer ? ` — ${ach.issuer}` : ""}
+                </span>
+                {ach.date && (
+                  <span className="text-[11px] font-mono text-neutral-500">
+                    {ach.date}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ১০. VOLUNTEER & LEADERSHIP */}
+      {visibility.volunteer && data.volunteer.length > 0 && (
+        <section className="mb-6">
+          <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-neutral-900 border-b border-neutral-200 pb-1 mb-2.5">
+            Volunteer Experience &amp; Leadership
+          </h2>
+          <div className="space-y-3">
+            {data.volunteer.map((vol) => (
+              <div key={vol.id} className="space-y-0.5 text-xs font-sans">
+                <div className="flex items-baseline justify-between">
+                  <span className="font-bold text-neutral-950">
+                    {vol.role}
+                    {vol.organization ? ` — ${vol.organization}` : ""}
+                  </span>
+                  {vol.duration && (
+                    <span className="text-[11px] font-mono text-neutral-500">
+                      {vol.duration}
+                    </span>
+                  )}
+                </div>
+                {vol.description && (
+                  <p className="text-neutral-700 leading-relaxed">
+                    {vol.description}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ১১. PUBLICATIONS & RESEARCH */}
+      {visibility.publications && data.publications.length > 0 && (
+        <section className="mb-6">
+          <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-neutral-900 border-b border-neutral-200 pb-1 mb-2.5">
+            Publications &amp; Research
+          </h2>
+          <div className="space-y-2 text-xs font-sans">
+            {data.publications.map((pub) => (
+              <div
+                key={pub.id}
+                className="flex items-baseline justify-between gap-2"
+              >
+                <div>
+                  <strong className="text-neutral-950">{pub.title}</strong>
+                  {pub.publisher && (
+                    <span className="text-neutral-700"> — {pub.publisher}</span>
+                  )}
+                  {pub.url && (
+                    <span className="block text-[11px] font-mono text-neutral-500">
+                      {pub.url.replace(/^https?:\/\//, "")}
+                    </span>
+                  )}
+                </div>
+                {pub.year && (
+                  <span className="text-[11px] font-mono text-neutral-500 shrink-0">
+                    {pub.year}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ১২. CUSTOM SECTION */}
+      {visibility.customSection && data.customSectionContent.trim() && (
+        <section className="mb-6">
+          <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-neutral-900 border-b border-neutral-200 pb-1 mb-2">
+            {data.customSectionTitle || "Additional Information"}
+          </h2>
+          <p className="text-xs font-sans text-neutral-800 leading-relaxed whitespace-pre-line">
+            {data.customSectionContent}
+          </p>
+        </section>
+      )}
+
+      {/* ১৩. REFERENCES */}
+      {visibility.references && data.references.length > 0 && (
+        <section className="mb-6">
+          <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-neutral-900 border-b border-neutral-200 pb-1 mb-2.5">
+            References
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-sans">
+            {data.references.map((ref) => (
+              <div key={ref.id} className="space-y-0.5">
+                <p className="font-bold text-neutral-950">{ref.name}</p>
+                {ref.designation && (
+                  <p className="text-neutral-700">{ref.designation}</p>
+                )}
+                {ref.contact && (
+                  <p className="text-[11px] font-mono text-neutral-600">
+                    {ref.contact}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ১৪. PERSONAL DETAILS */}
+      {visibility.personalDetails && hasPersonalDetails && (
+        <section className="mb-6">
+          <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-neutral-900 border-b border-neutral-200 pb-1 mb-2.5">
+            Personal Details
+          </h2>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs font-sans">
+            {data.personalDetails.dob && (
+              <p>
+                <span className="text-neutral-500">Date of Birth:</span>{" "}
+                <strong className="text-neutral-900">
+                  {data.personalDetails.dob}
+                </strong>
+              </p>
+            )}
+            {data.personalDetails.gender && (
+              <p>
+                <span className="text-neutral-500">Gender:</span>{" "}
+                <strong className="text-neutral-900">
+                  {data.personalDetails.gender}
+                </strong>
+              </p>
+            )}
+            {data.personalDetails.nationality && (
+              <p>
+                <span className="text-neutral-500">Nationality:</span>{" "}
+                <strong className="text-neutral-900">
+                  {data.personalDetails.nationality}
+                </strong>
+              </p>
+            )}
+            {data.personalDetails.noticePeriod && (
+              <p>
+                <span className="text-neutral-500">Notice Period:</span>{" "}
+                <strong className="text-neutral-900">
+                  {data.personalDetails.noticePeriod}
+                </strong>
+              </p>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ১৫. DECLARATION */}
+      {visibility.declaration && data.declarationText.trim() && (
+        <section className="pt-3 border-t border-neutral-200 mt-6">
+          <h2 className="text-[11px] font-mono font-bold uppercase tracking-widest text-neutral-900 mb-1.5">
+            Declaration
+          </h2>
+          <p className="text-xs font-sans text-neutral-700 leading-relaxed mb-5">
+            {data.declarationText}
+          </p>
+          <div className="flex items-end justify-between text-xs font-mono text-neutral-800 pt-2">
+            <span>Place: {data.location || "India"}</span>
+            <span className="border-t border-neutral-400 pt-1 px-3">
+              {data.fullName || "Signature"}
+            </span>
           </div>
         </section>
       )}

@@ -128,9 +128,9 @@ function PublicIdentityContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-neutral-50 flex flex-col items-center justify-center gap-3">
+      <div className="min-h-[calc(100vh-64px)] bg-neutral-50 flex flex-col items-center justify-center gap-3 px-4">
         <Loader2 className="h-7 w-7 animate-spin text-neutral-900" />
-        <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">
+        <p className="text-xs font-mono uppercase tracking-widest text-neutral-500 text-center">
           Verifying SutraNet Identity...
         </p>
       </div>
@@ -139,15 +139,15 @@ function PublicIdentityContent() {
 
   if (!entityType || (!individualData && !companyData)) {
     return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white border border-neutral-300 p-8 text-center rounded-sm shadow-sm space-y-4">
+      <div className="min-h-[calc(100vh-64px)] bg-neutral-50 flex items-center justify-center p-3 sm:p-4">
+        <div className="max-w-md w-full bg-white border border-neutral-300 p-6 sm:p-8 text-center rounded-sm shadow-sm space-y-4">
           <div className="h-12 w-12 bg-neutral-100 border border-neutral-200 rounded-full flex items-center justify-center mx-auto">
             <ShieldAlert className="h-6 w-6 text-neutral-700" />
           </div>
-          <h1 className="text-lg font-serif font-bold text-neutral-950">
+          <h1 className="text-base sm:text-lg font-serif font-bold text-neutral-950">
             Identity Not Found
           </h1>
-          <p className="text-xs text-neutral-600 leading-relaxed">
+          <p className="text-xs text-neutral-600 leading-relaxed wrap-break-word">
             No verified SutraNet record matches ID{" "}
             <span className="font-mono font-bold text-neutral-900">
               {kagazId}
@@ -156,7 +156,7 @@ function PublicIdentityContent() {
           </p>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-900 text-white text-xs font-mono uppercase rounded-xs hover:bg-neutral-800 transition-colors"
+            className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2 bg-neutral-900 text-white text-xs font-mono uppercase rounded-xs hover:bg-neutral-800 transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>Back to SutraNet</span>
@@ -167,10 +167,10 @@ function PublicIdentityContent() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-100 text-neutral-900">
-      <main className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-[10px] font-mono uppercase tracking-widest text-neutral-600 bg-white px-3 py-1.5 rounded-xs border border-neutral-300 shadow-2xs">
+    <div className="min-h-[calc(100vh-64px)] bg-neutral-100 text-neutral-900 flex flex-col justify-between overflow-x-hidden">
+      <main className="max-w-4xl w-full mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <span className="text-[9.5px] sm:text-[10px] font-mono uppercase tracking-widest text-neutral-600 bg-white px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xs border border-neutral-300 shadow-2xs">
             ● Official Verified Public Record
           </span>
         </div>
@@ -182,7 +182,11 @@ function PublicIdentityContent() {
         ) : null}
       </main>
 
-      <footer className="border-t border-neutral-200 bg-white py-5 mt-12 text-center">
+      <footer
+        className={`border-t border-neutral-200 bg-white py-5 mt-8 sm:mt-12 text-center px-4 ${
+          isOwner ? "pb-20 sm:pb-5" : ""
+        }`}
+      >
         <p className="text-[11px] font-mono text-neutral-500">
           Verified Digital Identity Powered by{" "}
           <span className="font-bold text-neutral-900">SutraNet</span>
@@ -194,10 +198,11 @@ function PublicIdentityContent() {
         <button
           type="button"
           onClick={() => setIsPrivacyOpen(true)}
-          className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 px-4 py-3 bg-neutral-950 text-white text-xs font-mono uppercase tracking-wider rounded-full border border-neutral-700 shadow-2xl hover:bg-neutral-800 active:scale-95 transition-all cursor-pointer"
+          className="fixed bottom-3.5 right-3.5 sm:bottom-6 sm:right-6 z-40 inline-flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 bg-neutral-950 text-white text-[10px] sm:text-xs font-mono uppercase tracking-wider rounded-full border border-neutral-700 shadow-xl hover:bg-neutral-800 active:scale-95 transition-all cursor-pointer"
         >
-          <SlidersHorizontal className="h-4 w-4 text-emerald-400" />
-          <span>Customize Visibility</span>
+          <SlidersHorizontal className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-emerald-400 shrink-0" />
+          <span className="sm:hidden">Visibility</span>
+          <span className="hidden sm:inline">Customize Visibility</span>
         </button>
       )}
 
@@ -224,9 +229,9 @@ export default function PublicIdentityPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-neutral-50 flex flex-col items-center justify-center gap-3">
+        <div className="min-h-[calc(100vh-64px)] bg-neutral-50 flex flex-col items-center justify-center gap-3 px-4">
           <Loader2 className="h-7 w-7 animate-spin text-neutral-900" />
-          <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">
+          <p className="text-xs font-mono uppercase tracking-widest text-neutral-500 text-center">
             Loading Identity...
           </p>
         </div>
