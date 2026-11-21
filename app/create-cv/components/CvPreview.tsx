@@ -34,7 +34,7 @@ export default function CvPreview({ data, template }: Props) {
   return (
     <div
       id="cv-printable-area"
-      className={`bg-white text-neutral-900 w-[680px] aspect-[210/297] mx-auto shadow-lg border border-neutral-300 p-8 sm:p-10 print:w-full print:max-w-none print:aspect-auto print:shadow-none print:border-none print:p-0 ${fontClass}`}
+      className={`bg-white text-neutral-900 w-full min-h-[297mm] shadow-lg border border-neutral-300 p-6 sm:p-10 lg:p-12 print:w-full print:max-w-none print:min-h-0 print:shadow-none print:border-none print:p-0 ${fontClass}`}
     >
       {/* ১. HEADER SECTION */}
       <header

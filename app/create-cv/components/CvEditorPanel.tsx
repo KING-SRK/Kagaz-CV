@@ -2,7 +2,15 @@
 "use client";
 
 import { useState, Dispatch, SetStateAction } from "react";
-import { Eye, EyeOff, Plus, Trash2 } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Plus,
+  Trash2,
+  ChevronDown,
+  ChevronUp,
+  SlidersHorizontal,
+} from "lucide-react";
 import { CvData, CvSectionVisibility } from "../types";
 
 interface Props {
@@ -14,6 +22,7 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
   const [skillInput, setSkillInput] = useState("");
   const [langInput, setLangInput] = useState("");
   const [hobbyInput, setHobbyInput] = useState("");
+  const [showOptional, setShowOptional] = useState(false);
 
   const toggleVisibility = (key: keyof CvSectionVisibility) => {
     setCvData((prev) => ({
@@ -35,6 +44,20 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
     setCvData((prev) => ({ ...prev, [field]: [...prev[field], trimmed] }));
     clearFn("");
   };
+
+  // কয়টি অপশনাল সেকশন বর্তমানে অন আছে তা গোনা
+  const activeOptionalCount = [
+    cvData.visibility.languages,
+    cvData.visibility.objective,
+    cvData.visibility.achievements,
+    cvData.visibility.volunteer,
+    cvData.visibility.publications,
+    cvData.visibility.hobbies,
+    cvData.visibility.references,
+    cvData.visibility.personalDetails,
+    cvData.visibility.customSection,
+    cvData.visibility.declaration,
+  ].filter(Boolean).length;
 
   return (
     <div className="space-y-3.5 sm:space-y-4 w-full">
@@ -410,8 +433,8 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
         )}
       </div>
 
-      {/* ৬. SKILLS & LANGUAGES */}
-      <div className="bg-white border border-neutral-300 p-3.5 sm:p-4 rounded-xs space-y-4">
+      {/* ৬. CORE SKILLS */}
+      <div className="bg-white border border-neutral-300 p-3.5 sm:p-4 rounded-xs">
         <TagManager
           title="6. Core Skills"
           placeholder="Add skill & press Enter"
@@ -428,32 +451,13 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
             })
           }
         />
-
-        <div className="pt-2 border-t border-neutral-200">
-          <TagManager
-            title="7. Languages"
-            placeholder="Add language (e.g. Bengali, English)"
-            isOn={cvData.visibility.languages}
-            onToggle={() => toggleVisibility("languages")}
-            items={cvData.languages}
-            inputVal={langInput}
-            setInputVal={setLangInput}
-            onAdd={() => addTag("languages", langInput, setLangInput)}
-            onRemove={(item) =>
-              setCvData({
-                ...cvData,
-                languages: cvData.languages.filter((l) => l !== item),
-              })
-            }
-          />
-        </div>
       </div>
 
-      {/* ৭. SOCIAL LINKS & CERTIFICATIONS */}
+      {/* ৭. CERTIFICATIONS & PORTFOLIO LINKS */}
       <div className="bg-white border border-neutral-300 p-3.5 sm:p-4 rounded-xs space-y-4">
         <div className="space-y-2.5">
           <SectionToggle
-            title="8. Social & Portfolio Links"
+            title="7. Social & Portfolio Links"
             isOn={cvData.visibility.socialLinks}
             onToggle={() => toggleVisibility("socialLinks")}
           />
@@ -522,7 +526,7 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
 
         <div className="space-y-2.5 pt-2 border-t border-neutral-200">
           <SectionToggle
-            title="9. Certifications"
+            title="8. Certifications"
             isOn={cvData.visibility.certifications}
             onToggle={() => toggleVisibility("certifications")}
           />
@@ -595,506 +599,549 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
         </div>
       </div>
 
-      {/* OPTIONAL & SPECIALIZED SECTIONS HEADER */}
-      <div className="pt-2">
-        <p className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-neutral-500 px-1 mb-2">
-          Optional &amp; Specialized Sections (Toggle ON to include)
-        </p>
+      {/* কলাপসিবল OPTIONAL SECTIONS DRAWER */}
+      <div className="pt-1">
+        <button
+          type="button"
+          onClick={() => setShowOptional((prev) => !prev)}
+          className="w-full flex items-center justify-between px-4 py-3 bg-white border border-neutral-300 hover:border-neutral-900 rounded-xs transition-colors cursor-pointer"
+        >
+          <span className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-neutral-900">
+            <SlidersHorizontal className="h-3.5 w-3.5 text-neutral-600 shrink-0" />
+            <span>
+              {showOptional
+                ? "Hide Optional Sections"
+                : "More Optional Sections"}
+            </span>
+            {activeOptionalCount > 0 && (
+              <span className="px-2 py-0.5 bg-emerald-50 border border-emerald-300 text-emerald-800 text-[10px] rounded-full">
+                {activeOptionalCount} Active
+              </span>
+            )}
+          </span>
+          {showOptional ? (
+            <ChevronUp className="h-4 w-4 text-neutral-600 shrink-0" />
+          ) : (
+            <ChevronDown className="h-4 w-4 text-neutral-600 shrink-0" />
+          )}
+        </button>
 
-        <div className="space-y-3">
-          {/* ১০. CAREER OBJECTIVE */}
-          <div className="bg-white border border-neutral-300 p-3.5 rounded-xs space-y-2">
-            <SectionToggle
-              title="10. Career Objective"
-              isOn={cvData.visibility.objective}
-              onToggle={() => toggleVisibility("objective")}
-            />
-            {cvData.visibility.objective && (
-              <textarea
-                rows={2}
-                placeholder="Seeking a role as..."
-                value={cvData.objective}
-                onChange={(e) =>
-                  setCvData({ ...cvData, objective: e.target.value })
+        {showOptional && (
+          <div className="space-y-3 mt-3 animate-in fade-in slide-in-from-top-1 duration-150">
+            {/* LANGUAGES */}
+            <div className="bg-white border border-neutral-300 p-3.5 rounded-xs">
+              <TagManager
+                title="Languages"
+                placeholder="Add language (e.g. Bengali, English)"
+                isOn={cvData.visibility.languages}
+                onToggle={() => toggleVisibility("languages")}
+                items={cvData.languages}
+                inputVal={langInput}
+                setInputVal={setLangInput}
+                onAdd={() => addTag("languages", langInput, setLangInput)}
+                onRemove={(item) =>
+                  setCvData({
+                    ...cvData,
+                    languages: cvData.languages.filter((l) => l !== item),
+                  })
                 }
-                className="w-full border border-neutral-300 p-2 text-xs rounded-xs"
               />
-            )}
-          </div>
-
-          {/* ১১. ACHIEVEMENTS */}
-          <div className="bg-white border border-neutral-300 p-3.5 rounded-xs space-y-2">
-            <SectionToggle
-              title="11. Achievements & Awards"
-              isOn={cvData.visibility.achievements}
-              onToggle={() => toggleVisibility("achievements")}
-            />
-            {cvData.visibility.achievements && (
-              <div className="space-y-2.5">
-                {cvData.achievements.map((ach, idx) => (
-                  <div
-                    key={ach.id}
-                    className="p-2.5 sm:p-0 bg-neutral-50 sm:bg-transparent border sm:border-0 border-neutral-200 rounded-xs flex flex-col sm:flex-row gap-2 sm:items-center"
-                  >
-                    <input
-                      type="text"
-                      placeholder="Award Title"
-                      value={ach.title}
-                      onChange={(e) => {
-                        const updated = [...cvData.achievements];
-                        updated[idx].title = e.target.value;
-                        setCvData({ ...cvData, achievements: updated });
-                      }}
-                      className="w-full sm:flex-1 min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
-                    />
-                    <div className="flex gap-2 items-center w-full sm:w-2/5 min-w-0">
-                      <input
-                        type="text"
-                        placeholder="Issuer / Year"
-                        value={ach.issuer}
-                        onChange={(e) => {
-                          const updated = [...cvData.achievements];
-                          updated[idx].issuer = e.target.value;
-                          setCvData({ ...cvData, achievements: updated });
-                        }}
-                        className="flex-1 min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setCvData({
-                            ...cvData,
-                            achievements: cvData.achievements.filter(
-                              (_, i) => i !== idx,
-                            ),
-                          })
-                        }
-                        className="p-1 text-neutral-400 hover:text-red-600 cursor-pointer shrink-0"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                <AddBtn
-                  label="Add Achievement"
-                  onClick={() =>
-                    setCvData({
-                      ...cvData,
-                      achievements: [
-                        ...cvData.achievements,
-                        {
-                          id: `ach-${Date.now()}`,
-                          title: "",
-                          issuer: "",
-                          date: "",
-                        },
-                      ],
-                    })
-                  }
-                />
-              </div>
-            )}
-          </div>
-
-          {/* ১২. VOLUNTEER & LEADERSHIP */}
-          <div className="bg-white border border-neutral-300 p-3.5 rounded-xs space-y-2">
-            <SectionToggle
-              title="12. Volunteer & Leadership"
-              isOn={cvData.visibility.volunteer}
-              onToggle={() => toggleVisibility("volunteer")}
-            />
-            {cvData.visibility.volunteer && (
-              <div className="space-y-2">
-                {cvData.volunteer.map((vol, idx) => (
-                  <div
-                    key={vol.id}
-                    className="p-2.5 bg-neutral-50 border border-neutral-200 rounded-xs space-y-2 relative"
-                  >
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setCvData({
-                          ...cvData,
-                          volunteer: cvData.volunteer.filter(
-                            (_, i) => i !== idx,
-                          ),
-                        })
-                      }
-                      className="absolute top-2 right-2 p-1 text-neutral-400 hover:text-red-600 cursor-pointer"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pr-6">
-                      <input
-                        type="text"
-                        placeholder="Role (e.g. Coordinator)"
-                        value={vol.role}
-                        onChange={(e) => {
-                          const updated = [...cvData.volunteer];
-                          updated[idx].role = e.target.value;
-                          setCvData({ ...cvData, volunteer: updated });
-                        }}
-                        className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Organization / Event"
-                        value={vol.organization}
-                        onChange={(e) => {
-                          const updated = [...cvData.volunteer];
-                          updated[idx].organization = e.target.value;
-                          setCvData({ ...cvData, volunteer: updated });
-                        }}
-                        className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Short description..."
-                      value={vol.description}
-                      onChange={(e) => {
-                        const updated = [...cvData.volunteer];
-                        updated[idx].description = e.target.value;
-                        setCvData({ ...cvData, volunteer: updated });
-                      }}
-                      className="w-full border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
-                    />
-                  </div>
-                ))}
-                <AddBtn
-                  label="Add Volunteer Role"
-                  onClick={() =>
-                    setCvData({
-                      ...cvData,
-                      volunteer: [
-                        ...cvData.volunteer,
-                        {
-                          id: `vol-${Date.now()}`,
-                          role: "",
-                          organization: "",
-                          duration: "",
-                          description: "",
-                        },
-                      ],
-                    })
-                  }
-                />
-              </div>
-            )}
-          </div>
-
-          {/* ১৩. PUBLICATIONS & RESEARCH */}
-          <div className="bg-white border border-neutral-300 p-3.5 rounded-xs space-y-2">
-            <SectionToggle
-              title="13. Publications & Research"
-              isOn={cvData.visibility.publications}
-              onToggle={() => toggleVisibility("publications")}
-            />
-            {cvData.visibility.publications && (
-              <div className="space-y-2.5">
-                {cvData.publications.map((pub, idx) => (
-                  <div
-                    key={pub.id}
-                    className="p-2.5 sm:p-0 bg-neutral-50 sm:bg-transparent border sm:border-0 border-neutral-200 rounded-xs flex flex-col sm:flex-row gap-2 sm:items-center"
-                  >
-                    <input
-                      type="text"
-                      placeholder="Paper / Article Title"
-                      value={pub.title}
-                      onChange={(e) => {
-                        const updated = [...cvData.publications];
-                        updated[idx].title = e.target.value;
-                        setCvData({ ...cvData, publications: updated });
-                      }}
-                      className="w-full sm:flex-1 min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
-                    />
-                    <div className="flex gap-2 items-center w-full sm:w-2/5 min-w-0">
-                      <input
-                        type="text"
-                        placeholder="Journal / Year"
-                        value={pub.publisher}
-                        onChange={(e) => {
-                          const updated = [...cvData.publications];
-                          updated[idx].publisher = e.target.value;
-                          setCvData({ ...cvData, publications: updated });
-                        }}
-                        className="flex-1 min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setCvData({
-                            ...cvData,
-                            publications: cvData.publications.filter(
-                              (_, i) => i !== idx,
-                            ),
-                          })
-                        }
-                        className="p-1 text-neutral-400 hover:text-red-600 cursor-pointer shrink-0"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                <AddBtn
-                  label="Add Publication"
-                  onClick={() =>
-                    setCvData({
-                      ...cvData,
-                      publications: [
-                        ...cvData.publications,
-                        {
-                          id: `pub-${Date.now()}`,
-                          title: "",
-                          publisher: "",
-                          year: "",
-                        },
-                      ],
-                    })
-                  }
-                />
-              </div>
-            )}
-          </div>
-
-          {/* ১৪. HOBBIES & ACTIVITIES */}
-          <div className="bg-white border border-neutral-300 p-3.5 rounded-xs">
-            <TagManager
-              title="14. Hobbies & Activities"
-              placeholder="Add hobby (e.g. Chess, Video Editing)"
-              isOn={cvData.visibility.hobbies}
-              onToggle={() => toggleVisibility("hobbies")}
-              items={cvData.hobbies}
-              inputVal={hobbyInput}
-              setInputVal={setHobbyInput}
-              onAdd={() => addTag("hobbies", hobbyInput, setHobbyInput)}
-              onRemove={(item) =>
-                setCvData({
-                  ...cvData,
-                  hobbies: cvData.hobbies.filter((h) => h !== item),
-                })
-              }
-            />
-          </div>
-
-          {/* ১৫. REFERENCES */}
-          <div className="bg-white border border-neutral-300 p-3.5 rounded-xs space-y-2">
-            <SectionToggle
-              title="15. References"
-              isOn={cvData.visibility.references}
-              onToggle={() => toggleVisibility("references")}
-            />
-            {cvData.visibility.references && (
-              <div className="space-y-2.5">
-                {cvData.references.map((ref, idx) => (
-                  <div
-                    key={ref.id}
-                    className="p-2.5 sm:p-0 bg-neutral-50 sm:bg-transparent border sm:border-0 border-neutral-200 rounded-xs grid grid-cols-1 sm:grid-cols-3 gap-2"
-                  >
-                    <input
-                      type="text"
-                      placeholder="Name"
-                      value={ref.name}
-                      onChange={(e) => {
-                        const updated = [...cvData.references];
-                        updated[idx].name = e.target.value;
-                        setCvData({ ...cvData, references: updated });
-                      }}
-                      className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Role / Org"
-                      value={ref.designation}
-                      onChange={(e) => {
-                        const updated = [...cvData.references];
-                        updated[idx].designation = e.target.value;
-                        setCvData({ ...cvData, references: updated });
-                      }}
-                      className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
-                    />
-                    <div className="flex gap-2 items-center min-w-0">
-                      <input
-                        type="text"
-                        placeholder="Phone/Email"
-                        value={ref.contact}
-                        onChange={(e) => {
-                          const updated = [...cvData.references];
-                          updated[idx].contact = e.target.value;
-                          setCvData({ ...cvData, references: updated });
-                        }}
-                        className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setCvData({
-                            ...cvData,
-                            references: cvData.references.filter(
-                              (_, i) => i !== idx,
-                            ),
-                          })
-                        }
-                        className="p-1 text-neutral-400 hover:text-red-600 cursor-pointer shrink-0"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                <AddBtn
-                  label="Add Reference"
-                  onClick={() =>
-                    setCvData({
-                      ...cvData,
-                      references: [
-                        ...cvData.references,
-                        {
-                          id: `ref-${Date.now()}`,
-                          name: "",
-                          designation: "",
-                          contact: "",
-                        },
-                      ],
-                    })
-                  }
-                />
-              </div>
-            )}
-          </div>
-
-          {/* ১৬. PERSONAL DETAILS */}
-          <div className="bg-white border border-neutral-300 p-3.5 rounded-xs space-y-2">
-            <SectionToggle
-              title="16. Personal Details"
-              isOn={cvData.visibility.personalDetails}
-              onToggle={() => toggleVisibility("personalDetails")}
-            />
-            {cvData.visibility.personalDetails && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <input
-                  type="text"
-                  placeholder="Date of Birth"
-                  value={cvData.personalDetails.dob}
-                  onChange={(e) =>
-                    setCvData({
-                      ...cvData,
-                      personalDetails: {
-                        ...cvData.personalDetails,
-                        dob: e.target.value,
-                      },
-                    })
-                  }
-                  className="w-full min-w-0 border border-neutral-300 px-2.5 py-1.5 text-xs rounded-xs"
-                />
-                <input
-                  type="text"
-                  placeholder="Gender"
-                  value={cvData.personalDetails.gender}
-                  onChange={(e) =>
-                    setCvData({
-                      ...cvData,
-                      personalDetails: {
-                        ...cvData.personalDetails,
-                        gender: e.target.value,
-                      },
-                    })
-                  }
-                  className="w-full min-w-0 border border-neutral-300 px-2.5 py-1.5 text-xs rounded-xs"
-                />
-                <input
-                  type="text"
-                  placeholder="Nationality"
-                  value={cvData.personalDetails.nationality}
-                  onChange={(e) =>
-                    setCvData({
-                      ...cvData,
-                      personalDetails: {
-                        ...cvData.personalDetails,
-                        nationality: e.target.value,
-                      },
-                    })
-                  }
-                  className="w-full min-w-0 border border-neutral-300 px-2.5 py-1.5 text-xs rounded-xs"
-                />
-                <input
-                  type="text"
-                  placeholder="Notice Period"
-                  value={cvData.personalDetails.noticePeriod}
-                  onChange={(e) =>
-                    setCvData({
-                      ...cvData,
-                      personalDetails: {
-                        ...cvData.personalDetails,
-                        noticePeriod: e.target.value,
-                      },
-                    })
-                  }
-                  className="w-full min-w-0 border border-neutral-300 px-2.5 py-1.5 text-xs rounded-xs"
-                />
-              </div>
-            )}
-          </div>
-
-          {/* ১৭. CUSTOM SECTION & DECLARATION */}
-          <div className="bg-white border border-neutral-300 p-3.5 rounded-xs space-y-3">
-            <div className="space-y-2">
-              <SectionToggle
-                title="17. Custom Section"
-                isOn={cvData.visibility.customSection}
-                onToggle={() => toggleVisibility("customSection")}
-              />
-              {cvData.visibility.customSection && (
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    placeholder="Section Heading"
-                    value={cvData.customSectionTitle}
-                    onChange={(e) =>
-                      setCvData({
-                        ...cvData,
-                        customSectionTitle: e.target.value,
-                      })
-                    }
-                    className="w-full min-w-0 border border-neutral-300 px-2.5 py-1.5 text-xs rounded-xs"
-                  />
-                  <textarea
-                    rows={2}
-                    placeholder="Details..."
-                    value={cvData.customSectionContent}
-                    onChange={(e) =>
-                      setCvData({
-                        ...cvData,
-                        customSectionContent: e.target.value,
-                      })
-                    }
-                    className="w-full border border-neutral-300 p-2 text-xs rounded-xs"
-                  />
-                </div>
-              )}
             </div>
 
-            <div className="space-y-2 pt-2 border-t border-neutral-200">
+            {/* CAREER OBJECTIVE */}
+            <div className="bg-white border border-neutral-300 p-3.5 rounded-xs space-y-2">
               <SectionToggle
-                title="18. Declaration & Signature"
-                isOn={cvData.visibility.declaration}
-                onToggle={() => toggleVisibility("declaration")}
+                title="Career Objective"
+                isOn={cvData.visibility.objective}
+                onToggle={() => toggleVisibility("objective")}
               />
-              {cvData.visibility.declaration && (
+              {cvData.visibility.objective && (
                 <textarea
                   rows={2}
-                  value={cvData.declarationText}
+                  placeholder="Seeking a role as..."
+                  value={cvData.objective}
                   onChange={(e) =>
-                    setCvData({ ...cvData, declarationText: e.target.value })
+                    setCvData({ ...cvData, objective: e.target.value })
                   }
                   className="w-full border border-neutral-300 p-2 text-xs rounded-xs"
                 />
               )}
             </div>
+
+            {/* ACHIEVEMENTS */}
+            <div className="bg-white border border-neutral-300 p-3.5 rounded-xs space-y-2">
+              <SectionToggle
+                title="Achievements & Awards"
+                isOn={cvData.visibility.achievements}
+                onToggle={() => toggleVisibility("achievements")}
+              />
+              {cvData.visibility.achievements && (
+                <div className="space-y-2.5">
+                  {cvData.achievements.map((ach, idx) => (
+                    <div
+                      key={ach.id}
+                      className="p-2.5 sm:p-0 bg-neutral-50 sm:bg-transparent border sm:border-0 border-neutral-200 rounded-xs flex flex-col sm:flex-row gap-2 sm:items-center"
+                    >
+                      <input
+                        type="text"
+                        placeholder="Award Title"
+                        value={ach.title}
+                        onChange={(e) => {
+                          const updated = [...cvData.achievements];
+                          updated[idx].title = e.target.value;
+                          setCvData({ ...cvData, achievements: updated });
+                        }}
+                        className="w-full sm:flex-1 min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
+                      />
+                      <div className="flex gap-2 items-center w-full sm:w-2/5 min-w-0">
+                        <input
+                          type="text"
+                          placeholder="Issuer / Year"
+                          value={ach.issuer}
+                          onChange={(e) => {
+                            const updated = [...cvData.achievements];
+                            updated[idx].issuer = e.target.value;
+                            setCvData({ ...cvData, achievements: updated });
+                          }}
+                          className="flex-1 min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCvData({
+                              ...cvData,
+                              achievements: cvData.achievements.filter(
+                                (_, i) => i !== idx,
+                              ),
+                            })
+                          }
+                          className="p-1 text-neutral-400 hover:text-red-600 cursor-pointer shrink-0"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  <AddBtn
+                    label="Add Achievement"
+                    onClick={() =>
+                      setCvData({
+                        ...cvData,
+                        achievements: [
+                          ...cvData.achievements,
+                          {
+                            id: `ach-${Date.now()}`,
+                            title: "",
+                            issuer: "",
+                            date: "",
+                          },
+                        ],
+                      })
+                    }
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* VOLUNTEER & LEADERSHIP */}
+            <div className="bg-white border border-neutral-300 p-3.5 rounded-xs space-y-2">
+              <SectionToggle
+                title="Volunteer & Leadership"
+                isOn={cvData.visibility.volunteer}
+                onToggle={() => toggleVisibility("volunteer")}
+              />
+              {cvData.visibility.volunteer && (
+                <div className="space-y-2">
+                  {cvData.volunteer.map((vol, idx) => (
+                    <div
+                      key={vol.id}
+                      className="p-2.5 bg-neutral-50 border border-neutral-200 rounded-xs space-y-2 relative"
+                    >
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCvData({
+                            ...cvData,
+                            volunteer: cvData.volunteer.filter(
+                              (_, i) => i !== idx,
+                            ),
+                          })
+                        }
+                        className="absolute top-2 right-2 p-1 text-neutral-400 hover:text-red-600 cursor-pointer"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pr-6">
+                        <input
+                          type="text"
+                          placeholder="Role (e.g. Coordinator)"
+                          value={vol.role}
+                          onChange={(e) => {
+                            const updated = [...cvData.volunteer];
+                            updated[idx].role = e.target.value;
+                            setCvData({ ...cvData, volunteer: updated });
+                          }}
+                          className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Organization / Event"
+                          value={vol.organization}
+                          onChange={(e) => {
+                            const updated = [...cvData.volunteer];
+                            updated[idx].organization = e.target.value;
+                            setCvData({ ...cvData, volunteer: updated });
+                          }}
+                          className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Short description..."
+                        value={vol.description}
+                        onChange={(e) => {
+                          const updated = [...cvData.volunteer];
+                          updated[idx].description = e.target.value;
+                          setCvData({ ...cvData, volunteer: updated });
+                        }}
+                        className="w-full border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
+                      />
+                    </div>
+                  ))}
+                  <AddBtn
+                    label="Add Volunteer Role"
+                    onClick={() =>
+                      setCvData({
+                        ...cvData,
+                        volunteer: [
+                          ...cvData.volunteer,
+                          {
+                            id: `vol-${Date.now()}`,
+                            role: "",
+                            organization: "",
+                            duration: "",
+                            description: "",
+                          },
+                        ],
+                      })
+                    }
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* PUBLICATIONS & RESEARCH */}
+            <div className="bg-white border border-neutral-300 p-3.5 rounded-xs space-y-2">
+              <SectionToggle
+                title="Publications & Research"
+                isOn={cvData.visibility.publications}
+                onToggle={() => toggleVisibility("publications")}
+              />
+              {cvData.visibility.publications && (
+                <div className="space-y-2.5">
+                  {cvData.publications.map((pub, idx) => (
+                    <div
+                      key={pub.id}
+                      className="p-2.5 sm:p-0 bg-neutral-50 sm:bg-transparent border sm:border-0 border-neutral-200 rounded-xs flex flex-col sm:flex-row gap-2 sm:items-center"
+                    >
+                      <input
+                        type="text"
+                        placeholder="Paper / Article Title"
+                        value={pub.title}
+                        onChange={(e) => {
+                          const updated = [...cvData.publications];
+                          updated[idx].title = e.target.value;
+                          setCvData({ ...cvData, publications: updated });
+                        }}
+                        className="w-full sm:flex-1 min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
+                      />
+                      <div className="flex gap-2 items-center w-full sm:w-2/5 min-w-0">
+                        <input
+                          type="text"
+                          placeholder="Journal / Year"
+                          value={pub.publisher}
+                          onChange={(e) => {
+                            const updated = [...cvData.publications];
+                            updated[idx].publisher = e.target.value;
+                            setCvData({ ...cvData, publications: updated });
+                          }}
+                          className="flex-1 min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCvData({
+                              ...cvData,
+                              publications: cvData.publications.filter(
+                                (_, i) => i !== idx,
+                              ),
+                            })
+                          }
+                          className="p-1 text-neutral-400 hover:text-red-600 cursor-pointer shrink-0"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  <AddBtn
+                    label="Add Publication"
+                    onClick={() =>
+                      setCvData({
+                        ...cvData,
+                        publications: [
+                          ...cvData.publications,
+                          {
+                            id: `pub-${Date.now()}`,
+                            title: "",
+                            publisher: "",
+                            year: "",
+                          },
+                        ],
+                      })
+                    }
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* HOBBIES & ACTIVITIES */}
+            <div className="bg-white border border-neutral-300 p-3.5 rounded-xs">
+              <TagManager
+                title="Hobbies & Activities"
+                placeholder="Add hobby (e.g. Chess, Video Editing)"
+                isOn={cvData.visibility.hobbies}
+                onToggle={() => toggleVisibility("hobbies")}
+                items={cvData.hobbies}
+                inputVal={hobbyInput}
+                setInputVal={setHobbyInput}
+                onAdd={() => addTag("hobbies", hobbyInput, setHobbyInput)}
+                onRemove={(item) =>
+                  setCvData({
+                    ...cvData,
+                    hobbies: cvData.hobbies.filter((h) => h !== item),
+                  })
+                }
+              />
+            </div>
+
+            {/* REFERENCES */}
+            <div className="bg-white border border-neutral-300 p-3.5 rounded-xs space-y-2">
+              <SectionToggle
+                title="References"
+                isOn={cvData.visibility.references}
+                onToggle={() => toggleVisibility("references")}
+              />
+              {cvData.visibility.references && (
+                <div className="space-y-2.5">
+                  {cvData.references.map((ref, idx) => (
+                    <div
+                      key={ref.id}
+                      className="p-2.5 sm:p-0 bg-neutral-50 sm:bg-transparent border sm:border-0 border-neutral-200 rounded-xs grid grid-cols-1 sm:grid-cols-3 gap-2"
+                    >
+                      <input
+                        type="text"
+                        placeholder="Name"
+                        value={ref.name}
+                        onChange={(e) => {
+                          const updated = [...cvData.references];
+                          updated[idx].name = e.target.value;
+                          setCvData({ ...cvData, references: updated });
+                        }}
+                        className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Role / Org"
+                        value={ref.designation}
+                        onChange={(e) => {
+                          const updated = [...cvData.references];
+                          updated[idx].designation = e.target.value;
+                          setCvData({ ...cvData, references: updated });
+                        }}
+                        className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
+                      />
+                      <div className="flex gap-2 items-center min-w-0">
+                        <input
+                          type="text"
+                          placeholder="Phone/Email"
+                          value={ref.contact}
+                          onChange={(e) => {
+                            const updated = [...cvData.references];
+                            updated[idx].contact = e.target.value;
+                            setCvData({ ...cvData, references: updated });
+                          }}
+                          className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCvData({
+                              ...cvData,
+                              references: cvData.references.filter(
+                                (_, i) => i !== idx,
+                              ),
+                            })
+                          }
+                          className="p-1 text-neutral-400 hover:text-red-600 cursor-pointer shrink-0"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  <AddBtn
+                    label="Add Reference"
+                    onClick={() =>
+                      setCvData({
+                        ...cvData,
+                        references: [
+                          ...cvData.references,
+                          {
+                            id: `ref-${Date.now()}`,
+                            name: "",
+                            designation: "",
+                            contact: "",
+                          },
+                        ],
+                      })
+                    }
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* PERSONAL DETAILS */}
+            <div className="bg-white border border-neutral-300 p-3.5 rounded-xs space-y-2">
+              <SectionToggle
+                title="Personal Details"
+                isOn={cvData.visibility.personalDetails}
+                onToggle={() => toggleVisibility("personalDetails")}
+              />
+              {cvData.visibility.personalDetails && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    placeholder="Date of Birth"
+                    value={cvData.personalDetails.dob}
+                    onChange={(e) =>
+                      setCvData({
+                        ...cvData,
+                        personalDetails: {
+                          ...cvData.personalDetails,
+                          dob: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-full min-w-0 border border-neutral-300 px-2.5 py-1.5 text-xs rounded-xs"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Gender"
+                    value={cvData.personalDetails.gender}
+                    onChange={(e) =>
+                      setCvData({
+                        ...cvData,
+                        personalDetails: {
+                          ...cvData.personalDetails,
+                          gender: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-full min-w-0 border border-neutral-300 px-2.5 py-1.5 text-xs rounded-xs"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Nationality"
+                    value={cvData.personalDetails.nationality}
+                    onChange={(e) =>
+                      setCvData({
+                        ...cvData,
+                        personalDetails: {
+                          ...cvData.personalDetails,
+                          nationality: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-full min-w-0 border border-neutral-300 px-2.5 py-1.5 text-xs rounded-xs"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Notice Period"
+                    value={cvData.personalDetails.noticePeriod}
+                    onChange={(e) =>
+                      setCvData({
+                        ...cvData,
+                        personalDetails: {
+                          ...cvData.personalDetails,
+                          noticePeriod: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-full min-w-0 border border-neutral-300 px-2.5 py-1.5 text-xs rounded-xs"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* CUSTOM SECTION & DECLARATION */}
+            <div className="bg-white border border-neutral-300 p-3.5 rounded-xs space-y-3">
+              <div className="space-y-2">
+                <SectionToggle
+                  title="Custom Section"
+                  isOn={cvData.visibility.customSection}
+                  onToggle={() => toggleVisibility("customSection")}
+                />
+                {cvData.visibility.customSection && (
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      placeholder="Section Heading"
+                      value={cvData.customSectionTitle}
+                      onChange={(e) =>
+                        setCvData({
+                          ...cvData,
+                          customSectionTitle: e.target.value,
+                        })
+                      }
+                      className="w-full min-w-0 border border-neutral-300 px-2.5 py-1.5 text-xs rounded-xs"
+                    />
+                    <textarea
+                      rows={2}
+                      placeholder="Details..."
+                      value={cvData.customSectionContent}
+                      onChange={(e) =>
+                        setCvData({
+                          ...cvData,
+                          customSectionContent: e.target.value,
+                        })
+                      }
+                      className="w-full border border-neutral-300 p-2 text-xs rounded-xs"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2 pt-2 border-t border-neutral-200">
+                <SectionToggle
+                  title="Declaration & Signature"
+                  isOn={cvData.visibility.declaration}
+                  onToggle={() => toggleVisibility("declaration")}
+                />
+                {cvData.visibility.declaration && (
+                  <textarea
+                    rows={2}
+                    value={cvData.declarationText}
+                    onChange={(e) =>
+                      setCvData({ ...cvData, declarationText: e.target.value })
+                    }
+                    className="w-full border border-neutral-300 p-2 text-xs rounded-xs"
+                  />
+                )}
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -1119,16 +1166,17 @@ function SectionToggle({
       <button
         type="button"
         onClick={onToggle}
-        className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono uppercase border rounded-xs cursor-pointer transition-colors shrink-0 ${
+        title={isOn ? "Click to hide from CV" : "Click to show in CV"}
+        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[10px] font-mono uppercase border rounded-xs cursor-pointer transition-colors shrink-0 ${
           isOn
-            ? "bg-emerald-50 border-emerald-300 text-emerald-800"
-            : "bg-neutral-100 border-neutral-300 text-neutral-500"
+            ? "bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100"
+            : "bg-neutral-100 border-neutral-300 text-neutral-500 hover:bg-neutral-200"
         }`}
       >
         {isOn ? (
           <>
             <Eye className="h-3 w-3" />
-            <span>Visible</span>
+            <span>Shown</span>
           </>
         ) : (
           <>

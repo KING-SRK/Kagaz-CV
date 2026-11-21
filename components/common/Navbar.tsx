@@ -12,14 +12,12 @@ import {
   AlertTriangle,
   Loader2,
 } from "lucide-react";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const currentType = searchParams.get("type");
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [loadingAuth, setLoadingAuth] = useState<boolean>(true);
@@ -29,11 +27,10 @@ export default function Navbar() {
   const [logoutModalOpen, setLogoutModalOpen] = useState<boolean>(false);
   const [loggingOut, setLoggingOut] = useState<boolean>(false);
 
-  const currentRoute = `${pathname}?${currentType || ""}`;
-  const [prevRoute, setPrevRoute] = useState<string>(currentRoute);
+  const [prevRoute, setPrevRoute] = useState<string>(pathname);
 
-  if (currentRoute !== prevRoute) {
-    setPrevRoute(currentRoute);
+  if (pathname !== prevRoute) {
+    setPrevRoute(pathname);
     if (mobileMenuOpen) {
       setMobileMenuOpen(false);
     }
@@ -70,6 +67,18 @@ export default function Navbar() {
     };
   }, [pathname]);
 
+  // মোবাইল মেনু বা মোডাল খোলা থাকলে ব্যাকগ্রাউন্ড স্ক্রল লক করা
+  useEffect(() => {
+    if (mobileMenuOpen || logoutModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen, logoutModalOpen]);
+
   // ২. লগআউট পপআপ ওপেন করা
   const triggerLogoutPopup = () => {
     setMobileMenuOpen(false);
@@ -90,15 +99,12 @@ export default function Navbar() {
     router.replace("/auth");
   };
 
-  // একটিভ পাথ ও প্যারামিটার ম্যাচিং লজিক
-  const isActive = (path: string, queryType?: string) => {
-    if (queryType) {
-      return pathname === path && currentType === queryType;
-    }
+  // একটিভ পাথ ম্যাচিং লজিক
+  const isActive = (path: string) => {
     if (path === "/") {
-      return pathname === "/" && !currentType;
+      return pathname === "/";
     }
-    return pathname.startsWith(path) && !currentType;
+    return pathname.startsWith(path);
   };
 
   const isDashboardActive = pathname.startsWith("/dashboard");
@@ -112,20 +118,20 @@ export default function Navbar() {
     },
     {
       name: "Find Talent",
-      href: "/explore?type=individual",
-      active: isActive("/explore", "individual"),
+      href: "/find-talent",
+      active: isActive("/find-talent"),
     },
     {
       name: "Find Enterprise",
-      href: "/explore?type=organization",
-      active: isActive("/explore", "organization"),
+      href: "/find-enterprise",
+      active: isActive("/find-enterprise"),
     },
   ];
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-neutral-200/70 bg-[#FDFCFB]/90 backdrop-blur-md print:hidden">
-        <div className="mx-auto flex h-16 sm:h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-50 w-full border-b border-neutral-200/70 bg-[#FDFCFB]/95 backdrop-blur-md print:hidden">
+        <div className="mx-auto flex h-16 sm:h-20 w-full items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
           {/* SutraNet Logo */}
           <Link
             href="/"
@@ -139,8 +145,8 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* 💻 ডেস্কটপ নেভিগেশন লিংকস */}
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-xs font-medium uppercase tracking-[0.2em]">
+          {/* 💻 ডেস্কটপ নেভিগেশন লিংকস (lg+ স্ক্রিনে যাতে ট্যাবলেটে চাপাচাপি না হয়) */}
+          <nav className="hidden lg:flex items-center gap-6 xl:gap-8 text-xs font-medium uppercase tracking-[0.18em]">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -159,15 +165,15 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* ডানদিকের অ্যাকশন বাটনস + মোবাইল হ্যামবার্গার মেনু বাটন */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* ডানদিকের অ্যাকশন বাটনস + মোবাইল/ট্যাবলেট হ্যামবার্গার মেনু */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             {loadingAuth ? (
               <div className="h-8 sm:h-9 w-20 sm:w-24 bg-neutral-100 animate-pulse rounded-xs" />
             ) : isLoggedIn ? (
               <div className="flex items-center gap-1.5 sm:gap-2.5">
                 <Link
                   href="/dashboard"
-                  className={`group inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 text-[11px] sm:text-xs font-medium uppercase tracking-[0.12em] sm:tracking-[0.15em] transition-all duration-300 rounded-xs ${
+                  className={`group inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5 text-[11px] sm:text-xs font-medium uppercase tracking-[0.12em] sm:tracking-[0.15em] transition-all duration-300 rounded-xs whitespace-nowrap ${
                     isDashboardActive
                       ? "bg-white text-neutral-950 border-2 border-neutral-950 font-bold shadow-xs"
                       : "bg-neutral-950 text-white shadow-sm hover:bg-neutral-800 border border-transparent"
@@ -182,21 +188,21 @@ export default function Navbar() {
                   <ArrowUpRight className="hidden sm:block h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Link>
 
-                {/* ডেস্কটপে Logout বাটন */}
+                {/* ডেস্কটপ/ট্যাবলেটে Logout বাটন */}
                 <button
                   type="button"
                   onClick={triggerLogoutPopup}
                   title="Logout"
-                  className="hidden sm:inline-flex items-center gap-1.5 border border-neutral-300 bg-white px-3.5 py-2.5 text-xs font-mono uppercase tracking-wider text-neutral-700 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors cursor-pointer rounded-xs"
+                  className="hidden sm:inline-flex items-center gap-1.5 border border-neutral-300 bg-white px-3 lg:px-3.5 py-2 sm:py-2.5 text-xs font-mono uppercase tracking-wider text-neutral-700 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors cursor-pointer rounded-xs whitespace-nowrap"
                 >
-                  <LogOut className="h-3.5 w-3.5" />
+                  <LogOut className="h-3.5 w-3.5 shrink-0" />
                   <span>Logout</span>
                 </button>
               </div>
             ) : (
               <Link
                 href="/auth"
-                className="group inline-flex items-center gap-1.5 sm:gap-2 bg-neutral-950 px-3.5 sm:px-5 py-2 sm:py-2.5 text-[11px] sm:text-xs font-medium uppercase tracking-[0.12em] sm:tracking-[0.15em] text-white shadow-sm transition-all duration-300 hover:bg-neutral-800 rounded-xs whitespace-nowrap"
+                className="group inline-flex items-center gap-1.5 sm:gap-2 bg-neutral-950 px-3 sm:px-5 py-2 sm:py-2.5 text-[11px] sm:text-xs font-medium uppercase tracking-[0.12em] sm:tracking-[0.15em] text-white shadow-sm transition-all duration-300 hover:bg-neutral-800 rounded-xs whitespace-nowrap"
               >
                 <span>Sign In</span>
                 <span className="hidden sm:inline">/ Join</span>
@@ -204,12 +210,13 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* 📱 মোবাইল মেনু টগল বাটন (< md) */}
+            {/* 📱 মোবাইল ও ট্যাবলেট মেনু টগল বাটন (< lg) */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen((prev) => !prev)}
               aria-label="Toggle navigation menu"
-              className="md:hidden inline-flex items-center justify-center p-2 border border-neutral-200 bg-white text-neutral-800 hover:bg-neutral-100 rounded-xs cursor-pointer transition-colors"
+              aria-expanded={mobileMenuOpen}
+              className="lg:hidden inline-flex items-center justify-center p-2 border border-neutral-200 bg-white text-neutral-800 hover:bg-neutral-100 rounded-xs cursor-pointer transition-colors"
             >
               {mobileMenuOpen ? (
                 <X className="h-5 w-5" />
@@ -220,33 +227,33 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* 📱 মোবাইল ড্রপডাউন মেনু ড্রয়ার */}
+        {/* 📱 মোবাইল ও ট্যাবলেট ড্রপডাউন মেনু ড্রয়ার (< lg) */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-neutral-200/80 bg-[#FDFCFB] px-4 pt-3 pb-5 space-y-1.5 shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="lg:hidden border-t border-neutral-200/80 bg-[#FDFCFB] px-4 sm:px-6 pt-3 pb-5 space-y-1.5 shadow-xl animate-in fade-in slide-in-from-top-2 duration-200 max-h-[calc(100vh-4rem)] overflow-y-auto">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xs text-xs font-mono uppercase tracking-[0.18em] transition-colors ${
+                className={`flex items-center justify-between px-3.5 py-3 rounded-xs text-xs font-mono uppercase tracking-[0.18em] transition-colors ${
                   link.active
                     ? "bg-neutral-950 text-white font-semibold"
                     : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950"
                 }`}
               >
                 <span>{link.name}</span>
-                <ArrowUpRight className="h-3.5 w-3.5 opacity-60" />
+                <ArrowUpRight className="h-3.5 w-3.5 opacity-60 shrink-0" />
               </Link>
             ))}
 
             {isLoggedIn && (
-              <div className="pt-2 mt-2 border-t border-neutral-200/70">
+              <div className="pt-2.5 mt-2.5 border-t border-neutral-200/70 sm:hidden">
                 <button
                   type="button"
                   onClick={triggerLogoutPopup}
                   className="w-full flex items-center justify-center gap-2 border border-red-200 bg-red-50/70 text-red-600 px-4 py-2.5 text-xs font-mono uppercase tracking-wider rounded-xs hover:bg-red-100 transition-colors cursor-pointer"
                 >
-                  <LogOut className="h-3.5 w-3.5" />
+                  <LogOut className="h-3.5 w-3.5 shrink-0" />
                   <span>Logout from Account</span>
                 </button>
               </div>

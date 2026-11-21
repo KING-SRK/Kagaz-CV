@@ -176,7 +176,7 @@ export default function CreateCvPage() {
           </p>
         </div>
       ) : (
-        <div className="max-w-7xl w-full mx-auto px-3 sm:px-4 pt-3 sm:pt-4 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 lg:h-[calc(100vh-64px)] lg:overflow-hidden">
+        <div className="w-full mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 lg:h-[calc(100vh-80px)] lg:overflow-hidden">
           {/* LEFT PANEL: EDITOR */}
           <div
             className={`w-full lg:col-span-5 lg:h-full lg:overflow-y-auto thin-scrollbar lg:pr-2 pb-24 print:hidden ${
