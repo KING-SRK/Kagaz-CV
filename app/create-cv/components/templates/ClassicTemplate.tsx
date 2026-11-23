@@ -237,7 +237,7 @@ export default function ClassicTemplate({ rawData }: Props) {
           {hasContact && (
             <div>
               <h2 className={sideHeadingClass}>Contact</h2>
-              <div className="space-y-1 text-[11px] text-neutral-700 break-words">
+              <div className="space-y-1 text-[11px] text-neutral-700 wrap-break-word">
                 {data.phone && <p>{data.phone}</p>}
                 {data.email && <p>{data.email}</p>}
                 {data.location && <p>{data.location}</p>}
@@ -248,7 +248,7 @@ export default function ClassicTemplate({ rawData }: Props) {
           {visibility.socialLinks && data.socialLinks.length > 0 && (
             <div>
               <h2 className={sideHeadingClass}>Links</h2>
-              <div className="space-y-1 text-[10.5px] font-mono text-neutral-700 break-words">
+              <div className="space-y-1 text-[10.5px] font-mono text-neutral-700 wrap-break-word">
                 {data.socialLinks.map((link) => (
                   <p key={link.id}>
                     <strong>{link.platform}:</strong>{" "}
@@ -278,7 +278,7 @@ export default function ClassicTemplate({ rawData }: Props) {
           {visibility.languages && data.languages.length > 0 && (
             <div>
               <h2 className={sideHeadingClass}>Languages</h2>
-              <p className="text-[11px] text-neutral-800 leading-relaxed break-words">
+              <p className="text-[11px] text-neutral-800 leading-relaxed wrap-break-word">
                 {data.languages.join(", ")}
               </p>
             </div>
@@ -287,7 +287,7 @@ export default function ClassicTemplate({ rawData }: Props) {
           {visibility.hobbies && data.hobbies.length > 0 && (
             <div>
               <h2 className={sideHeadingClass}>Hobbies</h2>
-              <p className="text-[11px] text-neutral-800 leading-relaxed break-words">
+              <p className="text-[11px] text-neutral-800 leading-relaxed wrap-break-word">
                 {data.hobbies.join(", ")}
               </p>
             </div>
@@ -296,7 +296,7 @@ export default function ClassicTemplate({ rawData }: Props) {
           {visibility.personalDetails && hasPersonal && (
             <div>
               <h2 className={sideHeadingClass}>Personal Details</h2>
-              <div className="space-y-1 text-[11px] text-neutral-800 break-words">
+              <div className="space-y-1 text-[11px] text-neutral-800 wrap-break-word">
                 {data.personalDetails.dob && (
                   <p>
                     <span className="text-neutral-500">DOB:</span>{" "}
@@ -330,11 +330,11 @@ export default function ClassicTemplate({ rawData }: Props) {
         <div className="col-span-8 min-w-0 p-5 sm:p-7 flex flex-col space-y-5">
           {/* NAME & ROLE BLOCK (DIV) */}
           <div className="pb-4 border-b border-neutral-200">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 break-words">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 wrap-break-word">
               {data.fullName}
             </h1>
             {data.title && (
-              <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-neutral-600 mt-1 break-words">
+              <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-neutral-600 mt-1 wrap-break-word">
                 {data.title}
               </p>
             )}

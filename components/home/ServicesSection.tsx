@@ -1,53 +1,92 @@
-// components/ServicesSection.tsx
+// components/home/ServicesSection.tsx
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { motion } from "motion/react";
-import { User, Building2, Search, ArrowUpRight } from "lucide-react";
+import {
+  FileText,
+  IdCard,
+  ShieldCheck,
+  Compass,
+  ArrowUpRight,
+} from "lucide-react";
 import Link from "next/link";
 
-const features = [
-  {
-    id: "01",
-    title: "Personal CV & Digital ID",
-    tagline: "Create a job-ready resume, verified profile, and free PDF.",
-    points: [
-      "Instant A4 PDF CV builder",
-      "Show or hide any CV section",
-      "Live QR code for verification",
-    ],
-    icon: User,
-    link: "/create-cv",
-    cta: "Build Free CV",
-  },
-  {
-    id: "02",
-    title: "Enterprise & Business Hub",
-    tagline: "Official online profile for companies, shops, and teams.",
-    points: [
-      "List your services & products",
-      "Post open jobs & hire talent",
-      "Verified Enterprise ID badge",
-    ],
-    icon: Building2,
-    link: "/auth",
-    cta: "Create Business Page",
-  },
-  {
-    id: "03",
-    title: "Public Search Directory",
-    tagline: "Find verified professionals and trusted local businesses.",
-    points: [
-      "Filter by skill, sector & city",
-      "Check any SutraNet ID online",
-      "Safe & privacy-controlled profiles",
-    ],
-    icon: Search,
-    link: "/find-talent",
-    cta: "Explore Directory",
-  },
-];
+function subscribeToStorage(callback: () => void) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("storage", callback);
+  return () => window.removeEventListener("storage", callback);
+}
+
+function getActiveKagazIdSnapshot(): string | null {
+  if (typeof window === "undefined") return null;
+  const savedCardId = localStorage.getItem("kagaz_card_id");
+  return savedCardId && savedCardId.trim() ? savedCardId.trim() : null;
+}
+
+function getServerSnapshot(): string | null {
+  return null;
+}
 
 export default function ServicesSection() {
+  const activeKagazId = useSyncExternalStore(
+    subscribeToStorage,
+    getActiveKagazIdSnapshot,
+    getServerSnapshot,
+  );
+
+  const features = [
+    {
+      title: "Create CV & Biodata",
+      tagline: "Build a clean resume or biodata even without logging in.",
+      points: [
+        "Instant live A4 CV preview",
+        "Switch layouts & export PDF",
+        "Sync data with SutraNet ID",
+      ],
+      icon: FileText,
+      link: "/create-cv",
+      cta: "Create CV",
+    },
+    {
+      title: "Download ID Card",
+      tagline: "Get your smart digital & printable card with live QR.",
+      points: [
+        "Instant QR scan verification",
+        "Clean black & white identity card",
+        "Share or print anytime",
+      ],
+      icon: IdCard,
+      link: "/dashboard",
+      cta: "Download Card",
+    },
+    {
+      title: "Verified Status & Profile",
+      tagline:
+        "Check verification status and open your public SutraNet record.",
+      points: [
+        "View live /p/[id] verified record",
+        "Check individual or organisation status",
+        "Shareable identity & QR profile",
+      ],
+      icon: ShieldCheck,
+      link: activeKagazId ? `/p/${encodeURIComponent(activeKagazId)}` : "/auth",
+      cta: "Check Verified Profile",
+    },
+    {
+      title: "Find Talent & Enterprise",
+      tagline: "Discover verified individuals or trusted organisations.",
+      points: [
+        "Browse skilled talent profiles",
+        "Explore verified enterprises",
+        "Direct & structured discovery",
+      ],
+      icon: Compass,
+      link: "/find-talent",
+      cta: "Explore Now",
+    },
+  ];
+
   return (
     <section className="relative bg-[#FDFCFB] text-[#141414] px-4 sm:px-6 lg:px-8 py-14 sm:py-20 border-t border-neutral-200/80">
       <div className="mx-auto w-full">
@@ -58,44 +97,41 @@ export default function ServicesSection() {
               Ecosystem
             </span>
             <h2 className="text-2xl sm:text-4xl font-serif font-light tracking-tight text-neutral-950 mt-1">
-              What you can create.
+              What you can do here.
             </h2>
           </div>
           <p className="text-[11px] sm:text-xs font-mono text-neutral-400 uppercase tracking-wider">
-            3 Systems // 1 Platform
+            4 Core Actions // 1 Hub
           </p>
         </div>
 
-        {/* ৩টি রেসপন্সিভ কার্ড */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+        {/* ৪টি রেসপন্সিভ কার্ড */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
           {features.map((item, index) => {
             const Icon = item.icon;
             return (
               <motion.div
-                key={item.id}
+                key={item.title}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group flex flex-col justify-between border border-neutral-200 bg-white p-5 sm:p-7 rounded-xs transition-all duration-300 hover:border-neutral-950 hover:shadow-md"
+                transition={{ duration: 0.5, delay: index * 0.08 }}
+                className="group flex flex-col justify-between border border-neutral-200 bg-white p-5 sm:p-6 rounded-xs transition-all duration-300 hover:border-neutral-950 hover:shadow-md"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-6 sm:mb-8">
-                    <span className="text-xs font-mono text-neutral-300 group-hover:text-neutral-950 transition-colors">
-                      /{item.id}
-                    </span>
+                  <div className="flex items-center justify-end mb-5 sm:mb-7">
                     <Icon className="h-4 w-4 text-neutral-500 group-hover:text-neutral-950 transition-colors shrink-0" />
                   </div>
 
                   <h3 className="text-lg sm:text-xl font-serif text-neutral-950 mb-1.5">
                     {item.title}
                   </h3>
-                  <p className="text-xs text-neutral-500 mb-5 sm:mb-6 font-light leading-relaxed">
+                  <p className="text-xs text-neutral-500 mb-5 font-light leading-relaxed">
                     {item.tagline}
                   </p>
 
                   {/* টু-দ্য-পয়েন্ট বুলেটস */}
-                  <ul className="space-y-2 mb-6 sm:mb-8 border-t border-neutral-100 pt-4">
+                  <ul className="space-y-2 mb-6 border-t border-neutral-100 pt-4">
                     {item.points.map((pt, i) => (
                       <li
                         key={i}

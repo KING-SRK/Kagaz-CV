@@ -213,7 +213,7 @@ export default function MinimalTemplate({ rawData }: Props) {
           <div className="flex items-center justify-between gap-4">
             <div className="space-y-1 min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-neutral-950 break-words">
+                <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-neutral-950 wrap-break-word">
                   {data.fullName}
                 </h1>
                 {visibility.sutraNetBadge && data.kagazId && (
@@ -232,7 +232,7 @@ export default function MinimalTemplate({ rawData }: Props) {
               </div>
 
               {data.title && (
-                <p className="text-xs sm:text-sm text-neutral-600 font-medium break-words">
+                <p className="text-xs sm:text-sm text-neutral-600 font-medium wrap-break-word">
                   {data.title}
                 </p>
               )}

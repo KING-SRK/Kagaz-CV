@@ -108,7 +108,7 @@ function PublicIdentityContent() {
         return;
       }
 
-      // ৩. কোনোটিই না পাওয়া গেলে
+      // ৩. কোনোটিই না পাওয়া গেলে
       setEntityType(null);
       setIsOwner(false);
       setLoading(false);
@@ -152,15 +152,24 @@ function PublicIdentityContent() {
             <span className="font-mono font-bold text-neutral-900">
               {kagazId}
             </span>
-            . Please check the QR code or URL and try again.
+            . Check your SutraNet ID, QR code, or sign in to view your verified
+            status and saved profile.
           </p>
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2 bg-neutral-900 text-white text-xs font-mono uppercase rounded-xs hover:bg-neutral-800 transition-colors"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            <span>Back to SutraNet</span>
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-1">
+            <Link
+              href="/auth"
+              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2 bg-neutral-950 text-white text-xs font-mono uppercase rounded-xs hover:bg-neutral-800 transition-colors"
+            >
+              <span>Check Status / Sign In</span>
+            </Link>
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2 border border-neutral-300 bg-white text-neutral-900 text-xs font-mono uppercase rounded-xs hover:bg-neutral-50 transition-colors"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>Back to SutraNet</span>
+            </Link>
+          </div>
         </div>
       </div>
     );

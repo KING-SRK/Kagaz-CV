@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { QrCode, ArrowUpRight, Users, ShieldCheck } from "lucide-react";
+import { QrCode, ArrowUpRight, Users } from "lucide-react";
 import Image from "next/image";
 
 export default function HeroSection() {
@@ -26,6 +26,7 @@ export default function HeroSection() {
                 Verified Digital Identity, Smart CV &amp; Organization Hub
               </span>
             </motion.div>
+
             <motion.h1
               initial={{ opacity: 0, y: 25 }}
               animate={{ opacity: 1, y: 0 }}
@@ -120,31 +121,16 @@ export default function HeroSection() {
             transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-5 relative pb-10 sm:pb-8 max-w-md mx-auto w-full"
           >
-            {/* মূল ইমেজ ফ্রেম */}
+            {/* মূল ইমেজ ফ্রেম (বাড়তি টেক্সট ওভারলে ছাড়া পরিষ্কার ভিজ্যুয়াল) */}
             <div className="group relative aspect-4/5 w-full overflow-hidden bg-neutral-100 border border-neutral-200 shadow-[0_20px_50px_rgba(0,0,0,0.06)] rounded-tl-full rounded-tr-full">
               <Image
-                src="/biprajit.jpg"
-                alt="Biprajit Paul - Verified SutraNet Member"
+                src="/images/image.png"
+                alt="SutraNet Digital Identity, Talent and Enterprise Network"
                 fill
                 priority
                 sizes="(max-width: 640px) 92vw, (max-width: 1024px) 448px, 38vw"
-                className="object-cover transition-all duration-700 ease-out group-hover:scale-105"
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-103"
               />
-
-              <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/80 via-black/15 to-transparent transition-opacity duration-500 group-hover:opacity-85" />
-
-              <div className="pointer-events-none absolute bottom-4 right-4 sm:bottom-6 sm:right-6 text-right text-white space-y-0.5 sm:space-y-1">
-                <span className="inline-flex items-center gap-1 text-[9px] sm:text-[9.5px] tracking-[0.16em] sm:tracking-[0.18em] uppercase font-mono bg-white/20 backdrop-blur-md px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-xs">
-                  <ShieldCheck className="h-3 w-3 text-emerald-400 shrink-0" />
-                  <span>Verified ID</span>
-                </span>
-                <p className="text-sm sm:text-lg font-serif font-medium">
-                  Biprajit Paul
-                </p>
-                <p className="text-[10.5px] sm:text-xs text-white/85 font-light">
-                  Hardware Engineer • Kolkata
-                </p>
-              </div>
             </div>
 
             {/* ওভারল্যাপিং মিনি কিউআর ব্যাজ */}
