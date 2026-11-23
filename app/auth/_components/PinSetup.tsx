@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { ArrowRight, CheckCircle2, Copy, Check, Loader2 } from "lucide-react";
 import PinInput from "./PinInput";
-import { generateKagazId } from "../_utils/generateKagazId";
+import { generateUniqueSutraNetId } from "../_utils/generateKagazId";
 import { supabase } from "@/lib/supabaseClient";
 import bcrypt from "bcryptjs";
 import { useRouter } from "next/navigation";
@@ -55,7 +55,7 @@ export default function PinSetup({
     try {
       const salt = await bcrypt.genSalt(10);
       const pinHash = await bcrypt.hash(rawPin, salt);
-      const newId = generateKagazId(fullName);
+      const newId = await generateUniqueSutraNetId(role);
       const cleanEmail = (email || "").trim().toLowerCase();
 
       let createdUuid = "";

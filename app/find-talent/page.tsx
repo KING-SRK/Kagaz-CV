@@ -1,7 +1,8 @@
 // app/find-talent/page.tsx
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal, X, Loader2, RotateCcw } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import {
@@ -31,12 +32,15 @@ function getProfileRichnessScore(p: TalentProfile): number {
   return score;
 }
 
-export default function FindTalentPage() {
+function FindTalentContent() {
+  const searchParams = useSearchParams();
   const [profiles, setProfiles] = useState<TalentProfile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // সার্চ ও ফিল্টার স্টেট
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  // সার্চ ও ফিল্টার স্টেট (URL থেকে ?q= থাকলে শুরুতেই বসিয়ে নেবে)
+  const [searchQuery, setSearchQuery] = useState<string>(
+    () => searchParams.get("q") || "",
+  );
   const [selectedSector, setSelectedSector] = useState<string>("All");
   const [selectedSkill, setSelectedSkill] = useState<string>("");
   const [experienceLevel, setExperienceLevel] = useState<
@@ -477,5 +481,24 @@ export default function FindTalentPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+function FindTalentWrapper() {
+  const searchParams = useSearchParams();
+  return <FindTalentContent key={searchParams.get("q") || "all"} />;
+}
+
+export default function FindTalentPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-[#FDFCFB]">
+          <Loader2 className="h-6 w-6 animate-spin text-neutral-900" />
+        </div>
+      }
+    >
+      <FindTalentWrapper />
+    </Suspense>
   );
 }

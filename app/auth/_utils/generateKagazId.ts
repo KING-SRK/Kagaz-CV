@@ -1,22 +1,38 @@
-// lib/generateKagazId.ts
-export function generateKagazId(fullName: string): string {
-  // ১. নাম ও পদবির প্রথম অক্ষর নেওয়া (যেমন: Joy Thayal -> JT)
-  const parts = fullName.trim().split(/\s+/);
-  let initials = "KC";
-  if (parts.length === 1) {
-    initials = parts[0].slice(0, 2).toUpperCase();
-  } else if (parts.length >= 2) {
-    initials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+import { supabase } from "@/lib/supabaseClient";
+
+// র‍্যান্ডম ১০-ডিজিটের SutraNet ID তৈরি (Individual: SN-XXXXX-XXXXX | Organization: SNC-XXXXX-XXXXX)
+export function generateKagazId(
+  _fullName?: string,
+  role: "individual" | "organization" = "individual",
+): string {
+  const part1 = Math.floor(10000 + Math.random() * 90000); // প্রথম ৫ ডিজিট
+  const part2 = Math.floor(10000 + Math.random() * 90000); // শেষ ৫ ডিজিট
+  const prefix = role === "organization" ? "SNC" : "SN";
+
+  return `${prefix}-${part1}-${part2}`;
+}
+
+// ডাটাবেসে চেক করে ১০০% ইউনিক (Collision-Free) ID জেনারেটর
+export async function generateUniqueSutraNetId(
+  role: "individual" | "organization" = "individual",
+): Promise<string> {
+  let isUnique = false;
+  let newId = "";
+
+  while (!isUnique) {
+    newId = generateKagazId(undefined, role);
+    const table = role === "organization" ? "company_profiles" : "profiles";
+
+    const { data, error } = await supabase
+      .from(table)
+      .select("kagaz_id")
+      .eq("kagaz_id", newId)
+      .maybeSingle();
+
+    if (!error && !data) {
+      isUnique = true;
+    }
   }
 
-  // ২. বছর ও মাস (YYMM ফরম্যাট, যেমন: 2610)
-  const now = new Date();
-  const year = now.getFullYear().toString().slice(-2);
-  const month = (now.getMonth() + 1).toString().padStart(2, "0");
-  const yearMonth = `${year}${month}`;
-
-  // ৩. ৪-ডিজিট সিকিউর ইউনিক র‍্যান্ডম কোড
-  const randomCode = Math.floor(1000 + Math.random() * 9000);
-
-  return `${initials}-${yearMonth}-${randomCode}`;
+  return newId;
 }

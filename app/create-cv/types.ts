@@ -1,6 +1,6 @@
 // app/create-cv/types.ts
 
-export type CvTemplateType = "classic" | "modern" | "mono";
+export type CvTemplateType = "classic" | "modern" | "mono" | "minimal";
 
 export interface CvExperience {
   id: string;

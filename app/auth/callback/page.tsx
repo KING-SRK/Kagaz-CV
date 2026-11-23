@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import bcrypt from "bcryptjs";
 import { supabase } from "@/lib/supabaseClient";
-import { generateKagazId } from "../_utils/generateKagazId";
+import { generateUniqueSutraNetId } from "../_utils/generateKagazId";
 import PinInput from "../_components/PinInput";
 
 interface ExistingAccount {
@@ -226,7 +226,7 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      const newId = generateKagazId(googleUser.name);
+      const newId = await generateUniqueSutraNetId(selectedRole);
 
       if (selectedRole === "organization") {
         const { data, error: orgError } = await supabase

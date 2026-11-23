@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import Image from "next/image";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -137,9 +138,16 @@ export default function Navbar() {
             href="/"
             className="group flex items-center gap-2 sm:gap-2.5 shrink-0"
           >
-            <span className="flex h-7 w-7 items-center justify-center bg-neutral-950 text-xs font-mono font-medium text-white transition-transform duration-300 group-hover:scale-95">
-              S
-            </span>
+            <div className="relative h-7 w-7 sm:h-8 sm:w-8 overflow-hidden rounded-xs transition-transform duration-300 group-hover:scale-95 shrink-0">
+              <Image
+                src="/images/sutranet-logo.png" // তোমার public ফোল্ডারে থাকা ইমেজের আসল নাম দাও
+                alt="SutraNet Logo"
+                fill
+                priority
+                sizes="32px"
+                className="object-contain"
+              />
+            </div>
             <span className="text-base sm:text-lg font-light tracking-tight text-neutral-950">
               Sutra<span className="font-serif italic font-normal">Net</span>
             </span>

@@ -1,7 +1,8 @@
 // app/find-enterprise/page.tsx
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal, X, Loader2, RotateCcw } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import {
@@ -37,12 +38,15 @@ function getOrgRichnessScore(org: EnterpriseProfile): number {
   return score;
 }
 
-export default function FindEnterprisePage() {
+function FindEnterpriseContent() {
+  const searchParams = useSearchParams();
   const [organizations, setOrganizations] = useState<EnterpriseProfile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // সার্চ ও ফিল্টার স্টেট
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  // সার্চ ও ফিল্টার স্টেট (URL থেকে ?q= থাকলে শুরুতেই বসিয়ে নেবে)
+  const [searchQuery, setSearchQuery] = useState<string>(
+    () => searchParams.get("q") || "",
+  );
   const [selectedIndustry, setSelectedIndustry] = useState<string>("All");
   const [selectedBusinessType, setSelectedBusinessType] =
     useState<string>("All");
@@ -73,7 +77,6 @@ export default function FindEnterprisePage() {
       if (error) {
         console.error("Supabase company_profiles error:", error);
       } else if (Array.isArray(data)) {
-        // যদি company_jobs আলাদা টেবিল হয়, তবে ওপেন জবগুলো আলাদা কুয়েরিতে আনা হচ্ছে (যাতে রিলেশন না থাকলেও এরর না দেয়)
         const { data: jobsData } = await supabase
           .from("company_jobs")
           .select("id, company_id, status");
@@ -510,5 +513,24 @@ export default function FindEnterprisePage() {
         </div>
       </main>
     </div>
+  );
+}
+
+function FindEnterpriseWrapper() {
+  const searchParams = useSearchParams();
+  return <FindEnterpriseContent key={searchParams.get("q") || "all"} />;
+}
+
+export default function FindEnterprisePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-[#FDFCFB]">
+          <Loader2 className="h-6 w-6 animate-spin text-neutral-900" />
+        </div>
+      }
+    >
+      <FindEnterpriseWrapper />
+    </Suspense>
   );
 }

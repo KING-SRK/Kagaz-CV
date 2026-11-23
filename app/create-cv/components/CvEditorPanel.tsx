@@ -1169,19 +1169,19 @@ function SectionToggle({
         title={isOn ? "Click to hide from CV" : "Click to show in CV"}
         className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[10px] font-mono uppercase border rounded-xs cursor-pointer transition-colors shrink-0 ${
           isOn
-            ? "bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100"
-            : "bg-neutral-100 border-neutral-300 text-neutral-500 hover:bg-neutral-200"
+            ? "bg-neutral-100 border-neutral-300 text-neutral-600 hover:bg-red-50 hover:border-red-300 hover:text-red-700"
+            : "bg-emerald-50 border-emerald-400 text-emerald-800 font-semibold hover:bg-emerald-100"
         }`}
       >
         {isOn ? (
           <>
-            <Eye className="h-3 w-3" />
-            <span>Shown</span>
+            <EyeOff className="h-3 w-3" />
+            <span>Hide</span>
           </>
         ) : (
           <>
-            <EyeOff className="h-3 w-3" />
-            <span>Hidden</span>
+            <Eye className="h-3 w-3" />
+            <span>Show</span>
           </>
         )}
       </button>
