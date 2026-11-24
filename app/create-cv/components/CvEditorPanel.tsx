@@ -1,7 +1,7 @@
 // app/create-cv/components/CvEditorPanel.tsx
 "use client";
 
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState, useRef, Dispatch, SetStateAction, ChangeEvent } from "react";
 import {
   Eye,
   EyeOff,
@@ -10,6 +10,9 @@ import {
   ChevronDown,
   ChevronUp,
   SlidersHorizontal,
+  User,
+  Upload,
+  X,
 } from "lucide-react";
 import { CvData, CvSectionVisibility } from "../types";
 
@@ -18,11 +21,37 @@ interface Props {
   setCvData: Dispatch<SetStateAction<CvData>>;
 }
 
+function SoftLimitHint({
+  current,
+  recommendedMax,
+}: {
+  current: number;
+  recommendedMax: number;
+}) {
+  const isLong = current > recommendedMax;
+
+  return (
+    <div className="flex items-center justify-between gap-2 text-[10px] font-mono pt-0.5">
+      <span className={isLong ? "text-amber-700" : "text-neutral-400"}>
+        {isLong
+          ? "Long text may push CV onto page 2"
+          : `Recommended up to ${recommendedMax} chars for 1-page fit`}
+      </span>
+      <span
+        className={isLong ? "text-amber-700 font-semibold" : "text-neutral-400"}
+      >
+        {current}/{recommendedMax}
+      </span>
+    </div>
+  );
+}
+
 export default function CvEditorPanel({ cvData, setCvData }: Props) {
   const [skillInput, setSkillInput] = useState("");
   const [langInput, setLangInput] = useState("");
   const [hobbyInput, setHobbyInput] = useState("");
   const [showOptional, setShowOptional] = useState(false);
+  const photoInputRef = useRef<HTMLInputElement>(null);
 
   const toggleVisibility = (key: keyof CvSectionVisibility) => {
     setCvData((prev) => ({
@@ -31,6 +60,34 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
         ...prev.visibility,
         [key]: !prev.visibility[key],
       },
+    }));
+  };
+
+  const handlePhotoUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setCvData((prev) => ({
+          ...prev,
+          avatarUrl: reader.result as string,
+          visibility: {
+            ...prev.visibility,
+            photo: true,
+          },
+        }));
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const handleRemovePhoto = () => {
+    setCvData((prev) => ({
+      ...prev,
+      avatarUrl: "",
     }));
   };
 
@@ -45,7 +102,6 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
     clearFn("");
   };
 
-  // কয়টি অপশনাল সেকশন বর্তমানে অন আছে তা গোনা
   const activeOptionalCount = [
     cvData.visibility.languages,
     cvData.visibility.objective,
@@ -81,6 +137,63 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                 isOn={cvData.visibility.sutraNetBadge}
                 onToggle={() => toggleVisibility("sutraNetBadge")}
               />
+            )}
+          </div>
+        </div>
+
+        {/* প্রোফাইল ফটো আপলোড ও খালি আইকন প্রিভিউ */}
+        <div className="flex items-center gap-3 p-2.5 bg-neutral-50 border border-neutral-200 rounded-xs">
+          <div className="h-12 w-12 rounded-xs border border-neutral-300 bg-white flex items-center justify-center overflow-hidden shrink-0">
+            {cvData.avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={cvData.avatarUrl}
+                alt="Profile"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <User className="h-5 w-5 text-neutral-400" />
+            )}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] font-mono font-semibold text-neutral-800">
+              Profile Photo (Optional)
+            </p>
+            <p className="text-[10px] text-neutral-500 truncate">
+              {cvData.avatarUrl
+                ? "Photo added to CV preview"
+                : "No photo added — leave empty or upload"}
+            </p>
+          </div>
+
+          <input
+            ref={photoInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handlePhotoUpload}
+            className="hidden"
+          />
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => photoInputRef.current?.click()}
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-neutral-900 text-white text-[10px] font-mono uppercase rounded-xs hover:bg-neutral-800 transition-colors cursor-pointer"
+            >
+              <Upload className="h-3 w-3" />
+              <span>{cvData.avatarUrl ? "Change" : "Add Photo"}</span>
+            </button>
+
+            {cvData.avatarUrl && (
+              <button
+                type="button"
+                onClick={handleRemovePhoto}
+                title="Remove photo"
+                className="p-1.5 border border-neutral-300 bg-white text-neutral-500 hover:text-red-600 hover:border-red-300 rounded-xs transition-colors cursor-pointer"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
             )}
           </div>
         </div>
@@ -132,13 +245,21 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
           onToggle={() => toggleVisibility("summary")}
         />
         {cvData.visibility.summary && (
-          <textarea
-            rows={3}
-            placeholder="Write a concise summary about your background..."
-            value={cvData.summary}
-            onChange={(e) => setCvData({ ...cvData, summary: e.target.value })}
-            className="w-full border border-neutral-300 p-2.5 text-xs rounded-xs focus:outline-none focus:border-neutral-900"
-          />
+          <div className="space-y-1">
+            <textarea
+              rows={3}
+              placeholder="Write a concise summary about your background..."
+              value={cvData.summary}
+              onChange={(e) =>
+                setCvData({ ...cvData, summary: e.target.value })
+              }
+              className="w-full border border-neutral-300 p-2.5 text-xs rounded-xs focus:outline-none focus:border-neutral-900"
+            />
+            <SoftLimitHint
+              current={cvData.summary.length}
+              recommendedMax={320}
+            />
+          </div>
         )}
       </div>
 
@@ -208,24 +329,32 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                     value={exp.isCurrent ? "Present" : exp.endDate}
                     onChange={(e) => {
                       const updated = [...cvData.experience];
-                      updated[idx].isCurrent = false;
-                      updated[idx].endDate = e.target.value;
+                      const val = e.target.value;
+                      updated[idx].isCurrent =
+                        val.trim().toLowerCase() === "present";
+                      updated[idx].endDate = val;
                       setCvData({ ...cvData, experience: updated });
                     }}
                     className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
                   />
                 </div>
-                <textarea
-                  rows={2}
-                  placeholder="Key responsibilities..."
-                  value={exp.responsibilities}
-                  onChange={(e) => {
-                    const updated = [...cvData.experience];
-                    updated[idx].responsibilities = e.target.value;
-                    setCvData({ ...cvData, experience: updated });
-                  }}
-                  className="w-full border border-neutral-300 bg-white p-2 text-xs rounded-xs"
-                />
+                <div className="space-y-1">
+                  <textarea
+                    rows={2}
+                    placeholder="Key responsibilities..."
+                    value={exp.responsibilities}
+                    onChange={(e) => {
+                      const updated = [...cvData.experience];
+                      updated[idx].responsibilities = e.target.value;
+                      setCvData({ ...cvData, experience: updated });
+                    }}
+                    className="w-full border border-neutral-300 bg-white p-2 text-xs rounded-xs"
+                  />
+                  <SoftLimitHint
+                    current={exp.responsibilities.length}
+                    recommendedMax={220}
+                  />
+                </div>
               </div>
             ))}
             <AddBtn
@@ -303,17 +432,23 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                     className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
                   />
                 </div>
-                <textarea
-                  rows={2}
-                  placeholder="Project description..."
-                  value={proj.description}
-                  onChange={(e) => {
-                    const updated = [...cvData.projects];
-                    updated[idx].description = e.target.value;
-                    setCvData({ ...cvData, projects: updated });
-                  }}
-                  className="w-full border border-neutral-300 bg-white p-2 text-xs rounded-xs"
-                />
+                <div className="space-y-1">
+                  <textarea
+                    rows={2}
+                    placeholder="Project description..."
+                    value={proj.description}
+                    onChange={(e) => {
+                      const updated = [...cvData.projects];
+                      updated[idx].description = e.target.value;
+                      setCvData({ ...cvData, projects: updated });
+                    }}
+                    className="w-full border border-neutral-300 bg-white p-2 text-xs rounded-xs"
+                  />
+                  <SoftLimitHint
+                    current={proj.description.length}
+                    recommendedMax={200}
+                  />
+                </div>
               </div>
             ))}
             <AddBtn
@@ -453,7 +588,7 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
         />
       </div>
 
-      {/* ৭. CERTIFICATIONS & PORTFOLIO LINKS */}
+      {/* ৭. SOCIAL & PORTFOLIO LINKS + CERTIFICATIONS */}
       <div className="bg-white border border-neutral-300 p-3.5 sm:p-4 rounded-xs space-y-4">
         <div className="space-y-2.5">
           <SectionToggle
@@ -656,15 +791,21 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                 onToggle={() => toggleVisibility("objective")}
               />
               {cvData.visibility.objective && (
-                <textarea
-                  rows={2}
-                  placeholder="Seeking a role as..."
-                  value={cvData.objective}
-                  onChange={(e) =>
-                    setCvData({ ...cvData, objective: e.target.value })
-                  }
-                  className="w-full border border-neutral-300 p-2 text-xs rounded-xs"
-                />
+                <div className="space-y-1">
+                  <textarea
+                    rows={2}
+                    placeholder="Seeking a role as..."
+                    value={cvData.objective}
+                    onChange={(e) =>
+                      setCvData({ ...cvData, objective: e.target.value })
+                    }
+                    className="w-full border border-neutral-300 p-2 text-xs rounded-xs"
+                  />
+                  <SoftLimitHint
+                    current={cvData.objective.length}
+                    recommendedMax={200}
+                  />
+                </div>
               )}
             </div>
 

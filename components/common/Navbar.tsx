@@ -16,6 +16,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 
+function formatCompactUsers(count: number): string {
+  if (count < 1000) return count.toString();
+  return new Intl.NumberFormat("en", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(count);
+}
+
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -23,6 +31,7 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [loadingAuth, setLoadingAuth] = useState<boolean>(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [totalUsers, setTotalUsers] = useState<number | null>(null);
 
   // লগআউট কনফার্মেশন পপআপ স্টেট
   const [logoutModalOpen, setLogoutModalOpen] = useState<boolean>(false);
@@ -36,6 +45,24 @@ export default function Navbar() {
       setMobileMenuOpen(false);
     }
   }
+
+  // ০. প্ল্যাটফর্মের মোট ইউজার সংখ্যা আনা
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchPlatformUsers() {
+      const { data, error } = await supabase.rpc("get_total_platform_users");
+      if (isMounted && !error && data !== null) {
+        setTotalUsers(Number(data));
+      }
+    }
+
+    fetchPlatformUsers();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // ১. ইউজার অথেন্টিকেশন চেক
   useEffect(() => {
@@ -132,28 +159,43 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-neutral-200/70 bg-[#FDFCFB]/95 backdrop-blur-md print:hidden">
-        <div className="mx-auto flex h-16 sm:h-20 w-full items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-          {/* SutraNet Logo */}
-          <Link
-            href="/"
-            className="group flex items-center gap-2 sm:gap-2.5 shrink-0"
-          >
-            <div className="relative h-7 w-7 sm:h-8 sm:w-8 overflow-hidden rounded-xs transition-transform duration-300 group-hover:scale-95 shrink-0">
-              <Image
-                src="/images/sutranet-logo.png" // তোমার public ফোল্ডারে থাকা ইমেজের আসল নাম দাও
-                alt="SutraNet Logo"
-                fill
-                priority
-                sizes="32px"
-                className="object-contain"
-              />
-            </div>
-            <span className="text-base sm:text-lg font-light tracking-tight text-neutral-950">
-              Sutra<span className="font-serif italic font-normal">Net</span>
-            </span>
-          </Link>
+        <div className="mx-auto flex h-16 sm:h-20 w-full items-center justify-between gap-2 sm:gap-3 px-3.5 sm:px-6 lg:px-8">
+          {/* SutraNet Logo + Live User Counter (মোবাইল ও ডেস্কটপ সব জায়গায় স্পষ্ট) */}
+          <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
+            <Link
+              href="/"
+              className="group flex items-center gap-1.5 sm:gap-2.5 shrink-0"
+            >
+              <div className="relative h-7 w-7 sm:h-8 sm:w-8 overflow-hidden rounded-xs transition-transform duration-300 group-hover:scale-95 shrink-0">
+                <Image
+                  src="/images/sutranet-logo.png"
+                  alt="SutraNet Logo"
+                  fill
+                  priority
+                  sizes="32px"
+                  className="object-contain"
+                />
+              </div>
+              <span className="text-base sm:text-lg font-light tracking-tight text-neutral-950">
+                Sutra<span className="font-serif italic font-normal">Net</span>
+              </span>
+            </Link>
 
-          {/* 💻 ডেস্কটপ নেভিগেশন লিংকস (lg+ স্ক্রিনে যাতে ট্যাবলেটে চাপাচাপি না হয়) */}
+            {totalUsers !== null && totalUsers > 0 && (
+              <div
+                title={`${totalUsers.toLocaleString()} total active individuals, enterprises & guest CV creators`}
+                className="inline-flex items-center gap-1.5 px-2 py-1 sm:px-2.5 sm:py-1 bg-neutral-100/90 border border-neutral-200 rounded-xs text-[10.5px] sm:text-[11px] font-mono text-neutral-700 whitespace-nowrap"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <span className="font-semibold text-neutral-950">
+                  {formatCompactUsers(totalUsers)}
+                </span>
+                <span className="text-neutral-600">Users</span>
+              </div>
+            )}
+          </div>
+
+          {/* 💻 ডেস্কটপ নেভিগেশন লিংকস */}
           <nav className="hidden lg:flex items-center gap-6 xl:gap-8 text-xs font-medium uppercase tracking-[0.18em]">
             {navLinks.map((link) => (
               <Link
@@ -174,14 +216,16 @@ export default function Navbar() {
           </nav>
 
           {/* ডানদিকের অ্যাকশন বাটনস + মোবাইল/ট্যাবলেট হ্যামবার্গার মেনু */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             {loadingAuth ? (
-              <div className="h-8 sm:h-9 w-20 sm:w-24 bg-neutral-100 animate-pulse rounded-xs" />
+              <div className="h-8 sm:h-9 w-9 sm:w-24 bg-neutral-100 animate-pulse rounded-xs" />
             ) : isLoggedIn ? (
               <div className="flex items-center gap-1.5 sm:gap-2.5">
                 <Link
                   href="/dashboard"
-                  className={`group inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5 text-[11px] sm:text-xs font-medium uppercase tracking-[0.12em] sm:tracking-[0.15em] transition-all duration-300 rounded-xs whitespace-nowrap ${
+                  title="Your Account Dashboard"
+                  aria-label="Account"
+                  className={`group inline-flex items-center justify-center gap-1.5 sm:gap-2 p-2 sm:px-4 lg:px-5 sm:py-2.5 text-[11px] sm:text-xs font-medium uppercase tracking-[0.12em] sm:tracking-[0.15em] transition-all duration-300 rounded-xs whitespace-nowrap ${
                     isDashboardActive
                       ? "bg-white text-neutral-950 border-2 border-neutral-950 font-bold shadow-xs"
                       : "bg-neutral-950 text-white shadow-sm hover:bg-neutral-800 border border-transparent"
@@ -190,9 +234,9 @@ export default function Navbar() {
                   {isDashboardActive ? (
                     <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                   ) : (
-                    <User className="h-3.5 w-3.5 text-neutral-300 shrink-0" />
+                    <User className="h-4 w-4 sm:h-3.5 sm:w-3.5 text-neutral-300 shrink-0" />
                   )}
-                  <span>Account</span>
+                  <span className="hidden sm:inline">Account</span>
                   <ArrowUpRight className="hidden sm:block h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Link>
 
@@ -210,10 +254,10 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/auth"
-                className="group inline-flex items-center gap-1.5 sm:gap-2 bg-neutral-950 px-3 sm:px-5 py-2 sm:py-2.5 text-[11px] sm:text-xs font-medium uppercase tracking-[0.12em] sm:tracking-[0.15em] text-white shadow-sm transition-all duration-300 hover:bg-neutral-800 rounded-xs whitespace-nowrap"
+                className="group inline-flex items-center gap-1.5 sm:gap-2 bg-neutral-950 px-2.5 sm:px-5 py-2 sm:py-2.5 text-[10.5px] sm:text-xs font-medium uppercase tracking-widest sm:tracking-[0.15em] text-white shadow-sm transition-all duration-300 hover:bg-neutral-800 rounded-xs whitespace-nowrap"
               >
-                <span>Sign In</span>
-                <span className="hidden sm:inline">/ Join</span>
+                <span>Join</span>
+                <span className="hidden sm:inline">/ Sign In</span>
                 <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Link>
             )}
@@ -255,7 +299,16 @@ export default function Navbar() {
             ))}
 
             {isLoggedIn && (
-              <div className="pt-2.5 mt-2.5 border-t border-neutral-200/70 sm:hidden">
+              <div className="pt-2.5 mt-2.5 border-t border-neutral-200/70 sm:hidden space-y-2">
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center gap-2 bg-neutral-950 text-white px-4 py-2.5 text-xs font-mono uppercase tracking-wider rounded-xs hover:bg-neutral-800 transition-colors"
+                >
+                  <User className="h-3.5 w-3.5 shrink-0" />
+                  <span>My Account Dashboard</span>
+                </Link>
+
                 <button
                   type="button"
                   onClick={triggerLogoutPopup}

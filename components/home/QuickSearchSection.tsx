@@ -1,7 +1,7 @@
 // components/QuickSearchSection.tsx
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -10,6 +10,42 @@ import {
   ArrowRight,
   ShieldCheck,
 } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
+
+const FALLBACK_TALENT_TAGS = [
+  "Web Developer",
+  "Next.js",
+  "Kolkata",
+  "Barrackpore",
+];
+
+const FALLBACK_ENTERPRISE_TAGS = [
+  "Web Development",
+  "Computer Repairing",
+  "Digital Solutions",
+  "Barrackpore",
+];
+
+function getTopFrequentItems(items: string[], limit: number): string[] {
+  const counts = new Map<string, { label: string; count: number }>();
+
+  for (const raw of items) {
+    const clean = raw?.trim();
+    if (!clean) continue;
+    const key = clean.toLowerCase();
+    const existing = counts.get(key);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      counts.set(key, { label: clean, count: 1 });
+    }
+  }
+
+  return Array.from(counts.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, limit)
+    .map((entry) => entry.label);
+}
 
 export default function QuickSearchSection() {
   const router = useRouter();
@@ -17,6 +53,94 @@ export default function QuickSearchSection() {
     "talent",
   );
   const [query, setQuery] = useState("");
+  const [talentTags, setTalentTags] = useState<string[]>(FALLBACK_TALENT_TAGS);
+  const [enterpriseTags, setEnterpriseTags] = useState<string[]>(
+    FALLBACK_ENTERPRISE_TAGS,
+  );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadPopularTags() {
+      // ১. profiles টেবিল থেকে আসল skills ও city আনা
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("skills, city")
+        .limit(50);
+
+      if (isMounted && profiles && profiles.length > 0) {
+        const allSkills: string[] = [];
+        const allCities: string[] = [];
+
+        profiles.forEach((p) => {
+          if (Array.isArray(p.skills)) {
+            allSkills.push(...p.skills);
+          }
+          if (typeof p.city === "string" && p.city.trim()) {
+            allCities.push(p.city.trim());
+          }
+        });
+
+        const topSkills = getTopFrequentItems(allSkills, 3);
+        const topCity = getTopFrequentItems(allCities, 1);
+        const combined = [...topSkills, ...topCity];
+
+        if (combined.length > 0) {
+          setTalentTags(combined);
+        }
+      }
+
+      // ২. company_profiles টেবিল থেকে আসল industry, business_category ও branches-এর city আনা
+      const { data: companies } = await supabase
+        .from("company_profiles")
+        .select("industry, business_category, branches")
+        .limit(50);
+
+      if (isMounted && companies && companies.length > 0) {
+        const allCategories: string[] = [];
+        const allCities: string[] = [];
+
+        companies.forEach((c) => {
+          if (typeof c.industry === "string" && c.industry.trim()) {
+            allCategories.push(c.industry.trim());
+          } else if (
+            typeof c.business_category === "string" &&
+            c.business_category.trim()
+          ) {
+            allCategories.push(c.business_category.trim());
+          }
+
+          if (Array.isArray(c.branches)) {
+            c.branches.forEach((b: Record<string, unknown>) => {
+              const branchCity =
+                typeof b?.city === "string"
+                  ? b.city
+                  : typeof b?.location === "string"
+                    ? b.location.split(",")[0]
+                    : "";
+              if (branchCity && branchCity.trim()) {
+                allCities.push(branchCity.trim());
+              }
+            });
+          }
+        });
+
+        const topCategories = getTopFrequentItems(allCategories, 3);
+        const topCity = getTopFrequentItems(allCities, 1);
+        const combined = [...topCategories, ...topCity];
+
+        if (combined.length > 0) {
+          setEnterpriseTags(combined);
+        }
+      }
+    }
+
+    loadPopularTags();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -31,18 +155,10 @@ export default function QuickSearchSection() {
     }
   };
 
-  const quickTags =
-    searchMode === "talent"
-      ? ["Full-Stack Developer", "Hardware Engineer", "UI/UX Design", "Kolkata"]
-      : [
-          "Web Development",
-          "Computer Repairing",
-          "Digital Agency",
-          "Barrackpore",
-        ];
+  const quickTags = searchMode === "talent" ? talentTags : enterpriseTags;
 
   return (
-    <section className="border-y border-neutral-200/80 text-black bg-white text- px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+    <section className="border-y border-neutral-200/80 text-black bg-white px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
       <div className="mx-auto max-w-5xl w-full space-y-6">
         {/* ওপরের হেডিং ও মোড সুইচার */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">

@@ -6,7 +6,7 @@ import Image from "next/image";
 export default function Footer() {
   return (
     <footer className="border-t border-neutral-200 bg-white text-neutral-800 print:hidden">
-      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 pt-12 pb-8 sm:pt-16 sm:pb-10">
         {/* ওপরের মেইন গ্রিড */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 sm:gap-10 pb-10 sm:pb-12 border-b border-neutral-200/80">
           {/* ১. ব্র্যান্ড ও সংক্ষিপ্ত বিবরণ (৫ কলাম) */}
@@ -14,7 +14,7 @@ export default function Footer() {
             <Link href="/" className="inline-flex items-center gap-2.5 group">
               <div className="relative h-7 w-7 sm:h-8 sm:w-8 overflow-hidden rounded-xs transition-transform duration-300 group-hover:scale-95 shrink-0">
                 <Image
-                  src="/images/sutranet-logo.png" // তোমার public ফোল্ডারে থাকা ইমেজের আসল নাম দাও
+                  src="/images/sutranet-logo.png"
                   alt="SutraNet Logo"
                   fill
                   priority
@@ -115,15 +115,37 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* নিচের কপিরাইট বার */}
-        <div className="pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono text-neutral-500">
-          <p>© 2026 SutraNet. All rights reserved.</p>
+        {/* নিচের কপিরাইট, লিগ্যাল লিংকস ও ক্রেডিট বার */}
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono text-neutral-500">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1">
+            <p>© 2026 SutraNet. All rights reserved.</p>
+            <span className="text-neutral-300">•</span>
+            <Link
+              href="/privacy-policy"
+              className="hover:text-neutral-950 transition-colors"
+            >
+              Privacy Policy
+            </Link>
+            <span className="text-neutral-300">•</span>
+            <Link
+              href="/terms"
+              className="hover:text-neutral-950 transition-colors"
+            >
+              Terms &amp; Conditions
+            </Link>
+          </div>
+
           <p className="text-center sm:text-right">
             Built by{" "}
-            <span className="text-neutral-900 font-semibold">
+            <a
+              href="https://grow-tech.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neutral-900 font-semibold hover:underline transition-colors"
+            >
               Grow Tech Digital Solutions
-            </span>{" "}
-            • Kolkata, India
+            </a>{" "}
+            - ❤️ Kolkata, India
           </p>
         </div>
       </div>

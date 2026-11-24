@@ -7,7 +7,6 @@ import {
   FileText,
   IdCard,
   ShieldCheck,
-  Compass,
   ArrowUpRight,
 } from "lucide-react";
 import Link from "next/link";
@@ -66,25 +65,14 @@ export default function ServicesSection() {
         "Check verification status and open your public SutraNet record.",
       points: [
         "View live /p/[id] verified record",
-        "Check individual or organisation status",
+        "Check person or company status",
         "Shareable identity & QR profile",
       ],
       icon: ShieldCheck,
       link: activeKagazId ? `/p/${encodeURIComponent(activeKagazId)}` : "/auth",
       cta: "Check Verified Profile",
     },
-    {
-      title: "Find Talent & Enterprise",
-      tagline: "Discover verified individuals or trusted organisations.",
-      points: [
-        "Browse skilled talent profiles",
-        "Explore verified enterprises",
-        "Direct & structured discovery",
-      ],
-      icon: Compass,
-      link: "/find-talent",
-      cta: "Explore Now",
-    },
+
   ];
 
   return (
@@ -101,12 +89,12 @@ export default function ServicesSection() {
             </h2>
           </div>
           <p className="text-[11px] sm:text-xs font-mono text-neutral-400 uppercase tracking-wider">
-            4 Core Actions // 1 Hub
+            5 Core Actions // 1 Hub
           </p>
         </div>
 
-        {/* ৪টি রেসপন্সিভ কার্ড */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+        {/* ৫টি রেসপন্সিভ কার্ড */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
           {features.map((item, index) => {
             const Icon = item.icon;
             return (
@@ -116,40 +104,42 @@ export default function ServicesSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.08 }}
-                className="group flex flex-col justify-between border border-neutral-200 bg-white p-5 sm:p-6 rounded-xs transition-all duration-300 hover:border-neutral-950 hover:shadow-md"
+                className="h-full"
               >
-                <div>
-                  <div className="flex items-center justify-end mb-5 sm:mb-7">
-                    <Icon className="h-4 w-4 text-neutral-500 group-hover:text-neutral-950 transition-colors shrink-0" />
-                  </div>
-
-                  <h3 className="text-lg sm:text-xl font-serif text-neutral-950 mb-1.5">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-neutral-500 mb-5 font-light leading-relaxed">
-                    {item.tagline}
-                  </p>
-
-                  {/* টু-দ্য-পয়েন্ট বুলেটস */}
-                  <ul className="space-y-2 mb-6 border-t border-neutral-100 pt-4">
-                    {item.points.map((pt, i) => (
-                      <li
-                        key={i}
-                        className="text-xs text-neutral-600 flex items-center gap-2"
-                      >
-                        <span className="h-1 w-1 bg-neutral-400 rounded-full shrink-0" />
-                        <span>{pt}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
                 <Link
                   href={item.link}
-                  className="inline-flex items-center justify-between border-t border-neutral-100 pt-4 text-xs font-mono uppercase tracking-wider text-neutral-950 group-hover:underline"
+                  className="group flex h-full flex-col justify-between border border-neutral-200 bg-white p-5 sm:p-6 rounded-xs transition-all duration-300 hover:border-neutral-950 hover:shadow-md cursor-pointer"
                 >
-                  <span>{item.cta}</span>
-                  <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 shrink-0" />
+                  <div>
+                    <div className="flex items-center justify-end mb-5 sm:mb-7">
+                      <Icon className="h-4 w-4 text-neutral-500 group-hover:text-neutral-950 transition-colors shrink-0" />
+                    </div>
+
+                    <h3 className="text-lg sm:text-xl font-serif text-neutral-950 mb-1.5">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-neutral-500 mb-5 font-light leading-relaxed">
+                      {item.tagline}
+                    </p>
+
+                    {/* টু-দ্য-পয়েন্ট বুলেটস */}
+                    <ul className="space-y-2 mb-6 border-t border-neutral-100 pt-4">
+                      {item.points.map((pt, i) => (
+                        <li
+                          key={i}
+                          className="text-xs text-neutral-600 flex items-center gap-2"
+                        >
+                          <span className="h-1 w-1 bg-neutral-400 rounded-full shrink-0" />
+                          <span>{pt}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="inline-flex items-center justify-between border-t border-neutral-100 pt-4 text-xs font-mono uppercase tracking-wider text-neutral-950 group-hover:underline">
+                    <span>{item.cta}</span>
+                    <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 shrink-0" />
+                  </div>
                 </Link>
               </motion.div>
             );

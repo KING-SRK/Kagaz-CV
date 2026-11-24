@@ -17,7 +17,8 @@ const SAMPLE_DATA: CvData = {
   location: "City, State",
   kagazId: "SN-00000-00000",
   isVerified: true,
-  avatarUrl: "",
+  avatarUrl:
+    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f5f5f5'/><circle cx='50' cy='38' r='16' fill='%23d4d4d4'/><path d='M22 86c0-15.5 12.5-26 28-26s28 10.5 28 26' fill='%23d4d4d4'/></svg>",
   socialLinks: [
     { id: "s1", platform: "Portfolio", url: "https://example.com" },
     { id: "s2", platform: "GitHub", url: "https://github.com/username" },
@@ -99,6 +100,7 @@ const SAMPLE_DATA: CvData = {
 
 export default function ClassicTemplate({ rawData }: Props) {
   const hasAnyInput =
+    Boolean(rawData.avatarUrl) ||
     Boolean(rawData.fullName.trim()) ||
     Boolean(rawData.title.trim()) ||
     Boolean(rawData.email.trim()) ||
@@ -208,7 +210,11 @@ export default function ClassicTemplate({ rawData }: Props) {
         {/* LEFT SIDEBAR COLUMN */}
         <div className="col-span-4 min-w-0 bg-neutral-100 border-r border-neutral-200 p-4 sm:p-5 space-y-4">
           {visibility.photo && data.avatarUrl && (
-            <div className="mx-auto h-22 w-22 rounded-md border border-neutral-300 overflow-hidden bg-white">
+            <div
+              className={`mx-auto h-22 w-22 rounded-md border border-neutral-300 overflow-hidden bg-white ${
+                !rawData.avatarUrl ? "print:hidden" : ""
+              }`}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={data.avatarUrl}

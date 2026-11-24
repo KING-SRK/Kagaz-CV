@@ -23,6 +23,7 @@ export default function CreateCvPage() {
   const [hasSutraNetAccount, setHasSutraNetAccount] = useState(false);
   const [mobileView, setMobileView] = useState<"editor" | "preview">("editor");
   const [isPrinting, setIsPrinting] = useState(false);
+  const [statsRefreshKey, setStatsRefreshKey] = useState(0);
 
   // ডাইনামিক অটো-স্কেল রেফারেন্স ও স্টেট
   const previewContainerRef = useRef<HTMLDivElement>(null);
@@ -71,27 +72,83 @@ export default function CreateCvPage() {
     };
   }, [fetchSutraNetData]);
 
-  // উপলব্ধ প্রস্থ অনুযায়ী A4 কাগজের স্কেল অটো-ফিট করা
+  // উপলব্ধ প্রস্থ অনুযায়ী A4 কাগজের স্কেল অটো-ফিট করা
   useEffect(() => {
+    const container = previewContainerRef.current;
+    if (!container) return;
+
     const updateScale = () => {
-      if (!previewContainerRef.current) return;
-      const availableWidth = previewContainerRef.current.clientWidth;
+      const availableWidth = container.clientWidth;
       if (availableWidth > 0 && availableWidth < A4_BASE_WIDTH) {
-        setPreviewScale(availableWidth / A4_BASE_WIDTH);
+        setPreviewScale(Number((availableWidth / A4_BASE_WIDTH).toFixed(4)));
       } else {
         setPreviewScale(1);
       }
     };
 
     updateScale();
+
+    let observer: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      observer = new ResizeObserver(updateScale);
+      observer.observe(container);
+    }
+
     window.addEventListener("resize", updateScale);
-    return () => window.removeEventListener("resize", updateScale);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", updateScale);
+    };
   }, [mobileView, loadingProfile, template]);
 
-  // ব্রাউজারের প্রিন্ট ইভেন্ট লিসেনার (যাতে Ctrl+P চাপলেও স্কেল রিসেট হয়)
+  // প্রিন্ট ডায়ালগ শেষ হলে ডাউনলোড স্ট্যাটস ব্যাকগ্রাউন্ডে সেভ করা
+  const logCvDownload = useCallback(() => {
+    const trimmedName = cvData.fullName.trim();
+    if (!trimmedName && !hasSutraNetAccount) return;
+
+    const identityKey = trimmedName
+      ? trimmedName.toLowerCase()
+      : "registered_user";
+    const sessionKey = `cv_logged_${template}_${identityKey}`;
+    const alreadyLogged =
+      typeof window !== "undefined" && sessionStorage.getItem(sessionKey);
+
+    if (alreadyLogged) return;
+
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(sessionKey, "1");
+    }
+
+    const payload = {
+      full_name: trimmedName || null,
+      title: cvData.title.trim() || null,
+      location: cvData.location.trim() || null,
+      email: hasSutraNetAccount ? null : cvData.email.trim() || null,
+      phone: hasSutraNetAccount ? null : cvData.phone.trim() || null,
+      template,
+      skills: hasSutraNetAccount ? [] : cvData.skills || [],
+      is_guest: !hasSutraNetAccount,
+    };
+
+    supabase
+      .from("guest_cv_logs")
+      .insert(payload)
+      .then(({ error }) => {
+        if (error) {
+          console.error("CV download log error:", error.message);
+        } else {
+          setStatsRefreshKey((prev) => prev + 1);
+        }
+      });
+  }, [cvData, hasSutraNetAccount, template]);
+
+  // ব্রাউজারের প্রিন্ট ইভেন্ট লিসেনার
   useEffect(() => {
     const onBeforePrint = () => setIsPrinting(true);
-    const onAfterPrint = () => setIsPrinting(false);
+    const onAfterPrint = () => {
+      setIsPrinting(false);
+      logCvDownload();
+    };
 
     window.addEventListener("beforeprint", onBeforePrint);
     window.addEventListener("afterprint", onAfterPrint);
@@ -99,12 +156,55 @@ export default function CreateCvPage() {
       window.removeEventListener("beforeprint", onBeforePrint);
       window.removeEventListener("afterprint", onAfterPrint);
     };
-  }, []);
+  }, [logCvDownload]);
 
   const handleDownloadPdf = () => {
     setIsPrinting(true);
+
+    // নাম লেখা থাকলে বা লগইন করা থাকলে সাথে সাথে কাউন্ট সেভ করা
+    const trimmedName = cvData.fullName.trim();
+    if (trimmedName || hasSutraNetAccount) {
+      const identityKey = trimmedName
+        ? trimmedName.toLowerCase()
+        : "registered_user";
+      const sessionKey = `cv_logged_${template}_${identityKey}`;
+      const alreadyLogged =
+        typeof window !== "undefined" && sessionStorage.getItem(sessionKey);
+
+      if (!alreadyLogged) {
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem(sessionKey, "1");
+        }
+
+        const payload = {
+          full_name: trimmedName || null,
+          title: cvData.title.trim() || null,
+          location: cvData.location.trim() || null,
+          email: hasSutraNetAccount ? null : cvData.email.trim() || null,
+          phone: hasSutraNetAccount ? null : cvData.phone.trim() || null,
+          template,
+          skills: hasSutraNetAccount ? [] : cvData.skills || [],
+          is_guest: !hasSutraNetAccount,
+        };
+
+        supabase
+          .from("guest_cv_logs")
+          .insert(payload)
+          .then(({ error }) => {
+            if (error) {
+              console.error("CV download log error:", error.message);
+            } else {
+              setStatsRefreshKey((prev) => prev + 1);
+            }
+          });
+      }
+    }
+
     setTimeout(() => {
       window.print();
+      setTimeout(() => {
+        setIsPrinting(false);
+      }, 600);
     }, 80);
   };
 
@@ -222,7 +322,11 @@ export default function CreateCvPage() {
             }`}
           >
             <div className="hidden lg:block">
-              <StyleSwitcher value={template} onChange={setTemplate} />
+              <StyleSwitcher
+                value={template}
+                onChange={setTemplate}
+                refreshKey={statsRefreshKey}
+              />
             </div>
 
             <CvEditorPanel cvData={cvData} setCvData={setCvData} />
@@ -236,7 +340,11 @@ export default function CreateCvPage() {
           >
             {mobileView === "preview" && (
               <div className="w-full max-w-198.5 mb-2.5 block lg:hidden print:hidden">
-                <StyleSwitcher value={template} onChange={setTemplate} />
+                <StyleSwitcher
+                  value={template}
+                  onChange={setTemplate}
+                  refreshKey={statsRefreshKey}
+                />
               </div>
             )}
 
@@ -274,10 +382,11 @@ export default function CreateCvPage() {
         <button
           type="button"
           onClick={handleDownloadPdf}
-          className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-neutral-950 text-white text-[10px] font-mono uppercase tracking-wider rounded-xs hover:bg-neutral-800 cursor-pointer shadow-xs transition-colors"
+          disabled={isPrinting}
+          className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-neutral-950 text-white text-[10px] font-mono uppercase tracking-wider rounded-xs hover:bg-neutral-800 cursor-pointer shadow-xs transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <Download className="h-3.5 w-3.5 text-emerald-400" />
-          <span>Download PDF</span>
+          <span>{isPrinting ? "Preparing..." : "Download PDF"}</span>
         </button>
       </div>
     </div>
