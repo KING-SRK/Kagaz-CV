@@ -185,6 +185,7 @@ export default function FamilyTab({
                     <option value="Spouse">Spouse</option>
                     <option value="Guardian">Guardian</option>
                     <option value="Relative">Relative</option>
+                    <option value="Friend">Friend</option>
                   </select>
                 </div>
 

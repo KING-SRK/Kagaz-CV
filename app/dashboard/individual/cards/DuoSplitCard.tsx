@@ -203,7 +203,11 @@ export default function DuoSplitCard({
             {/* মাঝখানের অংশ: QR কোড (ডানপাশে গোছানো) */}
             <div className="flex items-center justify-end my-auto relative z-10">
               <div className="p-2 bg-white rounded-xl shadow-lg border border-neutral-700 shrink-0">
-                <QRCodeSVG value={userProfileUrl} size={72} level="M" />
+                <QRCodeSVG
+                  value="https://sutra-net.vercel.app/"
+                  size={72}
+                  level="M"
+                />
               </div>
             </div>
 

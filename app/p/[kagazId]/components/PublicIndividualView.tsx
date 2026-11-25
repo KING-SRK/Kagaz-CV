@@ -82,6 +82,7 @@ interface FamilyItem {
   relation?: string;
   name?: string;
   occupation?: string;
+  contact?: string;
 }
 
 interface ReferenceItem {
@@ -692,8 +693,8 @@ export default function PublicIndividualView({
               )}
               {profile.career_preferences.availableForFreelance && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 border border-blue-300 text-blue-800 rounded-xs">
-                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> Available for
-                  Freelance
+                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> Available
+                  for Freelance
                 </span>
               )}
               {profile.career_preferences.noticePeriod && (
@@ -722,7 +723,7 @@ export default function PublicIndividualView({
                 .map((fam, idx) => (
                   <div
                     key={fam.id || idx}
-                    className="p-3 bg-neutral-50 border border-neutral-200 rounded-xs"
+                    className="p-3 bg-neutral-50 border border-neutral-200 rounded-xs space-y-1"
                   >
                     <p className="text-[10px] font-mono uppercase text-neutral-500">
                       {fam.relation}
@@ -730,6 +731,15 @@ export default function PublicIndividualView({
                     <p className="font-bold text-neutral-900">{fam.name}</p>
                     {fam.occupation && (
                       <p className="text-neutral-600">{fam.occupation}</p>
+                    )}
+                    {fam.contact?.trim() && (
+                      <a
+                        href={`tel:${fam.contact}`}
+                        className="inline-flex items-center gap-1.5 pt-1 text-[11px] font-mono text-neutral-800 hover:text-emerald-700 hover:underline"
+                      >
+                        <Phone className="h-3 w-3 text-neutral-500 shrink-0" />
+                        <span>{fam.contact}</span>
+                      </a>
                     )}
                   </div>
                 ))}
