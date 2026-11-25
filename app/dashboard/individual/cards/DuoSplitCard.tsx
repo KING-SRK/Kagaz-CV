@@ -26,7 +26,7 @@ export default function DuoSplitCard({
     <div
       onClick={() => setIsFlipped((prev) => !prev)}
       title="Click card to flip"
-      className="w-full max-w-110 aspect-1.75/1] mx-auto select-none cursor-pointer"
+      className="w-full max-w-110 aspect-1.75/1 mx-auto select-none cursor-pointer"
       style={{ perspective: "1000px" }}
     >
       <div
