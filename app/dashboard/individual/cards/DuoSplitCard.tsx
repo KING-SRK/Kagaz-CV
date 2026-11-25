@@ -4,7 +4,15 @@
 import { useState } from "react";
 import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
-import { UserShield, Phone, MapPin, Mail, User, ShieldCheck, CalendarFold } from "lucide-react";
+import {
+  UserCheck,
+  Phone,
+  MapPin,
+  Mail,
+  User,
+  ShieldCheck,
+  CalendarFold,
+} from "lucide-react";
 import { CardProps } from "./types";
 
 export default function DuoSplitCard({
@@ -18,7 +26,7 @@ export default function DuoSplitCard({
     <div
       onClick={() => setIsFlipped((prev) => !prev)}
       title="Click card to flip"
-      className="w-full max-w-[440px] aspect-[1.75/1] mx-auto select-none cursor-pointer"
+      className="w-full max-w-110 aspect-1.75/1] mx-auto select-none cursor-pointer"
       style={{ perspective: "1000px" }}
     >
       <div
@@ -41,7 +49,7 @@ export default function DuoSplitCard({
           }}
         >
           {/* বাঁদিকের অংশ: নাম, পদবি ও কন্টাক্ট ইনফো */}
-          <div className="w-[62%] h-full p-5 flex flex-col justify-between relative z-10">
+          <div className="w-[62%] h-full p-4 sm:p-5 flex flex-col justify-between relative z-10">
             {/* ওপরের SutraNet লোগো ও নাম */}
             <div className="flex items-center justify-start gap-2 z-10">
               <img
@@ -58,26 +66,27 @@ export default function DuoSplitCard({
             </div>
 
             {/* মাঝখানের অংশ: আইডি ঠিক মাঝে হাইলাইটেড */}
-            <div className=" py-1 text-center flex justify-center items-center gap-2 px-2.5 rounded-md w-fit mx-auto">
-              <span className="text-lg font-mono font-bold text-neutral-950 tracking-wider">
+            <div className="py-0.5 text-center flex justify-center items-center gap-2 px-2.5 rounded-md w-fit mx-auto">
+              <span className="text-base sm:text-lg font-mono font-bold text-neutral-950 tracking-wider">
                 {kagazId}
               </span>
             </div>
 
-            {/* প্রোফাইল ছবি ও নাম-রোল */}
-            <div className="flex items-center gap-3 my-1">
-              {/* প্রোফাইল ছবি */}
-              <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-full border border-neutral-400 bg-white shadow-sm overflow-hidden flex items-center justify-center shrink-0">
+            {/* বড় Square প্রোফাইল ছবি ও নাম-রোল */}
+            <div className="flex items-center gap-3 my-0.5">
+              {/* Square প্রোফাইল ছবি */}
+              <div className="h-14 w-14 sm:h-15 sm:w-15 rounded-lg border border-neutral-400 bg-white shadow-sm overflow-hidden flex items-center justify-center shrink-0">
                 {data.avatarUrl ? (
                   <Image
                     src={data.avatarUrl}
                     alt="Avatar"
-                    width={50}
-                    height={50}
+                    width={64}
+                    height={64}
+                    unoptimized
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User className="h-5 w-5 text-neutral-700" />
+                  <User className="h-6 w-6 text-neutral-700" />
                 )}
               </div>
 
@@ -93,7 +102,7 @@ export default function DuoSplitCard({
             </div>
 
             {/* নিচের অংশ: ফোন, লোকেশন ও ইমেইল */}
-            <div className="space-y-1.5 text-[10px] font-mono text-neutral-900 border-t border-neutral-300 pt-2">
+            <div className="space-y-1 text-[10px] font-mono text-neutral-900 border-t border-neutral-300 pt-1.5">
               <div className="flex items-center gap-5 truncate">
                 <div className="flex items-center gap-2 truncate">
                   <div className="p-0.5 text-slate-950 rounded-xs shrink-0">
@@ -106,7 +115,7 @@ export default function DuoSplitCard({
 
                 <div className="flex items-center gap-2 truncate">
                   <div className="p-0.5 text-slate-950 rounded-xs shrink-0">
-                    <UserShield className="h-3 w-3" />
+                    <UserCheck className="h-3 w-3" />
                   </div>
                   <span className="truncate font-medium">
                     {data.gender || "GENDER"}

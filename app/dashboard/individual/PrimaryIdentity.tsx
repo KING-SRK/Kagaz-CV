@@ -88,6 +88,10 @@ export default function PrimaryIdentity() {
           ...prev!,
           full_name: updated.full_name || prev?.full_name || "Name Not Set",
           title: updated.title || prev?.title || "Identity Holder",
+          phone:
+            updated.phone !== undefined
+              ? updated.phone || "Not linked"
+              : prev?.phone || "Not linked",
           dob: updated.dob || prev?.dob || "DD/MM/YYYY",
           avatar_url: updated.avatar_url ?? prev?.avatar_url,
         }));

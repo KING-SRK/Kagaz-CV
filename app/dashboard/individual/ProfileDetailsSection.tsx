@@ -234,6 +234,7 @@ export default function ProfileDetailsSection() {
         avatar_url: draft.avatar_url || "",
         full_name: draft.full_name || "",
         title: draft.title || "",
+        phone: draft.phone || "",
         sector: draft.sector || "",
         bio: draft.bio || "",
         dob: draft.dob || "",
@@ -461,6 +462,7 @@ export default function ProfileDetailsSection() {
                   avatarUrl: isEditing ? draft.avatar_url : profile.avatar_url,
                   fullName: isEditing ? draft.full_name : profile.full_name,
                   headline: isEditing ? draft.title : profile.title,
+                  phone: isEditing ? draft.phone : profile.phone,
                   dob: isEditing ? draft.dob : profile.dob,
                   gender: isEditing ? draft.gender : profile.gender,
                   bloodGroup: isEditing
@@ -486,6 +488,9 @@ export default function ProfileDetailsSection() {
                     }),
                     ...(updated.headline !== undefined && {
                       title: updated.headline,
+                    }),
+                    ...(updated.phone !== undefined && {
+                      phone: updated.phone,
                     }),
                     ...(updated.dob !== undefined && { dob: updated.dob }),
                     ...(updated.gender !== undefined && {

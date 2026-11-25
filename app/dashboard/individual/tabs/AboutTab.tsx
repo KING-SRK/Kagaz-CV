@@ -12,6 +12,7 @@ export interface AboutTabData {
   avatarUrl?: string;
   fullName?: string;
   headline?: string;
+  phone?: string;
   dob?: string;
   gender?: string;
   bloodGroup?: string;
@@ -36,6 +37,7 @@ export default function AboutTab({
     avatarUrl: data.avatarUrl || "",
     fullName: data.fullName || "",
     headline: data.headline || "",
+    phone: data.phone || "",
     dob: data.dob || "",
     gender: data.gender || "",
     bloodGroup: data.bloodGroup || "",
@@ -64,7 +66,7 @@ export default function AboutTab({
         onChange={handlePersonalDataChange}
       />
 
-      {/* ২. ডায়নামিক সোশ্যাল মিডিয়া লিংক কম্পোনেন্ট */}
+      {/* ২. ডায়নামিক সোশ্যাল মিডিয়া লিংক কম্পোনেন্ট */}
       <DynamicSocialLinks
         links={data.socialLinks || []}
         isEditing={isEditing}

@@ -2,14 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import {
-  Check,
-  Copy,
-  Download,
-  ExternalLink,
-  Loader2,
-  Shield,
-} from "lucide-react";
+import { Check, Copy, Download, ExternalLink, Loader2 } from "lucide-react";
 import { toPng } from "html-to-image";
 import { supabase } from "@/lib/supabaseClient";
 import { getIndividualProfile } from "@/lib/individualService";
@@ -148,12 +141,14 @@ export default function CardSection() {
         setCardData((prev) => ({
           ...prev,
           name: updated.full_name || prev.name,
+          phone:
+            updated.phone !== undefined
+              ? updated.phone || "Not Set"
+              : prev.phone,
           title: updated.title || prev.title,
           dob: updated.dob || prev.dob,
           avatarUrl: updated.avatar_url ?? prev.avatarUrl,
-          gender: updated.gender
-            ? updated.gender.charAt(0).toUpperCase()
-            : prev.gender,
+          gender: updated.gender ? updated.gender.toUpperCase() : prev.gender,
           ...(locStr && { address: locStr }),
         }));
       }
@@ -234,7 +229,7 @@ export default function CardSection() {
       <div
         ref={wrapperRef}
         style={{ height: `${CARD_HEIGHT * scale}px` }}
-        className="w-full max-w-[440px] flex items-center justify-center relative"
+        className="w-full max-w-110 flex items-center justify-center relative"
       >
         <div
           ref={cardRef}
@@ -261,7 +256,7 @@ export default function CardSection() {
       </div>
 
       {/* ২. কুইক অ্যাকশন বাটন বার (সম্পূর্ণ রেসপন্সিভ) */}
-      <div className="w-full max-w-[380px] sm:max-w-[440px] grid grid-cols-2 sm:flex sm:items-center gap-2 mt-5 px-2 sm:px-0">
+      <div className="w-full max-w-95 sm:max-w-110 grid grid-cols-2 sm:flex sm:items-center gap-2 mt-5 px-2 sm:px-0">
         {/* ১. Copy Link */}
         <button
           type="button"

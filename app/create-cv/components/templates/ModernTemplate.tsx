@@ -618,33 +618,22 @@ export default function ModernTemplate({ rawData }: Props) {
         </section>
       )}
 
-      {visibility.declaration && data.declarationText.trim() && (
-        <section className="pt-3 border-t border-neutral-200 mt-6">
-          <h2 className={sectionTitleClass}>Declaration</h2>
-          <p className="text-xs text-neutral-700 leading-relaxed mb-5">
-            {data.declarationText}
-          </p>
-          <div className="flex items-end justify-between text-xs font-mono text-neutral-800 pt-2">
-            <span>Place: {data.location || "Location"}</span>
-            <span className="border-t border-neutral-400 pt-1 px-3">
-              {data.fullName || "Signature"}
-            </span>
-          </div>
-        </section>
-      )}
-
       <style jsx>{`
         #cv-printable-area::after {
-          content: "Generated via SutraNet ${data.kagazId
+          content: "${visibility.declaration && data.declarationText.trim()
+            ? `Declaration: ${data.declarationText.replace(/"/g, '\\"').replace(/\n/g, " ")}\\A`
+            : ""}Generated via SutraNet ${data.kagazId
             ? `• ID: ${data.kagazId}  |  Verify at sutranet.in/p/${data.kagazId}`
             : "• Connected Digital Identity Network"}";
           display: block;
+          white-space: pre-line;
           margin-top: auto;
-          padding-top: 12px;
+          padding-top: 10px;
           border-top: 1px solid #e5e5e5;
           font-family: monospace;
           font-size: 9.5px;
-          color: #a3a3a3;
+          line-height: 1.55;
+          color: #737373;
           text-align: center;
         }
       `}</style>

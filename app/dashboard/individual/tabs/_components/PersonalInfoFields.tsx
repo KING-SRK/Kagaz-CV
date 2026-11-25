@@ -12,6 +12,7 @@ import {
   Loader2,
   Plus,
   X,
+  Phone,
 } from "lucide-react";
 import { uploadAvatar, deleteAvatarFromStorage } from "@/lib/individualService";
 
@@ -19,6 +20,7 @@ export interface PersonalInfoData {
   avatarUrl?: string;
   fullName: string;
   headline: string;
+  phone?: string;
   dob: string;
   gender: string;
   bloodGroup: string;
@@ -122,25 +124,32 @@ export default function PersonalInfoFields({
     return (
       <div className="space-y-4">
         {/* প্রোফাইল কার্ড */}
-        <div className="p-3 sm:p-3.5 bg-neutral-50/70 border border-neutral-200/80 rounded-xs flex items-center gap-3 sm:gap-3.5">
-          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden border border-neutral-300 bg-white flex items-center justify-center shrink-0 shadow-2xs">
-            {data.avatarUrl ? (
-              <img
-                src={data.avatarUrl}
-                alt={data.fullName || "Avatar"}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <User className="h-5 w-5 sm:h-6 sm:w-6 text-neutral-400" />
-            )}
+        <div className="p-3 sm:p-3.5 bg-neutral-50/70 border border-neutral-200/80 rounded-xs flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden border border-neutral-300 bg-white flex items-center justify-center shrink-0 shadow-2xs">
+              {data.avatarUrl ? (
+                <img
+                  src={data.avatarUrl}
+                  alt={data.fullName || "Avatar"}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User className="h-5 w-5 sm:h-6 sm:w-6 text-neutral-400" />
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-sm font-serif font-bold text-neutral-950 truncate">
+                {data.fullName || "Name Not Set"}
+              </h2>
+              <p className="text-[11px] sm:text-xs font-mono text-neutral-500 truncate">
+                {data.headline || "Headline Not Set"}
+              </p>
+            </div>
           </div>
-          <div className="min-w-0 flex-1">
-            <h2 className="text-sm font-serif font-bold text-neutral-950 truncate">
-              {data.fullName || "Name Not Set"}
-            </h2>
-            <p className="text-[11px] sm:text-xs font-mono text-neutral-500 truncate">
-              {data.headline || "Headline Not Set"}
-            </p>
+
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-neutral-200 rounded-xs text-[11px] font-mono text-neutral-700 shrink-0">
+            <Phone className="h-3 w-3 text-neutral-400 shrink-0" />
+            <span>{data.phone || "Phone Not Set"}</span>
           </div>
         </div>
 
@@ -230,7 +239,7 @@ export default function PersonalInfoFields({
           )}
         </div>
 
-        {/* প্রফেশনাল সামারি / বায়ো */}
+        {/* প্রফেশনাল সামারি / বায়ো */}
         <div className="p-3 bg-neutral-50/70 border border-neutral-200/80 rounded-xs text-xs text-neutral-700 leading-relaxed font-sans">
           <span className="text-[9px] font-mono uppercase text-neutral-400 block mb-1">
             Professional Summary / About
@@ -307,8 +316,8 @@ export default function PersonalInfoFields({
         </div>
       </div>
 
-      {/* নাম ও হেডলাইন */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {/* নাম, হেডলাইন ও ফোন নম্বর */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
             Full Name
@@ -330,6 +339,18 @@ export default function PersonalInfoFields({
             value={data.headline}
             placeholder="Enter your work title or headline"
             onChange={(e) => onChange("headline", e.target.value)}
+            className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
+          />
+        </div>
+        <div>
+          <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
+            Phone Number
+          </label>
+          <input
+            type="tel"
+            value={data.phone || ""}
+            placeholder="e.g. +91 98765 43210"
+            onChange={(e) => onChange("phone", e.target.value)}
             className="w-full border border-neutral-200 bg-neutral-50/30 px-3 py-2 text-xs font-mono outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
           />
         </div>
@@ -398,7 +419,7 @@ export default function PersonalInfoFields({
         </div>
       </div>
 
-      {/* ভাষা ও প্রোফিসিয়েন্সি (Read / Write / Speak) */}
+      {/* ভাষা ও প্রোফিসিয়েন্সি (Read / Write / Speak) */}
       <div className="p-3 bg-neutral-50/60 border border-neutral-200 rounded-xs space-y-2.5">
         <label className="block text-[11px] font-mono uppercase text-neutral-600 font-bold">
           Languages & Proficiency
@@ -473,7 +494,7 @@ export default function PersonalInfoFields({
         </div>
       </div>
 
-      {/* প্রফেশনাল সামারি / বায়ো */}
+      {/* প্রফেশনাল সামারি / বায়ো */}
       <div>
         <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">
           Professional Summary / Career Objective

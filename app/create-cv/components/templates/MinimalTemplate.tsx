@@ -629,35 +629,24 @@ export default function MinimalTemplate({ rawData }: Props) {
             </div>
           </section>
         )}
-
-        {visibility.declaration && data.declarationText.trim() && (
-          <section className="pt-3 border-t border-neutral-100 mt-auto">
-            <h2 className={headingClass}>Declaration</h2>
-            <p className="text-[11px] text-neutral-600 leading-relaxed mb-4">
-              {data.declarationText}
-            </p>
-            <div className="flex items-end justify-between text-[11px] font-mono text-neutral-600 pt-1">
-              <span>Place: {data.location || "Location"}</span>
-              <span className="border-t border-neutral-300 pt-1 px-3">
-                {data.fullName || "Signature"}
-              </span>
-            </div>
-          </section>
-        )}
       </div>
 
       <style jsx>{`
         #cv-printable-area::after {
-          content: "Generated via SutraNet ${data.kagazId
+          content: "${visibility.declaration && data.declarationText.trim()
+            ? `Declaration: ${data.declarationText.replace(/"/g, '\\"').replace(/\n/g, " ")}\\A`
+            : ""}Generated via SutraNet ${data.kagazId
             ? `• ID: ${data.kagazId}  |  Verify at sutranet.in/p/${data.kagazId}`
             : "• Connected Digital Identity Network"}";
           display: block;
+          white-space: pre-line;
           margin-top: auto;
           padding-top: 10px;
-          border-top: 1px solid #f5f5f5;
+          border-top: 1px solid #e5e5e5;
           font-family: monospace;
-          font-size: 9px;
-          color: #a3a3a3;
+          font-size: 9.5px;
+          line-height: 1.55;
+          color: #737373;
           text-align: center;
         }
       `}</style>

@@ -152,11 +152,11 @@ export const DEFAULT_CV_VISIBILITY: CvSectionVisibility = {
   references: false,
   personalDetails: false,
   customSection: false,
-  declaration: false,
+  declaration: true,
 };
 
 export const DEFAULT_DECLARATION =
-  "I hereby declare that all the information furnished above is true, complete, and correct to the best of my knowledge and belief.";
+  "I hereby declare that the above information is true and correct to the best of my knowledge.";
 
 export const EMPTY_CV_DATA: CvData = {
   fullName: "",

@@ -237,33 +237,22 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
         </div>
       </div>
 
-      {/* ২. PROFESSIONAL SUMMARY */}
+      {/* ২. PROFESSIONAL SUMMARY (সবসময় দৃশ্যমান) */}
       <div className="bg-white border border-neutral-300 p-3.5 sm:p-4 rounded-xs space-y-2.5">
-        <SectionToggle
-          title="2. Professional Summary"
-          isOn={cvData.visibility.summary}
-          onToggle={() => toggleVisibility("summary")}
-        />
-        {cvData.visibility.summary && (
-          <div className="space-y-1">
-            <textarea
-              rows={3}
-              placeholder="Write a concise summary about your background..."
-              value={cvData.summary}
-              onChange={(e) =>
-                setCvData({ ...cvData, summary: e.target.value })
-              }
-              className="w-full border border-neutral-300 p-2.5 text-xs rounded-xs focus:outline-none focus:border-neutral-900"
-            />
-            <SoftLimitHint
-              current={cvData.summary.length}
-              recommendedMax={320}
-            />
-          </div>
-        )}
+        <SectionHeader title="2. Professional Summary" />
+        <div className="space-y-1">
+          <textarea
+            rows={3}
+            placeholder="Write a concise summary about your background..."
+            value={cvData.summary}
+            onChange={(e) => setCvData({ ...cvData, summary: e.target.value })}
+            className="w-full border border-neutral-300 p-2.5 text-xs rounded-xs focus:outline-none focus:border-neutral-900"
+          />
+          <SoftLimitHint current={cvData.summary.length} recommendedMax={320} />
+        </div>
       </div>
 
-      {/* ৩. WORK EXPERIENCE */}
+      {/* ৩. WORK EXPERIENCE (টগলসহ) */}
       <div className="bg-white border border-neutral-300 p-3.5 sm:p-4 rounded-xs space-y-3">
         <SectionToggle
           title="3. Work Experience"
@@ -382,7 +371,7 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
         )}
       </div>
 
-      {/* ৪. KEY PROJECTS */}
+      {/* ৪. KEY PROJECTS (টগলসহ) */}
       <div className="bg-white border border-neutral-300 p-3.5 sm:p-4 rounded-xs space-y-3">
         <SectionToggle
           title="4. Key Projects"
@@ -472,109 +461,101 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
         )}
       </div>
 
-      {/* ৫. EDUCATION */}
+      {/* ৫. EDUCATION (সবসময় দৃশ্যমান) */}
       <div className="bg-white border border-neutral-300 p-3.5 sm:p-4 rounded-xs space-y-3">
-        <SectionToggle
-          title="5. Education"
-          isOn={cvData.visibility.education}
-          onToggle={() => toggleVisibility("education")}
-        />
-        {cvData.visibility.education && (
-          <div className="space-y-3">
-            {cvData.education.map((edu, idx) => (
-              <div
-                key={edu.id}
-                className="p-3 bg-neutral-50 border border-neutral-200 rounded-xs space-y-2 relative"
+        <SectionHeader title="5. Education" />
+        <div className="space-y-3">
+          {cvData.education.map((edu, idx) => (
+            <div
+              key={edu.id}
+              className="p-3 bg-neutral-50 border border-neutral-200 rounded-xs space-y-2 relative"
+            >
+              <button
+                type="button"
+                onClick={() =>
+                  setCvData({
+                    ...cvData,
+                    education: cvData.education.filter((_, i) => i !== idx),
+                  })
+                }
+                className="absolute top-2.5 right-2.5 p-1 text-neutral-400 hover:text-red-600 cursor-pointer"
               >
-                <button
-                  type="button"
-                  onClick={() =>
-                    setCvData({
-                      ...cvData,
-                      education: cvData.education.filter((_, i) => i !== idx),
-                    })
-                  }
-                  className="absolute top-2.5 right-2.5 p-1 text-neutral-400 hover:text-red-600 cursor-pointer"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pr-6">
-                  <input
-                    type="text"
-                    placeholder="Degree / Class"
-                    value={edu.degree}
-                    onChange={(e) => {
-                      const updated = [...cvData.education];
-                      updated[idx].degree = e.target.value;
-                      setCvData({ ...cvData, education: updated });
-                    }}
-                    className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
-                  />
-                  <input
-                    type="text"
-                    placeholder="School / College"
-                    value={edu.institution}
-                    onChange={(e) => {
-                      const updated = [...cvData.education];
-                      updated[idx].institution = e.target.value;
-                      setCvData({ ...cvData, education: updated });
-                    }}
-                    className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Start Year"
-                    value={edu.startYear}
-                    onChange={(e) => {
-                      const updated = [...cvData.education];
-                      updated[idx].startYear = e.target.value;
-                      setCvData({ ...cvData, education: updated });
-                    }}
-                    className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
-                  />
-                  <input
-                    type="text"
-                    placeholder="End Year"
-                    value={edu.endYear}
-                    onChange={(e) => {
-                      const updated = [...cvData.education];
-                      updated[idx].endYear = e.target.value;
-                      setCvData({ ...cvData, education: updated });
-                    }}
-                    className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
-                  />
-                </div>
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pr-6">
+                <input
+                  type="text"
+                  placeholder="Degree / Class"
+                  value={edu.degree}
+                  onChange={(e) => {
+                    const updated = [...cvData.education];
+                    updated[idx].degree = e.target.value;
+                    setCvData({ ...cvData, education: updated });
+                  }}
+                  className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
+                />
+                <input
+                  type="text"
+                  placeholder="School / College"
+                  value={edu.institution}
+                  onChange={(e) => {
+                    const updated = [...cvData.education];
+                    updated[idx].institution = e.target.value;
+                    setCvData({ ...cvData, education: updated });
+                  }}
+                  className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
+                />
+                <input
+                  type="text"
+                  placeholder="Start Year"
+                  value={edu.startYear}
+                  onChange={(e) => {
+                    const updated = [...cvData.education];
+                    updated[idx].startYear = e.target.value;
+                    setCvData({ ...cvData, education: updated });
+                  }}
+                  className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
+                />
+                <input
+                  type="text"
+                  placeholder="End Year"
+                  value={edu.endYear}
+                  onChange={(e) => {
+                    const updated = [...cvData.education];
+                    updated[idx].endYear = e.target.value;
+                    setCvData({ ...cvData, education: updated });
+                  }}
+                  className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
+                />
               </div>
-            ))}
-            <AddBtn
-              label="Add Education"
-              onClick={() =>
-                setCvData({
-                  ...cvData,
-                  education: [
-                    ...cvData.education,
-                    {
-                      id: `edu-${Date.now()}`,
-                      degree: "",
-                      institution: "",
-                      startYear: "",
-                      endYear: "",
-                    },
-                  ],
-                })
-              }
-            />
-          </div>
-        )}
+            </div>
+          ))}
+          <AddBtn
+            label="Add Education"
+            onClick={() =>
+              setCvData({
+                ...cvData,
+                education: [
+                  ...cvData.education,
+                  {
+                    id: `edu-${Date.now()}`,
+                    degree: "",
+                    institution: "",
+                    startYear: "",
+                    endYear: "",
+                  },
+                ],
+              })
+            }
+          />
+        </div>
       </div>
 
-      {/* ৬. CORE SKILLS */}
+      {/* ৬. CORE SKILLS (সবসময় দৃশ্যমান) */}
       <div className="bg-white border border-neutral-300 p-3.5 sm:p-4 rounded-xs">
         <TagManager
           title="6. Core Skills"
           placeholder="Add skill & press Enter"
-          isOn={cvData.visibility.skills}
-          onToggle={() => toggleVisibility("skills")}
           items={cvData.skills}
           inputVal={skillInput}
           setInputVal={setSkillInput}
@@ -588,7 +569,7 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
         />
       </div>
 
-      {/* ৭. SOCIAL & PORTFOLIO LINKS + CERTIFICATIONS */}
+      {/* ৭. SOCIAL & PORTFOLIO LINKS + ৮. CERTIFICATIONS */}
       <div className="bg-white border border-neutral-300 p-3.5 sm:p-4 rounded-xs space-y-4">
         <div className="space-y-2.5">
           <SectionToggle
@@ -1290,6 +1271,16 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
 
 // --- ছোট হেল্পার কম্পোনেন্টগুলো ---
 
+function SectionHeader({ title }: { title: string }) {
+  return (
+    <div className="flex items-center justify-between gap-2 border-b border-neutral-200 pb-2">
+      <h2 className="text-[11px] sm:text-xs font-mono font-bold uppercase tracking-wider text-neutral-900 truncate">
+        {title}
+      </h2>
+    </div>
+  );
+}
+
 function SectionToggle({
   title,
   isOn,
@@ -1380,18 +1371,24 @@ function TagManager({
 }: {
   title: string;
   placeholder: string;
-  isOn: boolean;
-  onToggle: () => void;
+  isOn?: boolean;
+  onToggle?: () => void;
   items: string[];
   inputVal: string;
   setInputVal: (v: string) => void;
   onAdd: () => void;
   onRemove: (item: string) => void;
 }) {
+  const showContent = isOn !== undefined ? isOn : true;
+
   return (
     <div className="space-y-2">
-      <SectionToggle title={title} isOn={isOn} onToggle={onToggle} />
-      {isOn && (
+      {isOn !== undefined && onToggle ? (
+        <SectionToggle title={title} isOn={isOn} onToggle={onToggle} />
+      ) : (
+        <SectionHeader title={title} />
+      )}
+      {showContent && (
         <>
           <div className="flex gap-2">
             <input
