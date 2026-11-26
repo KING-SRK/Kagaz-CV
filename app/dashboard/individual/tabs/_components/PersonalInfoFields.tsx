@@ -15,6 +15,7 @@ import {
   Phone,
 } from "lucide-react";
 import { uploadAvatar, deleteAvatarFromStorage } from "@/lib/individualService";
+import ImageCropModal from "@/components/ui/ImageCropModal";
 
 export interface PersonalInfoData {
   avatarUrl?: string;
@@ -64,6 +65,7 @@ export default function PersonalInfoFields({
 }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState<boolean>(false);
+  const [rawImageForCrop, setRawImageForCrop] = useState<string | null>(null);
   const [newLangName, setNewLangName] = useState<string>("");
 
   const langList = parseLanguages(data.languages);
@@ -95,20 +97,35 @@ export default function PersonalInfoFields({
     updateLanguagesList(langList.filter((_, i) => i !== idx));
   };
 
-  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setRawImageForCrop(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleCroppedUpload = async (croppedFile: File) => {
+    setRawImageForCrop(null);
     try {
       setUploading(true);
       const activeId = localStorage.getItem("kagaz_active_id") || "user";
-      const { url, error } = await uploadAvatar(activeId, file, data.avatarUrl);
+      const { url, error } = await uploadAvatar(
+        activeId,
+        croppedFile,
+        data.avatarUrl,
+      );
       if (!error && url) {
         onChange("avatarUrl", url);
       }
     } finally {
       setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -507,6 +524,13 @@ export default function PersonalInfoFields({
           className="w-full border border-neutral-200 bg-neutral-50/30 p-3 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 focus:bg-white resize-none rounded-xs"
         />
       </div>
+      {rawImageForCrop && (
+        <ImageCropModal
+          imageSrc={rawImageForCrop}
+          onClose={() => setRawImageForCrop(null)}
+          onCropComplete={handleCroppedUpload}
+        />
+      )}
     </div>
   );
 }

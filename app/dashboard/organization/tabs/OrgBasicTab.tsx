@@ -24,6 +24,7 @@ import {
   formatOtherDisplay,
 } from "@/constants/orgOptions";
 import { FormInput, FormSelectWithOther } from "@/components/ui/FormFields";
+import ImageCropModal from "@/components/ui/ImageCropModal";
 
 interface Props {
   isEditing: boolean;
@@ -34,18 +35,35 @@ interface Props {
 export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
   const logoInputRef = useRef<HTMLInputElement>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [rawLogoForCrop, setRawLogoForCrop] = useState<string | null>(null);
 
-  const handleLogoUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+  const handleLogoFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setRawLogoForCrop(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+    if (logoInputRef.current) logoInputRef.current.value = "";
+  };
+
+  const handleCroppedLogoUpload = async (croppedFile: File) => {
+    setRawLogoForCrop(null);
     try {
       setUploadingLogo(true);
       const activeId = localStorage.getItem("kagaz_active_id") || "org";
-      const { url, error } = await uploadAvatar(activeId, file, data.logo_url);
+      const { url, error } = await uploadAvatar(
+        activeId,
+        croppedFile,
+        data.logo_url,
+      );
       if (!error && url) onChange({ logo_url: url });
     } finally {
       setUploadingLogo(false);
-      if (logoInputRef.current) logoInputRef.current.value = "";
     }
   };
 
@@ -245,6 +263,7 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
             )}
             <button
               type="button"
+              disabled={uploadingLogo}
               onClick={() => logoInputRef.current?.click()}
               className="absolute inset-0 bg-neutral-950/45 hover:bg-neutral-950/65 flex items-center justify-center text-white cursor-pointer"
             >
@@ -260,10 +279,12 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
               type="file"
               accept="image/png, image/jpeg, image/webp"
               className="hidden"
-              onChange={handleLogoUpload}
+              onChange={handleLogoFileSelect}
+              disabled={uploadingLogo}
             />
             <button
               type="button"
+              disabled={uploadingLogo}
               onClick={() => logoInputRef.current?.click()}
               className="mt-1.5 px-3 py-1 bg-neutral-900 hover:bg-neutral-800 text-white text-[10.5px] font-mono uppercase rounded-xs cursor-pointer transition-colors"
             >
@@ -443,6 +464,15 @@ export default function OrgBasicTab({ isEditing, data, onChange }: Props) {
           </div>
         ))}
       </div>
+
+      {rawLogoForCrop && (
+        <ImageCropModal
+          imageSrc={rawLogoForCrop}
+          cropShape="rect"
+          onClose={() => setRawLogoForCrop(null)}
+          onCropComplete={handleCroppedLogoUpload}
+        />
+      )}
     </div>
   );
 }

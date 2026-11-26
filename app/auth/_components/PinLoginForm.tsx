@@ -4,7 +4,7 @@
 import { useState } from "react";
 import PinInput from "./PinInput";
 import GoogleAuthButton from "./GoogleAuthButton";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, User, Building2, ArrowLeft } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import bcrypt from "bcryptjs";
 import { useRouter } from "next/navigation";
@@ -13,12 +13,35 @@ interface PinLoginFormProps {
   onGoToRegister: () => void;
 }
 
+interface MatchedWorkspace {
+  id: string;
+  kagaz_id: string;
+  role: "individual" | "organization";
+  displayName: string;
+}
+
 export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
   const router = useRouter();
   const [identifier, setIdentifier] = useState("");
   const [pin, setPin] = useState<string[]>(["", "", "", ""]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // একই ইমেইল/ফোনে দুটো অ্যাকাউন্ট থাকলে ওয়ার্কস্পেস বেছে নেওয়ার স্টেট
+  const [matchedAccounts, setMatchedAccounts] = useState<MatchedWorkspace[]>(
+    [],
+  );
+
+  const enterWorkspace = (acc: MatchedWorkspace) => {
+    localStorage.setItem("kagaz_active_id", acc.id);
+    localStorage.setItem("kagaz_card_id", acc.kagaz_id);
+    localStorage.setItem("kagaz_role", acc.role);
+    router.push(
+      acc.role === "organization"
+        ? "/dashboard/organization"
+        : "/dashboard/individual",
+    );
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,70 +70,78 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
         phoneQuery = `+${cleanDigits}`;
       }
 
-      const orFilter = `kagaz_id.eq.${query},email.eq.${query.toLowerCase()},phone.eq.${phoneQuery},phone.eq.${query}`;
+      const orFilter = `kagaz_id.ilike.${query},email.ilike.${query},phone.eq.${phoneQuery},phone.eq.${query}`;
 
-      // ১. প্রথমে Individual (profiles টেবিল) খোঁজা
-      const { data: indProfile } = await supabase
-        .from("profiles")
-        .select("id, kagaz_id, pin_hash")
-        .or(orFilter)
-        .maybeSingle();
+      // ১. দুটো টেবিলেই একসাথে খোঁজা হচ্ছে
+      const [{ data: indProfile }, { data: orgProfile }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, kagaz_id, full_name, pin_hash")
+          .or(orFilter)
+          .maybeSingle(),
+        supabase
+          .from("company_profiles")
+          .select("id, kagaz_id, company_name, pin_hash")
+          .or(orFilter)
+          .maybeSingle(),
+      ]);
+
+      if (!indProfile && !orgProfile) {
+        setError("Account not found with this identifier.");
+        setLoading(false);
+        return;
+      }
+
+      const validMatches: MatchedWorkspace[] = [];
+      let hasGoogleOnlyAccount = false;
 
       if (indProfile) {
         if (!indProfile.pin_hash) {
-          setError(
-            "This account uses Google Sign-In. Please continue with Google.",
-          );
-          setLoading(false);
-          return;
+          hasGoogleOnlyAccount = true;
+        } else if (await bcrypt.compare(rawPin, indProfile.pin_hash)) {
+          validMatches.push({
+            id: indProfile.id,
+            kagaz_id: indProfile.kagaz_id,
+            role: "individual",
+            displayName: indProfile.full_name || "Individual Workspace",
+          });
         }
-
-        const isMatch = await bcrypt.compare(rawPin, indProfile.pin_hash);
-        if (!isMatch) {
-          setError("Incorrect PIN. Please try again.");
-          setLoading(false);
-          return;
-        }
-
-        localStorage.setItem("kagaz_active_id", indProfile.id);
-        localStorage.setItem("kagaz_card_id", indProfile.kagaz_id);
-        localStorage.setItem("kagaz_role", "individual");
-        router.push("/dashboard/individual");
-        return;
       }
-
-      // ২. না পেলে Organization (company_profiles টেবিল) খোঁজা
-      const { data: orgProfile } = await supabase
-        .from("company_profiles")
-        .select("id, kagaz_id, pin_hash")
-        .or(orFilter)
-        .maybeSingle();
 
       if (orgProfile) {
         if (!orgProfile.pin_hash) {
-          setError(
-            "This account uses Google Sign-In. Please continue with Google.",
-          );
-          setLoading(false);
-          return;
+          hasGoogleOnlyAccount = true;
+        } else if (await bcrypt.compare(rawPin, orgProfile.pin_hash)) {
+          validMatches.push({
+            id: orgProfile.id,
+            kagaz_id: orgProfile.kagaz_id,
+            role: "organization",
+            displayName: orgProfile.company_name || "Organization Workspace",
+          });
         }
+      }
 
-        const isMatch = await bcrypt.compare(rawPin, orgProfile.pin_hash);
-        if (!isMatch) {
-          setError("Incorrect PIN. Please try again.");
-          setLoading(false);
-          return;
-        }
-
-        localStorage.setItem("kagaz_active_id", orgProfile.id);
-        localStorage.setItem("kagaz_card_id", orgProfile.kagaz_id);
-        localStorage.setItem("kagaz_role", "organization");
-        router.push("/dashboard/organization");
+      // ২. যদি দুটো ওয়ার্কস্পেসেই PIN মিলে যায়, বেছে নেওয়ার অপশন দেখাবে
+      if (validMatches.length > 1) {
+        setMatchedAccounts(validMatches);
+        setLoading(false);
         return;
       }
 
-      // ৩. কোনো টেবিলেই না পাওয়া গেলে
-      setError("Account not found with this identifier.");
+      // ৩. যদি ১টি ওয়ার্কস্পেসে মিলে যায়, সরাসরি ঢুকিয়ে দেবে
+      if (validMatches.length === 1) {
+        enterWorkspace(validMatches[0]);
+        return;
+      }
+
+      // ৪. কোনোটাতেই PIN না মিললে
+      if (hasGoogleOnlyAccount) {
+        setError(
+          "This account uses Google Sign-In. Please continue with Google.",
+        );
+      } else {
+        setError("Incorrect PIN. Please try again.");
+      }
     } catch (err) {
       console.error("DEBUG ERROR DETAILS:", err);
       setError(
@@ -122,6 +153,63 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
       setLoading(false);
     }
   };
+
+  // একই ইমেইলে Individual ও Organization দুটোই থাকলে সুইচার UI
+  if (matchedAccounts.length > 1) {
+    return (
+      <div className="w-full space-y-5">
+        <button
+          type="button"
+          onClick={() => setMatchedAccounts([])}
+          className="inline-flex items-center gap-1 text-[11px] font-mono uppercase text-neutral-400 hover:text-neutral-950 transition-colors cursor-pointer"
+        >
+          <ArrowLeft className="h-3 w-3" /> Back
+        </button>
+
+        <div className="space-y-1">
+          <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-600">
+            Multiple Workspaces Found
+          </span>
+          <h2 className="text-xl sm:text-2xl font-serif text-neutral-950">
+            Select Workspace.
+          </h2>
+          <p className="text-xs text-neutral-500">
+            Choose which workspace you want to unlock right now.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          {matchedAccounts.map((acc) => (
+            <button
+              key={acc.id}
+              type="button"
+              onClick={() => enterWorkspace(acc)}
+              className="w-full border border-neutral-200 hover:border-neutral-950 p-4 flex items-center justify-between text-left transition-colors cursor-pointer rounded-xs"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="h-9 w-9 border border-neutral-200 flex items-center justify-center shrink-0">
+                  {acc.role === "organization" ? (
+                    <Building2 className="h-4 w-4" />
+                  ) : (
+                    <User className="h-4 w-4" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-neutral-950 truncate">
+                    {acc.displayName}
+                  </p>
+                  <p className="text-[11px] font-mono text-neutral-500 uppercase">
+                    {acc.role} • {acc.kagaz_id}
+                  </p>
+                </div>
+              </div>
+              <ArrowRight className="h-4 w-4 text-neutral-400 shrink-0" />
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-5">
@@ -172,7 +260,7 @@ export default function PinLoginForm({ onGoToRegister }: PinLoginFormProps) {
             </>
           ) : (
             <>
-              <span>Unlock & Enter</span>
+              <span>Unlock &amp; Enter</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </>
           )}

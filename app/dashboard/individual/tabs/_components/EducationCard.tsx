@@ -1,6 +1,7 @@
 // app/dashboard/individual/tabs/_components/EducationCard.tsx
 "use client";
 
+import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import {
   EducationItem,
@@ -23,6 +24,14 @@ export default function EducationCard({
 }: Props) {
   const isSchool = item.type === "school";
   const isCollege = item.type === "college";
+
+  // টাইপ করার সময় যাতে স্পেস বা '-' মুছে না যায়, তার জন্য লোকাল স্টেট
+  const [sessionInput, setSessionInput] = useState(item.session || "");
+
+  const handleSessionChange = (val: string) => {
+    setSessionInput(val);
+    onUpdate(item.id, "session", val);
+  };
 
   return (
     <div className="p-3 sm:p-4 border border-neutral-200/90 bg-neutral-50/40 rounded-xs space-y-3">
@@ -90,6 +99,7 @@ export default function EducationCard({
           ) : (
             <input
               type="text"
+              maxLength={60}
               value={item.degreeOrStandard}
               placeholder={
                 isCollege
@@ -97,7 +107,11 @@ export default function EducationCard({
                   : "e.g. Diploma in Hardware Repair"
               }
               onChange={(e) =>
-                onUpdate(item.id, "degreeOrStandard", e.target.value)
+                onUpdate(
+                  item.id,
+                  "degreeOrStandard",
+                  e.target.value.slice(0, 60),
+                )
               }
               className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 rounded-xs"
             />
@@ -119,6 +133,7 @@ export default function EducationCard({
           </label>
           <input
             type="text"
+            maxLength={70}
             value={item.institutionName}
             placeholder={
               isSchool
@@ -128,7 +143,7 @@ export default function EducationCard({
                   : "e.g. Training Academy"
             }
             onChange={(e) =>
-              onUpdate(item.id, "institutionName", e.target.value)
+              onUpdate(item.id, "institutionName", e.target.value.slice(0, 70))
             }
             className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 rounded-xs"
           />
@@ -141,10 +156,11 @@ export default function EducationCard({
             </label>
             <input
               type="text"
+              maxLength={70}
               value={item.universityName || ""}
               placeholder="e.g. University Name"
               onChange={(e) =>
-                onUpdate(item.id, "universityName", e.target.value)
+                onUpdate(item.id, "universityName", e.target.value.slice(0, 70))
               }
               className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 rounded-xs"
             />
@@ -188,7 +204,8 @@ export default function EducationCard({
           </label>
           <input
             type="text"
-            value={item.session}
+            maxLength={25}
+            value={sessionInput}
             placeholder={
               isCollege
                 ? item.status === "completed"
@@ -196,7 +213,7 @@ export default function EducationCard({
                   : "e.g. 2023 - 2026"
                 : "e.g. 2021 - 2023"
             }
-            onChange={(e) => onUpdate(item.id, "session", e.target.value)}
+            onChange={(e) => handleSessionChange(e.target.value.slice(0, 25))}
             className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 rounded-xs"
           />
         </div>
@@ -207,9 +224,12 @@ export default function EducationCard({
           </label>
           <input
             type="text"
+            maxLength={20}
             value={item.gradeOrScore}
             placeholder="e.g. 80% or A+"
-            onChange={(e) => onUpdate(item.id, "gradeOrScore", e.target.value)}
+            onChange={(e) =>
+              onUpdate(item.id, "gradeOrScore", e.target.value.slice(0, 20))
+            }
             className="w-full border border-neutral-200 bg-white px-3 py-2 sm:py-1.5 text-xs font-mono text-neutral-900 outline-none focus:border-neutral-950 rounded-xs"
           />
         </div>

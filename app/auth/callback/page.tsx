@@ -24,21 +24,6 @@ interface ExistingAccount {
   pin_hash?: string | null;
 }
 
-// 🍪 কুকি থেকে রোল পড়ার হেল্পার ফাংশন
-function getPendingRoleFromCookie(): "individual" | "organization" | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.match(
-    /(?:^|;\s*)sutranet_pending_role=(individual|organization)/,
-  );
-  return match ? (match[1] as "individual" | "organization") : null;
-}
-
-function clearPendingRoleCookie() {
-  if (typeof document === "undefined") return;
-  document.cookie =
-    "sutranet_pending_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-}
-
 export default function AuthCallbackPage() {
   const router = useRouter();
 
@@ -79,7 +64,6 @@ export default function AuthCallbackPage() {
     account: ExistingAccount,
     role: "individual" | "organization",
   ) => {
-    clearPendingRoleCookie();
     if (account.pin_hash) {
       localStorage.setItem("kagaz_active_id", account.id);
       localStorage.setItem("kagaz_card_id", account.kagaz_id);
@@ -100,6 +84,14 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     async function handleCallback() {
+      // URL থেকে সরাসরি intent ও role পড়া হচ্ছে
+      const params = new URLSearchParams(window.location.search);
+      const intent = params.get("intent");
+      const roleParam = params.get("role") as
+        | "individual"
+        | "organization"
+        | null;
+
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -109,33 +101,34 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      const email = user.email.toLowerCase();
+      const email = user.email.trim().toLowerCase();
       const fullName =
         user.user_metadata?.full_name || email.split("@")[0] || "Member";
       const avatar = user.user_metadata?.avatar_url || "";
 
       setGoogleUser({ email, name: fullName, avatar });
 
-      const [{ data: indProfile }, { data: orgProfile }] = await Promise.all([
+      const [{ data: indList }, { data: orgList }] = await Promise.all([
         supabase
           .from("profiles")
           .select("id, kagaz_id, pin_hash")
-          .eq("email", email)
-          .maybeSingle(),
+          .ilike("email", email)
+          .limit(1),
         supabase
           .from("company_profiles")
           .select("id, kagaz_id, pin_hash")
-          .eq("email", email)
-          .maybeSingle(),
+          .ilike("email", email)
+          .limit(1),
       ]);
+
+      const indProfile = indList?.[0] || null;
+      const orgProfile = orgList?.[0] || null;
 
       setFoundInd(indProfile);
       setFoundOrg(orgProfile);
 
-      // 🍪 কুকি থেকে পেন্ডিং রোল চেক করা হচ্ছে
-      const targetRole = getPendingRoleFromCookie();
-
-      if (targetRole === "organization") {
+      // যদি Register থেকে নির্দিষ্ট রোল সিলেক্ট করে আসে
+      if (intent !== "login" && roleParam === "organization") {
         if (orgProfile) {
           proceedToAccount(orgProfile, "organization");
         } else {
@@ -145,7 +138,7 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      if (targetRole === "individual") {
+      if (intent !== "login" && roleParam === "individual") {
         if (indProfile) {
           proceedToAccount(indProfile, "individual");
         } else {
@@ -155,7 +148,7 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      // সরাসরি Log In থেকে এলে:
+      // Log In পেজ থেকে এলে: দুটো থাকলে সুইচার দেখাবে
       if (indProfile && orgProfile) {
         setStep("switch-account");
       } else if (indProfile) {
@@ -198,10 +191,10 @@ export default function AuthCallbackPage() {
       const salt = await bcrypt.genSalt(10);
       const pinHash = await bcrypt.hash(rawPin, salt);
 
-      if (existingRecordId && existingKagazId) {
-        const tableName =
-          selectedRole === "organization" ? "company_profiles" : "profiles";
+      const tableName =
+        selectedRole === "organization" ? "company_profiles" : "profiles";
 
+      if (existingRecordId && existingKagazId) {
         const { error: updateError } = await supabase
           .from(tableName)
           .update({ pin_hash: pinHash })
@@ -213,7 +206,6 @@ export default function AuthCallbackPage() {
           return;
         }
 
-        clearPendingRoleCookie();
         localStorage.setItem("kagaz_active_id", existingRecordId);
         localStorage.setItem("kagaz_card_id", existingKagazId);
         localStorage.setItem("kagaz_role", selectedRole);
@@ -223,6 +215,17 @@ export default function AuthCallbackPage() {
             ? "/dashboard/organization"
             : "/dashboard/individual",
         );
+        return;
+      }
+
+      const { data: alreadyExists } = await supabase
+        .from(tableName)
+        .select("id, kagaz_id, pin_hash")
+        .ilike("email", googleUser.email)
+        .limit(1);
+
+      if (alreadyExists && alreadyExists.length > 0) {
+        proceedToAccount(alreadyExists[0], selectedRole);
         return;
       }
 
@@ -245,12 +248,15 @@ export default function AuthCallbackPage() {
           .single();
 
         if (orgError || !data) {
-          setError(orgError?.message || "Failed to create company profile.");
+          setError(
+            orgError?.message.includes("unique")
+              ? "An organization account with this email already exists."
+              : orgError?.message || "Failed to create company profile.",
+          );
           setSaving(false);
           return;
         }
 
-        clearPendingRoleCookie();
         localStorage.setItem("kagaz_active_id", data.id);
         localStorage.setItem("kagaz_card_id", newId);
         localStorage.setItem("kagaz_role", "organization");
@@ -271,12 +277,15 @@ export default function AuthCallbackPage() {
           .single();
 
         if (indError || !data) {
-          setError(indError?.message || "Failed to create individual profile.");
+          setError(
+            indError?.message.includes("unique")
+              ? "An individual account with this email already exists."
+              : indError?.message || "Failed to create individual profile.",
+          );
           setSaving(false);
           return;
         }
 
-        clearPendingRoleCookie();
         localStorage.setItem("kagaz_active_id", data.id);
         localStorage.setItem("kagaz_card_id", newId);
         localStorage.setItem("kagaz_role", "individual");
@@ -405,7 +414,7 @@ export default function AuthCallbackPage() {
                     Individual
                   </p>
                   <p className="text-[11px] text-neutral-500">
-                    Personal digital ID, CV & QR card
+                    Personal digital ID, CV &amp; QR card
                   </p>
                 </div>
               </button>
@@ -426,7 +435,7 @@ export default function AuthCallbackPage() {
                     Organization
                   </p>
                   <p className="text-[11px] text-neutral-500">
-                    Company profile, branches & team hub
+                    Company profile, branches &amp; team hub
                   </p>
                 </div>
               </button>

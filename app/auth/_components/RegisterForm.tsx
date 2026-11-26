@@ -1,9 +1,12 @@
 // app/auth/_components/RegisterForm.tsx
-import { ArrowLeft, ArrowRight } from "lucide-react";
+"use client";
+
+import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import GoogleAuthButton from "./GoogleAuthButton";
+import { supabase } from "@/lib/supabaseClient";
 
 interface RegisterFormProps {
   role: "individual" | "organization";
@@ -22,9 +25,64 @@ export default function RegisterForm({
   formData,
   setFormData,
 }: RegisterFormProps) {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [checking, setChecking] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onProceedToPin();
+    setError("");
+
+    const cleanEmail = formData.email.trim().toLowerCase();
+    const cleanPhone = formData.phonenumber.trim();
+
+    if (!cleanEmail) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    setChecking(true);
+    try {
+      const tableName =
+        role === "organization" ? "company_profiles" : "profiles";
+
+      // ১. একই রোলে ইমেইল আগে থেকে আছে কি না চেক করা
+      const { data: existingEmail } = await supabase
+        .from(tableName)
+        .select("id")
+        .ilike("email", cleanEmail)
+        .maybeSingle();
+
+      if (existingEmail) {
+        setError(
+          `An ${role} account already exists with this email. Please log in instead.`,
+        );
+        setChecking(false);
+        return;
+      }
+
+      // ২. একই রোলে ফোন নম্বর আগে থেকে আছে কি না চেক করা
+      if (cleanPhone) {
+        const { data: existingPhone } = await supabase
+          .from(tableName)
+          .select("id")
+          .eq("phone", cleanPhone)
+          .maybeSingle();
+
+        if (existingPhone) {
+          setError(
+            `This phone number is already registered with another ${role} account.`,
+          );
+          setChecking(false);
+          return;
+        }
+      }
+
+      onProceedToPin();
+    } catch {
+      setError("Unable to verify details right now. Please try again.");
+    } finally {
+      setChecking(false);
+    }
   };
 
   return (
@@ -69,9 +127,10 @@ export default function RegisterForm({
             type="email"
             required
             value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
+            onChange={(e) => {
+              setError("");
+              setFormData({ ...formData, email: e.target.value });
+            }}
             placeholder="Enter email address"
             className="w-full border border-neutral-200 bg-neutral-50/50 px-3.5 sm:px-4 py-2.5 text-sm outline-none focus:border-neutral-950 focus:bg-white rounded-xs"
           />
@@ -86,20 +145,37 @@ export default function RegisterForm({
               international
               defaultCountry="IN"
               value={formData.phonenumber}
-              onChange={(val) =>
-                setFormData({ ...formData, phonenumber: val || "" })
-              }
+              onChange={(val) => {
+                setError("");
+                setFormData({ ...formData, phonenumber: val || "" });
+              }}
               placeholder="Enter phone number"
             />
           </div>
         </div>
 
+        {error && (
+          <p className="text-[11px] font-mono text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded-xs">
+            {error}
+          </p>
+        )}
+
         <button
           type="submit"
-          className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors cursor-pointer rounded-xs"
+          disabled={checking}
+          className="flex w-full items-center justify-center gap-2 bg-neutral-950 py-3 text-xs font-medium uppercase tracking-wider text-white hover:bg-neutral-800 disabled:opacity-60 transition-colors cursor-pointer rounded-xs"
         >
-          <span>Continue to Set PIN</span>
-          <ArrowRight className="h-3.5 w-3.5" />
+          {checking ? (
+            <>
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <span>Checking Availability...</span>
+            </>
+          ) : (
+            <>
+              <span>Continue to Set PIN</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </>
+          )}
         </button>
       </form>
 

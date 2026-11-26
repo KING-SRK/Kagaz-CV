@@ -21,26 +21,46 @@ interface Props {
   setCvData: Dispatch<SetStateAction<CvData>>;
 }
 
-function SoftLimitHint({
-  current,
-  recommendedMax,
-}: {
-  current: number;
-  recommendedMax: number;
-}) {
-  const isLong = current > recommendedMax;
+// প্রতিটি সেকশনের আইটেম ও ক্যারেক্টারের হার্ড লিমিট কনফিগারেশন
+const SECTION_LIMITS = {
+  experience: 4,
+  projects: 4,
+  education: 3,
+  skills: 15,
+  socialLinks: 4,
+  certifications: 4,
+  languages: 5,
+  achievements: 3,
+  volunteer: 3,
+  publications: 3,
+  hobbies: 6,
+  references: 2,
+};
+
+const CHAR_LIMITS = {
+  summary: 320,
+  responsibilities: 220,
+  projectDescription: 200,
+  objective: 200,
+  volunteerDescription: 160,
+  customSectionContent: 300,
+  declarationText: 180,
+};
+
+function HardLimitHint({ current, max }: { current: number; max: number }) {
+  const isMaxed = current >= max;
 
   return (
     <div className="flex items-center justify-between gap-2 text-[10px] font-mono pt-0.5">
-      <span className={isLong ? "text-amber-700" : "text-neutral-400"}>
-        {isLong
-          ? "Long text may push CV onto page 2"
-          : `Recommended up to ${recommendedMax} chars for 1-page fit`}
+      <span
+        className={isMaxed ? "text-red-600 font-semibold" : "text-neutral-400"}
+      >
+        {isMaxed ? "Character limit reached" : `Max ${max} characters allowed`}
       </span>
       <span
-        className={isLong ? "text-amber-700 font-semibold" : "text-neutral-400"}
+        className={isMaxed ? "text-red-600 font-semibold" : "text-neutral-400"}
       >
-        {current}/{recommendedMax}
+        {current}/{max}
       </span>
     </div>
   );
@@ -95,9 +115,15 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
     field: "skills" | "languages" | "hobbies",
     value: string,
     clearFn: (v: string) => void,
+    maxLimit: number,
   ) => {
     const trimmed = value.trim();
-    if (!trimmed || cvData[field].includes(trimmed)) return;
+    if (
+      !trimmed ||
+      cvData[field].includes(trimmed) ||
+      cvData[field].length >= maxLimit
+    )
+      return;
     setCvData((prev) => ({ ...prev, [field]: [...prev[field], trimmed] }));
     clearFn("");
   };
@@ -201,58 +227,82 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <input
             type="text"
+            maxLength={50}
             placeholder="Full Name *"
             value={cvData.fullName}
-            onChange={(e) => setCvData({ ...cvData, fullName: e.target.value })}
+            onChange={(e) =>
+              setCvData({ ...cvData, fullName: e.target.value.slice(0, 50) })
+            }
             className="w-full min-w-0 border border-neutral-300 px-3 py-2 text-xs rounded-xs focus:outline-none focus:border-neutral-900"
           />
           <input
             type="text"
+            maxLength={60}
             placeholder="Professional Title"
             value={cvData.title}
-            onChange={(e) => setCvData({ ...cvData, title: e.target.value })}
+            onChange={(e) =>
+              setCvData({ ...cvData, title: e.target.value.slice(0, 60) })
+            }
             className="w-full min-w-0 border border-neutral-300 px-3 py-2 text-xs rounded-xs focus:outline-none focus:border-neutral-900"
           />
           <input
             type="email"
+            maxLength={60}
             placeholder="Email Address"
             value={cvData.email}
-            onChange={(e) => setCvData({ ...cvData, email: e.target.value })}
+            onChange={(e) =>
+              setCvData({ ...cvData, email: e.target.value.slice(0, 60) })
+            }
             className="w-full min-w-0 border border-neutral-300 px-3 py-2 text-xs rounded-xs focus:outline-none focus:border-neutral-900"
           />
           <input
             type="text"
+            maxLength={25}
             placeholder="Phone Number"
             value={cvData.phone}
-            onChange={(e) => setCvData({ ...cvData, phone: e.target.value })}
+            onChange={(e) =>
+              setCvData({ ...cvData, phone: e.target.value.slice(0, 25) })
+            }
             className="w-full min-w-0 border border-neutral-300 px-3 py-2 text-xs rounded-xs focus:outline-none focus:border-neutral-900"
           />
           <input
             type="text"
+            maxLength={60}
             placeholder="Location (City, State)"
             value={cvData.location}
-            onChange={(e) => setCvData({ ...cvData, location: e.target.value })}
+            onChange={(e) =>
+              setCvData({ ...cvData, location: e.target.value.slice(0, 60) })
+            }
             className="w-full min-w-0 sm:col-span-2 border border-neutral-300 px-3 py-2 text-xs rounded-xs focus:outline-none focus:border-neutral-900"
           />
         </div>
       </div>
 
-      {/* ২. PROFESSIONAL SUMMARY (সবসময় দৃশ্যমান) */}
+      {/* ২. PROFESSIONAL SUMMARY */}
       <div className="bg-white border border-neutral-300 p-3.5 sm:p-4 rounded-xs space-y-2.5">
         <SectionHeader title="2. Professional Summary" />
         <div className="space-y-1">
           <textarea
             rows={3}
+            maxLength={CHAR_LIMITS.summary}
             placeholder="Write a concise summary about your background..."
             value={cvData.summary}
-            onChange={(e) => setCvData({ ...cvData, summary: e.target.value })}
-            className="w-full border border-neutral-300 p-2.5 text-xs rounded-xs focus:outline-none focus:border-neutral-900"
+            onChange={(e) =>
+              setCvData({
+                ...cvData,
+                summary: e.target.value.slice(0, CHAR_LIMITS.summary),
+              })
+            }
+            className="w-full border border-neutral-300 p-2.5 text-xs rounded-xs focus:outline-none focus:border-neutral-900 resize-none"
           />
-          <SoftLimitHint current={cvData.summary.length} recommendedMax={320} />
+          <HardLimitHint
+            current={cvData.summary.length}
+            max={CHAR_LIMITS.summary}
+          />
         </div>
       </div>
 
-      {/* ৩. WORK EXPERIENCE (টগলসহ) */}
+      {/* ৩. WORK EXPERIENCE */}
       <div className="bg-white border border-neutral-300 p-3.5 sm:p-4 rounded-xs space-y-3">
         <SectionToggle
           title="3. Work Experience"
@@ -281,44 +331,48 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pr-6">
                   <input
                     type="text"
+                    maxLength={60}
                     placeholder="Designation"
                     value={exp.designation}
                     onChange={(e) => {
                       const updated = [...cvData.experience];
-                      updated[idx].designation = e.target.value;
+                      updated[idx].designation = e.target.value.slice(0, 60);
                       setCvData({ ...cvData, experience: updated });
                     }}
                     className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
                   />
                   <input
                     type="text"
+                    maxLength={60}
                     placeholder="Company"
                     value={exp.company}
                     onChange={(e) => {
                       const updated = [...cvData.experience];
-                      updated[idx].company = e.target.value;
+                      updated[idx].company = e.target.value.slice(0, 60);
                       setCvData({ ...cvData, experience: updated });
                     }}
                     className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
                   />
                   <input
                     type="text"
+                    maxLength={25}
                     placeholder="Start (e.g. Jul 2025)"
                     value={exp.startDate}
                     onChange={(e) => {
                       const updated = [...cvData.experience];
-                      updated[idx].startDate = e.target.value;
+                      updated[idx].startDate = e.target.value.slice(0, 25);
                       setCvData({ ...cvData, experience: updated });
                     }}
                     className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
                   />
                   <input
                     type="text"
+                    maxLength={25}
                     placeholder="End (or Present)"
                     value={exp.isCurrent ? "Present" : exp.endDate}
                     onChange={(e) => {
                       const updated = [...cvData.experience];
-                      const val = e.target.value;
+                      const val = e.target.value.slice(0, 25);
                       updated[idx].isCurrent =
                         val.trim().toLowerCase() === "present";
                       updated[idx].endDate = val;
@@ -330,25 +384,33 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                 <div className="space-y-1">
                   <textarea
                     rows={2}
+                    maxLength={CHAR_LIMITS.responsibilities}
                     placeholder="Key responsibilities..."
                     value={exp.responsibilities}
                     onChange={(e) => {
                       const updated = [...cvData.experience];
-                      updated[idx].responsibilities = e.target.value;
+                      updated[idx].responsibilities = e.target.value.slice(
+                        0,
+                        CHAR_LIMITS.responsibilities,
+                      );
                       setCvData({ ...cvData, experience: updated });
                     }}
-                    className="w-full border border-neutral-300 bg-white p-2 text-xs rounded-xs"
+                    className="w-full border border-neutral-300 bg-white p-2 text-xs rounded-xs resize-none"
                   />
-                  <SoftLimitHint
+                  <HardLimitHint
                     current={exp.responsibilities.length}
-                    recommendedMax={220}
+                    max={CHAR_LIMITS.responsibilities}
                   />
                 </div>
               </div>
             ))}
             <AddBtn
               label="Add Experience"
-              onClick={() =>
+              currentCount={cvData.experience.length}
+              maxLimit={SECTION_LIMITS.experience}
+              onClick={() => {
+                if (cvData.experience.length >= SECTION_LIMITS.experience)
+                  return;
                 setCvData({
                   ...cvData,
                   experience: [
@@ -364,14 +426,14 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                       responsibilities: "",
                     },
                   ],
-                })
-              }
+                });
+              }}
             />
           </div>
         )}
       </div>
 
-      {/* ৪. KEY PROJECTS (টগলসহ) */}
+      {/* ৪. KEY PROJECTS */}
       <div className="bg-white border border-neutral-300 p-3.5 sm:p-4 rounded-xs space-y-3">
         <SectionToggle
           title="4. Key Projects"
@@ -400,22 +462,24 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pr-6">
                   <input
                     type="text"
+                    maxLength={60}
                     placeholder="Project Title"
                     value={proj.title}
                     onChange={(e) => {
                       const updated = [...cvData.projects];
-                      updated[idx].title = e.target.value;
+                      updated[idx].title = e.target.value.slice(0, 60);
                       setCvData({ ...cvData, projects: updated });
                     }}
                     className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
                   />
                   <input
                     type="text"
+                    maxLength={70}
                     placeholder="Tech Stack"
                     value={proj.technologies}
                     onChange={(e) => {
                       const updated = [...cvData.projects];
-                      updated[idx].technologies = e.target.value;
+                      updated[idx].technologies = e.target.value.slice(0, 70);
                       setCvData({ ...cvData, projects: updated });
                     }}
                     className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
@@ -424,25 +488,32 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                 <div className="space-y-1">
                   <textarea
                     rows={2}
+                    maxLength={CHAR_LIMITS.projectDescription}
                     placeholder="Project description..."
                     value={proj.description}
                     onChange={(e) => {
                       const updated = [...cvData.projects];
-                      updated[idx].description = e.target.value;
+                      updated[idx].description = e.target.value.slice(
+                        0,
+                        CHAR_LIMITS.projectDescription,
+                      );
                       setCvData({ ...cvData, projects: updated });
                     }}
-                    className="w-full border border-neutral-300 bg-white p-2 text-xs rounded-xs"
+                    className="w-full border border-neutral-300 bg-white p-2 text-xs rounded-xs resize-none"
                   />
-                  <SoftLimitHint
+                  <HardLimitHint
                     current={proj.description.length}
-                    recommendedMax={200}
+                    max={CHAR_LIMITS.projectDescription}
                   />
                 </div>
               </div>
             ))}
             <AddBtn
               label="Add Project"
-              onClick={() =>
+              currentCount={cvData.projects.length}
+              maxLimit={SECTION_LIMITS.projects}
+              onClick={() => {
+                if (cvData.projects.length >= SECTION_LIMITS.projects) return;
                 setCvData({
                   ...cvData,
                   projects: [
@@ -454,14 +525,14 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                       technologies: "",
                     },
                   ],
-                })
-              }
+                });
+              }}
             />
           </div>
         )}
       </div>
 
-      {/* ৫. EDUCATION (সবসময় দৃশ্যমান) */}
+      {/* ৫. EDUCATION */}
       <div className="bg-white border border-neutral-300 p-3.5 sm:p-4 rounded-xs space-y-3">
         <SectionHeader title="5. Education" />
         <div className="space-y-3">
@@ -485,44 +556,48 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pr-6">
                 <input
                   type="text"
+                  maxLength={60}
                   placeholder="Degree / Class"
                   value={edu.degree}
                   onChange={(e) => {
                     const updated = [...cvData.education];
-                    updated[idx].degree = e.target.value;
+                    updated[idx].degree = e.target.value.slice(0, 60);
                     setCvData({ ...cvData, education: updated });
                   }}
                   className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
                 />
                 <input
                   type="text"
+                  maxLength={70}
                   placeholder="School / College"
                   value={edu.institution}
                   onChange={(e) => {
                     const updated = [...cvData.education];
-                    updated[idx].institution = e.target.value;
+                    updated[idx].institution = e.target.value.slice(0, 70);
                     setCvData({ ...cvData, education: updated });
                   }}
                   className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
                 />
                 <input
                   type="text"
+                  maxLength={15}
                   placeholder="Start Year"
                   value={edu.startYear}
                   onChange={(e) => {
                     const updated = [...cvData.education];
-                    updated[idx].startYear = e.target.value;
+                    updated[idx].startYear = e.target.value.slice(0, 15);
                     setCvData({ ...cvData, education: updated });
                   }}
                   className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
                 />
                 <input
                   type="text"
+                  maxLength={15}
                   placeholder="End Year"
                   value={edu.endYear}
                   onChange={(e) => {
                     const updated = [...cvData.education];
-                    updated[idx].endYear = e.target.value;
+                    updated[idx].endYear = e.target.value.slice(0, 15);
                     setCvData({ ...cvData, education: updated });
                   }}
                   className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
@@ -532,7 +607,10 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
           ))}
           <AddBtn
             label="Add Education"
-            onClick={() =>
+            currentCount={cvData.education.length}
+            maxLimit={SECTION_LIMITS.education}
+            onClick={() => {
+              if (cvData.education.length >= SECTION_LIMITS.education) return;
               setCvData({
                 ...cvData,
                 education: [
@@ -545,21 +623,24 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                     endYear: "",
                   },
                 ],
-              })
-            }
+              });
+            }}
           />
         </div>
       </div>
 
-      {/* ৬. CORE SKILLS (সবসময় দৃশ্যমান) */}
+      {/* ৬. CORE SKILLS */}
       <div className="bg-white border border-neutral-300 p-3.5 sm:p-4 rounded-xs">
         <TagManager
           title="6. Core Skills"
           placeholder="Add skill & press Enter"
           items={cvData.skills}
+          maxLimit={SECTION_LIMITS.skills}
           inputVal={skillInput}
           setInputVal={setSkillInput}
-          onAdd={() => addTag("skills", skillInput, setSkillInput)}
+          onAdd={() =>
+            addTag("skills", skillInput, setSkillInput, SECTION_LIMITS.skills)
+          }
           onRemove={(item) =>
             setCvData({
               ...cvData,
@@ -586,11 +667,12 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                 >
                   <input
                     type="text"
+                    maxLength={25}
                     placeholder="Platform (GitHub)"
                     value={link.platform}
                     onChange={(e) => {
                       const updated = [...cvData.socialLinks];
-                      updated[idx].platform = e.target.value;
+                      updated[idx].platform = e.target.value.slice(0, 25);
                       setCvData({ ...cvData, socialLinks: updated });
                     }}
                     className="w-full sm:w-1/3 min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
@@ -598,11 +680,12 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                   <div className="flex gap-2 items-center flex-1 min-w-0">
                     <input
                       type="text"
+                      maxLength={80}
                       placeholder="URL"
                       value={link.url}
                       onChange={(e) => {
                         const updated = [...cvData.socialLinks];
-                        updated[idx].url = e.target.value;
+                        updated[idx].url = e.target.value.slice(0, 80);
                         setCvData({ ...cvData, socialLinks: updated });
                       }}
                       className="flex-1 min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
@@ -626,15 +709,19 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
               ))}
               <AddBtn
                 label="Add Link"
-                onClick={() =>
+                currentCount={cvData.socialLinks.length}
+                maxLimit={SECTION_LIMITS.socialLinks}
+                onClick={() => {
+                  if (cvData.socialLinks.length >= SECTION_LIMITS.socialLinks)
+                    return;
                   setCvData({
                     ...cvData,
                     socialLinks: [
                       ...cvData.socialLinks,
                       { id: `link-${Date.now()}`, platform: "", url: "" },
                     ],
-                  })
-                }
+                  });
+                }}
               />
             </div>
           )}
@@ -655,11 +742,12 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                 >
                   <input
                     type="text"
+                    maxLength={60}
                     placeholder="Certificate Title"
                     value={cert.title}
                     onChange={(e) => {
                       const updated = [...cvData.certifications];
-                      updated[idx].title = e.target.value;
+                      updated[idx].title = e.target.value.slice(0, 60);
                       setCvData({ ...cvData, certifications: updated });
                     }}
                     className="w-full sm:flex-1 min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
@@ -667,11 +755,12 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                   <div className="flex gap-2 items-center w-full sm:w-2/5 min-w-0">
                     <input
                       type="text"
+                      maxLength={40}
                       placeholder="Issuer"
                       value={cert.issuer}
                       onChange={(e) => {
                         const updated = [...cvData.certifications];
-                        updated[idx].issuer = e.target.value;
+                        updated[idx].issuer = e.target.value.slice(0, 40);
                         setCvData({ ...cvData, certifications: updated });
                       }}
                       className="flex-1 min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
@@ -695,7 +784,14 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
               ))}
               <AddBtn
                 label="Add Certification"
-                onClick={() =>
+                currentCount={cvData.certifications.length}
+                maxLimit={SECTION_LIMITS.certifications}
+                onClick={() => {
+                  if (
+                    cvData.certifications.length >=
+                    SECTION_LIMITS.certifications
+                  )
+                    return;
                   setCvData({
                     ...cvData,
                     certifications: [
@@ -707,8 +803,8 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                         date: "",
                       },
                     ],
-                  })
-                }
+                  });
+                }}
               />
             </div>
           )}
@@ -752,9 +848,17 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                 isOn={cvData.visibility.languages}
                 onToggle={() => toggleVisibility("languages")}
                 items={cvData.languages}
+                maxLimit={SECTION_LIMITS.languages}
                 inputVal={langInput}
                 setInputVal={setLangInput}
-                onAdd={() => addTag("languages", langInput, setLangInput)}
+                onAdd={() =>
+                  addTag(
+                    "languages",
+                    langInput,
+                    setLangInput,
+                    SECTION_LIMITS.languages,
+                  )
+                }
                 onRemove={(item) =>
                   setCvData({
                     ...cvData,
@@ -775,16 +879,23 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                 <div className="space-y-1">
                   <textarea
                     rows={2}
+                    maxLength={CHAR_LIMITS.objective}
                     placeholder="Seeking a role as..."
                     value={cvData.objective}
                     onChange={(e) =>
-                      setCvData({ ...cvData, objective: e.target.value })
+                      setCvData({
+                        ...cvData,
+                        objective: e.target.value.slice(
+                          0,
+                          CHAR_LIMITS.objective,
+                        ),
+                      })
                     }
-                    className="w-full border border-neutral-300 p-2 text-xs rounded-xs"
+                    className="w-full border border-neutral-300 p-2 text-xs rounded-xs resize-none"
                   />
-                  <SoftLimitHint
+                  <HardLimitHint
                     current={cvData.objective.length}
-                    recommendedMax={200}
+                    max={CHAR_LIMITS.objective}
                   />
                 </div>
               )}
@@ -806,11 +917,12 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                     >
                       <input
                         type="text"
+                        maxLength={60}
                         placeholder="Award Title"
                         value={ach.title}
                         onChange={(e) => {
                           const updated = [...cvData.achievements];
-                          updated[idx].title = e.target.value;
+                          updated[idx].title = e.target.value.slice(0, 60);
                           setCvData({ ...cvData, achievements: updated });
                         }}
                         className="w-full sm:flex-1 min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
@@ -818,11 +930,12 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                       <div className="flex gap-2 items-center w-full sm:w-2/5 min-w-0">
                         <input
                           type="text"
+                          maxLength={40}
                           placeholder="Issuer / Year"
                           value={ach.issuer}
                           onChange={(e) => {
                             const updated = [...cvData.achievements];
-                            updated[idx].issuer = e.target.value;
+                            updated[idx].issuer = e.target.value.slice(0, 40);
                             setCvData({ ...cvData, achievements: updated });
                           }}
                           className="flex-1 min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
@@ -846,7 +959,14 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                   ))}
                   <AddBtn
                     label="Add Achievement"
-                    onClick={() =>
+                    currentCount={cvData.achievements.length}
+                    maxLimit={SECTION_LIMITS.achievements}
+                    onClick={() => {
+                      if (
+                        cvData.achievements.length >=
+                        SECTION_LIMITS.achievements
+                      )
+                        return;
                       setCvData({
                         ...cvData,
                         achievements: [
@@ -858,8 +978,8 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                             date: "",
                           },
                         ],
-                      })
-                    }
+                      });
+                    }}
                   />
                 </div>
               )}
@@ -896,22 +1016,27 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pr-6">
                         <input
                           type="text"
+                          maxLength={50}
                           placeholder="Role (e.g. Coordinator)"
                           value={vol.role}
                           onChange={(e) => {
                             const updated = [...cvData.volunteer];
-                            updated[idx].role = e.target.value;
+                            updated[idx].role = e.target.value.slice(0, 50);
                             setCvData({ ...cvData, volunteer: updated });
                           }}
                           className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
                         />
                         <input
                           type="text"
+                          maxLength={60}
                           placeholder="Organization / Event"
                           value={vol.organization}
                           onChange={(e) => {
                             const updated = [...cvData.volunteer];
-                            updated[idx].organization = e.target.value;
+                            updated[idx].organization = e.target.value.slice(
+                              0,
+                              60,
+                            );
                             setCvData({ ...cvData, volunteer: updated });
                           }}
                           className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
@@ -919,11 +1044,15 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                       </div>
                       <input
                         type="text"
+                        maxLength={CHAR_LIMITS.volunteerDescription}
                         placeholder="Short description..."
                         value={vol.description}
                         onChange={(e) => {
                           const updated = [...cvData.volunteer];
-                          updated[idx].description = e.target.value;
+                          updated[idx].description = e.target.value.slice(
+                            0,
+                            CHAR_LIMITS.volunteerDescription,
+                          );
                           setCvData({ ...cvData, volunteer: updated });
                         }}
                         className="w-full border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
@@ -932,7 +1061,11 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                   ))}
                   <AddBtn
                     label="Add Volunteer Role"
-                    onClick={() =>
+                    currentCount={cvData.volunteer.length}
+                    maxLimit={SECTION_LIMITS.volunteer}
+                    onClick={() => {
+                      if (cvData.volunteer.length >= SECTION_LIMITS.volunteer)
+                        return;
                       setCvData({
                         ...cvData,
                         volunteer: [
@@ -945,8 +1078,8 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                             description: "",
                           },
                         ],
-                      })
-                    }
+                      });
+                    }}
                   />
                 </div>
               )}
@@ -968,11 +1101,12 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                     >
                       <input
                         type="text"
+                        maxLength={70}
                         placeholder="Paper / Article Title"
                         value={pub.title}
                         onChange={(e) => {
                           const updated = [...cvData.publications];
-                          updated[idx].title = e.target.value;
+                          updated[idx].title = e.target.value.slice(0, 70);
                           setCvData({ ...cvData, publications: updated });
                         }}
                         className="w-full sm:flex-1 min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
@@ -980,11 +1114,15 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                       <div className="flex gap-2 items-center w-full sm:w-2/5 min-w-0">
                         <input
                           type="text"
+                          maxLength={40}
                           placeholder="Journal / Year"
                           value={pub.publisher}
                           onChange={(e) => {
                             const updated = [...cvData.publications];
-                            updated[idx].publisher = e.target.value;
+                            updated[idx].publisher = e.target.value.slice(
+                              0,
+                              40,
+                            );
                             setCvData({ ...cvData, publications: updated });
                           }}
                           className="flex-1 min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
@@ -1008,7 +1146,14 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                   ))}
                   <AddBtn
                     label="Add Publication"
-                    onClick={() =>
+                    currentCount={cvData.publications.length}
+                    maxLimit={SECTION_LIMITS.publications}
+                    onClick={() => {
+                      if (
+                        cvData.publications.length >=
+                        SECTION_LIMITS.publications
+                      )
+                        return;
                       setCvData({
                         ...cvData,
                         publications: [
@@ -1020,8 +1165,8 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                             year: "",
                           },
                         ],
-                      })
-                    }
+                      });
+                    }}
                   />
                 </div>
               )}
@@ -1035,9 +1180,17 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                 isOn={cvData.visibility.hobbies}
                 onToggle={() => toggleVisibility("hobbies")}
                 items={cvData.hobbies}
+                maxLimit={SECTION_LIMITS.hobbies}
                 inputVal={hobbyInput}
                 setInputVal={setHobbyInput}
-                onAdd={() => addTag("hobbies", hobbyInput, setHobbyInput)}
+                onAdd={() =>
+                  addTag(
+                    "hobbies",
+                    hobbyInput,
+                    setHobbyInput,
+                    SECTION_LIMITS.hobbies,
+                  )
+                }
                 onRemove={(item) =>
                   setCvData({
                     ...cvData,
@@ -1063,22 +1216,27 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                     >
                       <input
                         type="text"
+                        maxLength={45}
                         placeholder="Name"
                         value={ref.name}
                         onChange={(e) => {
                           const updated = [...cvData.references];
-                          updated[idx].name = e.target.value;
+                          updated[idx].name = e.target.value.slice(0, 45);
                           setCvData({ ...cvData, references: updated });
                         }}
                         className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
                       />
                       <input
                         type="text"
+                        maxLength={50}
                         placeholder="Role / Org"
                         value={ref.designation}
                         onChange={(e) => {
                           const updated = [...cvData.references];
-                          updated[idx].designation = e.target.value;
+                          updated[idx].designation = e.target.value.slice(
+                            0,
+                            50,
+                          );
                           setCvData({ ...cvData, references: updated });
                         }}
                         className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
@@ -1086,11 +1244,12 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                       <div className="flex gap-2 items-center min-w-0">
                         <input
                           type="text"
+                          maxLength={50}
                           placeholder="Phone/Email"
                           value={ref.contact}
                           onChange={(e) => {
                             const updated = [...cvData.references];
-                            updated[idx].contact = e.target.value;
+                            updated[idx].contact = e.target.value.slice(0, 50);
                             setCvData({ ...cvData, references: updated });
                           }}
                           className="w-full min-w-0 border border-neutral-300 bg-white px-2.5 py-1.5 text-xs rounded-xs"
@@ -1114,7 +1273,11 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                   ))}
                   <AddBtn
                     label="Add Reference"
-                    onClick={() =>
+                    currentCount={cvData.references.length}
+                    maxLimit={SECTION_LIMITS.references}
+                    onClick={() => {
+                      if (cvData.references.length >= SECTION_LIMITS.references)
+                        return;
                       setCvData({
                         ...cvData,
                         references: [
@@ -1126,8 +1289,8 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                             contact: "",
                           },
                         ],
-                      })
-                    }
+                      });
+                    }}
                   />
                 </div>
               )}
@@ -1144,6 +1307,7 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <input
                     type="text"
+                    maxLength={25}
                     placeholder="Date of Birth"
                     value={cvData.personalDetails.dob}
                     onChange={(e) =>
@@ -1151,7 +1315,7 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                         ...cvData,
                         personalDetails: {
                           ...cvData.personalDetails,
-                          dob: e.target.value,
+                          dob: e.target.value.slice(0, 25),
                         },
                       })
                     }
@@ -1159,6 +1323,7 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                   />
                   <input
                     type="text"
+                    maxLength={20}
                     placeholder="Gender"
                     value={cvData.personalDetails.gender}
                     onChange={(e) =>
@@ -1166,7 +1331,7 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                         ...cvData,
                         personalDetails: {
                           ...cvData.personalDetails,
-                          gender: e.target.value,
+                          gender: e.target.value.slice(0, 20),
                         },
                       })
                     }
@@ -1174,6 +1339,7 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                   />
                   <input
                     type="text"
+                    maxLength={30}
                     placeholder="Nationality"
                     value={cvData.personalDetails.nationality}
                     onChange={(e) =>
@@ -1181,7 +1347,7 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                         ...cvData,
                         personalDetails: {
                           ...cvData.personalDetails,
-                          nationality: e.target.value,
+                          nationality: e.target.value.slice(0, 30),
                         },
                       })
                     }
@@ -1189,6 +1355,7 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                   />
                   <input
                     type="text"
+                    maxLength={30}
                     placeholder="Notice Period"
                     value={cvData.personalDetails.noticePeriod}
                     onChange={(e) =>
@@ -1196,7 +1363,7 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                         ...cvData,
                         personalDetails: {
                           ...cvData.personalDetails,
-                          noticePeriod: e.target.value,
+                          noticePeriod: e.target.value.slice(0, 30),
                         },
                       })
                     }
@@ -1218,28 +1385,39 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                   <div className="space-y-2">
                     <input
                       type="text"
+                      maxLength={45}
                       placeholder="Section Heading"
                       value={cvData.customSectionTitle}
                       onChange={(e) =>
                         setCvData({
                           ...cvData,
-                          customSectionTitle: e.target.value,
+                          customSectionTitle: e.target.value.slice(0, 45),
                         })
                       }
                       className="w-full min-w-0 border border-neutral-300 px-2.5 py-1.5 text-xs rounded-xs"
                     />
-                    <textarea
-                      rows={2}
-                      placeholder="Details..."
-                      value={cvData.customSectionContent}
-                      onChange={(e) =>
-                        setCvData({
-                          ...cvData,
-                          customSectionContent: e.target.value,
-                        })
-                      }
-                      className="w-full border border-neutral-300 p-2 text-xs rounded-xs"
-                    />
+                    <div className="space-y-1">
+                      <textarea
+                        rows={2}
+                        maxLength={CHAR_LIMITS.customSectionContent}
+                        placeholder="Details..."
+                        value={cvData.customSectionContent}
+                        onChange={(e) =>
+                          setCvData({
+                            ...cvData,
+                            customSectionContent: e.target.value.slice(
+                              0,
+                              CHAR_LIMITS.customSectionContent,
+                            ),
+                          })
+                        }
+                        className="w-full border border-neutral-300 p-2 text-xs rounded-xs resize-none"
+                      />
+                      <HardLimitHint
+                        current={cvData.customSectionContent.length}
+                        max={CHAR_LIMITS.customSectionContent}
+                      />
+                    </div>
                   </div>
                 )}
               </div>
@@ -1251,14 +1429,27 @@ export default function CvEditorPanel({ cvData, setCvData }: Props) {
                   onToggle={() => toggleVisibility("declaration")}
                 />
                 {cvData.visibility.declaration && (
-                  <textarea
-                    rows={2}
-                    value={cvData.declarationText}
-                    onChange={(e) =>
-                      setCvData({ ...cvData, declarationText: e.target.value })
-                    }
-                    className="w-full border border-neutral-300 p-2 text-xs rounded-xs"
-                  />
+                  <div className="space-y-1">
+                    <textarea
+                      rows={2}
+                      maxLength={CHAR_LIMITS.declarationText}
+                      value={cvData.declarationText}
+                      onChange={(e) =>
+                        setCvData({
+                          ...cvData,
+                          declarationText: e.target.value.slice(
+                            0,
+                            CHAR_LIMITS.declarationText,
+                          ),
+                        })
+                      }
+                      className="w-full border border-neutral-300 p-2 text-xs rounded-xs resize-none"
+                    />
+                    <HardLimitHint
+                      current={cvData.declarationText.length}
+                      max={CHAR_LIMITS.declarationText}
+                    />
+                  </div>
                 )}
               </div>
             </div>
@@ -1345,16 +1536,44 @@ function MiniToggle({
   );
 }
 
-function AddBtn({ label, onClick }: { label: string; onClick: () => void }) {
+function AddBtn({
+  label,
+  onClick,
+  currentCount,
+  maxLimit,
+}: {
+  label: string;
+  onClick: () => void;
+  currentCount: number;
+  maxLimit: number;
+}) {
+  const isMaxed = currentCount >= maxLimit;
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex items-center gap-1 text-xs font-mono text-neutral-800 hover:underline cursor-pointer"
-    >
-      <Plus className="h-3.5 w-3.5" />
-      <span>{label}</span>
-    </button>
+    <div className="flex items-center justify-between pt-1">
+      <button
+        type="button"
+        disabled={isMaxed}
+        onClick={onClick}
+        className={`inline-flex items-center gap-1 text-xs font-mono ${
+          isMaxed
+            ? "text-neutral-400 cursor-not-allowed"
+            : "text-neutral-800 hover:underline cursor-pointer"
+        }`}
+      >
+        <Plus className="h-3.5 w-3.5" />
+        <span>
+          {isMaxed ? `Max Limit Reached (${maxLimit}/${maxLimit})` : label}
+        </span>
+      </button>
+      <span
+        className={`text-[10px] font-mono ${
+          isMaxed ? "text-amber-700 font-semibold" : "text-neutral-400"
+        }`}
+      >
+        {currentCount}/{maxLimit}
+      </span>
+    </div>
   );
 }
 
@@ -1364,6 +1583,7 @@ function TagManager({
   isOn,
   onToggle,
   items,
+  maxLimit,
   inputVal,
   setInputVal,
   onAdd,
@@ -1374,12 +1594,14 @@ function TagManager({
   isOn?: boolean;
   onToggle?: () => void;
   items: string[];
+  maxLimit: number;
   inputVal: string;
   setInputVal: (v: string) => void;
   onAdd: () => void;
   onRemove: (item: string) => void;
 }) {
   const showContent = isOn !== undefined ? isOn : true;
+  const isMaxed = items.length >= maxLimit;
 
   return (
     <div className="space-y-2">
@@ -1393,24 +1615,39 @@ function TagManager({
           <div className="flex gap-2">
             <input
               type="text"
-              placeholder={placeholder}
+              maxLength={30}
+              disabled={isMaxed}
+              placeholder={
+                isMaxed
+                  ? `Limit reached (${maxLimit}/${maxLimit})`
+                  : placeholder
+              }
               value={inputVal}
-              onChange={(e) => setInputVal(e.target.value)}
+              onChange={(e) => setInputVal(e.target.value.slice(0, 30))}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
                   onAdd();
                 }
               }}
-              className="flex-1 min-w-0 border border-neutral-300 px-2.5 py-1.5 text-xs rounded-xs"
+              className="flex-1 min-w-0 border border-neutral-300 px-2.5 py-1.5 text-xs rounded-xs disabled:bg-neutral-100 disabled:text-neutral-400"
             />
             <button
               type="button"
+              disabled={isMaxed}
               onClick={onAdd}
-              className="px-3 py-1.5 bg-neutral-900 text-white text-xs font-mono uppercase rounded-xs cursor-pointer shrink-0"
+              className="px-3 py-1.5 bg-neutral-900 text-white text-xs font-mono uppercase rounded-xs cursor-pointer shrink-0 disabled:bg-neutral-400 disabled:cursor-not-allowed"
             >
               Add
             </button>
+          </div>
+          <div className="flex items-center justify-between text-[10px] font-mono text-neutral-400">
+            <span>
+              {isMaxed ? "Maximum items added" : `Add up to ${maxLimit} items`}
+            </span>
+            <span className={isMaxed ? "text-amber-700 font-semibold" : ""}>
+              {items.length}/{maxLimit}
+            </span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {items.map((item) => (

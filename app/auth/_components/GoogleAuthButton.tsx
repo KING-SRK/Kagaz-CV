@@ -20,18 +20,22 @@ export default function GoogleAuthButton({
     try {
       setLoading(true);
 
-      // 🍪 কুকিতে রোল সেভ করে রাখা হচ্ছে (১০ মিনিটের জন্য)
+      // পুরনো কুকি পুরোপুরি মুছে ফেলা হচ্ছে
+      document.cookie =
+        "sutranet_pending_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
+      // URL প্যারামিটার দিয়ে সরাসরি পাঠানো হচ্ছে যাতে কখনো ভুল না হয়
+      const callbackUrl = new URL(`${window.location.origin}/auth/callback`);
       if (role) {
-        document.cookie = `sutranet_pending_role=${role}; path=/; max-age=600; SameSite=Lax`;
+        callbackUrl.searchParams.set("role", role);
       } else {
-        document.cookie =
-          "sutranet_pending_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        callbackUrl.searchParams.set("intent", "login");
       }
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: callbackUrl.toString(),
         },
       });
 
